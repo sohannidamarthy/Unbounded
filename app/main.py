@@ -5,15 +5,19 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 
+from app.redis_client import get_redis, close_redis
+from app.routes.debug import router as debug_router
+
 app = FastAPI(
     title="Unbounded Backend",
-    version="0.1.0"
+    version="0.1.0",
 )
 
+# --- CORS ---
 origins_env = os.getenv("FRONTEND_ORIGINS") or os.getenv(
     "CORS_ORIGINS", "http://localhost:3000"
 )
-frontend_origins = [origin.strip() for origin in origins_env.split(",") if origin.strip()]
+frontend_origins = [o.strip() for o in origins_env.split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
@@ -22,6 +26,17 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# --- Redis lifecycle ---
+@app.on_event("startup")
+async def startup():
+    r = await get_redis()
+    await r.ping()
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    await close_redis()
 
 
 @app.get("/")
@@ -34,6 +49,7 @@ async def health():
     return {"status": "healthy"}
 
 
+# --- Waitlist ---
 class WaitlistSignup(BaseModel):
     email: EmailStr
 
@@ -65,3 +81,8 @@ async def waitlist_signup(payload: WaitlistSignup):
         raise HTTPException(status_code=502, detail="Email send failed.") from exc
 
     return {"status": "ok"}
+
+
+# --- Routers ---
+app.include_router(debug_router)
+
