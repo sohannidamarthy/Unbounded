@@ -1,0 +1,87 @@
+from __future__ import annotations
+
+from datetime import datetime, timezone, timedelta
+from typing import Any, Dict, List
+
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
+from app.db.session import SessionLocal
+from app.redis_client import get_redis
+from app.services.odds_cache import upsert_odds
+
+
+LATEST_SQL = """
+SELECT DISTINCT ON (s.event_id, s.market_id, s.book_key)
+  s.event_id,
+  s.market_id,
+  s.book_key,
+  s.book_title,
+  s.odds_decimal,
+  s.odds_american,
+  s.fetched_at,
+  s.provider_last_update,
+  m.market_type,
+  m.selection,
+  m.line
+FROM odds_snapshots s
+JOIN markets m ON m.id = s.market_id
+WHERE s.fetched_at >= :since_ts
+ORDER BY s.event_id, s.market_id, s.book_key, s.fetched_at DESC
+"""
+
+
+def _rows_latest(db: Session, since_ts: datetime) -> List[Dict[str, Any]]:
+    res = db.execute(text(LATEST_SQL), {"since_ts": since_ts}).mappings().all()
+    return [dict(r) for r in res]
+
+
+async def rebuild_redis_latest_odds(*, since_minutes: int = 120) -> Dict[str, Any]:
+    """
+    Rebuild Redis latest-odds cache from Postgres snapshots.
+    Pulls the latest snapshot per (event_id, market_id, book_key) within the time window.
+    """
+    since_ts = datetime.now(timezone.utc) - timedelta(minutes=since_minutes)
+
+    # 1) Load latest snapshots from Postgres (sync)
+    db = SessionLocal()
+    try:
+        rows = _rows_latest(db, since_ts=since_ts)
+    finally:
+        db.close()
+
+    # 2) Write into Redis using your existing odds_cache upsert
+    await get_redis()  # ensures redis is ready
+    written = 0
+
+    for row in rows:
+        event_id = str(row["event_id"])
+        market_type = row["market_type"]
+        selection = row["selection"]
+        line = row["line"]
+        book = row["book_key"]
+
+        # Stable market key string for Redis
+        if line is None:
+            market_key = f"{market_type}:{selection}"
+        else:
+            market_key = f"{market_type}:{selection}:{float(line)}"
+
+        payload = {
+            "event_id": event_id,
+            "market_id": str(row["market_id"]),
+            "market_type": market_type,
+            "selection": selection,
+            "line": float(line) if line is not None else None,
+            "book": book,
+            "book_title": row["book_title"],
+            "odds_decimal": float(row["odds_decimal"]),
+            "odds_american": row["odds_american"],
+            "fetched_at": row["fetched_at"].isoformat() if row["fetched_at"] else None,
+            "provider_last_update": row["provider_last_update"].isoformat() if row["provider_last_update"] else None,
+        }
+
+        await upsert_odds(event_id=event_id, market=market_key, book=book, payload=payload)
+        written += 1
+
+    return {"since_minutes": since_minutes, "rows_loaded": len(rows), "redis_writes": written}

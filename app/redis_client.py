@@ -1,19 +1,22 @@
-﻿import os
+from __future__ import annotations
+
 import redis.asyncio as redis
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+from app.core.config import settings
 
 _redis: redis.Redis | None = None
+
 
 async def get_redis() -> redis.Redis:
     global _redis
     if _redis is None:
         _redis = redis.from_url(
-            REDIS_URL,
-            decode_responses=True,
+            str(settings.redis_url),
+            decode_responses=True,  # we store JSON strings
             health_check_interval=30,
         )
     return _redis
+
 
 async def close_redis() -> None:
     global _redis

@@ -1,0 +1,16 @@
+﻿{
+  "name": "unboundedbackend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "dev": "poetry run uvicorn app.main:app --reload",
+    "start": "poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000",
+    "docker:build": "docker build -t unboundedbackend .",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down",
+    "docker:reset": "docker compose down -v"
+  }
+}
+
+

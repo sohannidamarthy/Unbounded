@@ -1,19 +1,34 @@
-import os
+﻿import os
 
 import resend
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 
+from app.core.config import settings
 from app.redis_client import get_redis, close_redis
+from app.services.provider_client import ProviderClient
+
+# Routers
 from app.routes.debug import router as debug_router
+from app.api.sports import router as sports_router
+from app.api.arbs import router as arbs_router
+
+
+# -------------------------------------------------
+# App (DEFINE ONCE)
+# -------------------------------------------------
 
 app = FastAPI(
     title="Unbounded Backend",
     version="0.1.0",
 )
 
-# --- CORS ---
+
+# -------------------------------------------------
+# CORS
+# -------------------------------------------------
+
 origins_env = os.getenv("FRONTEND_ORIGINS") or os.getenv(
     "CORS_ORIGINS", "http://localhost:3000"
 )
@@ -27,17 +42,50 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Redis lifecycle ---
+
+# -------------------------------------------------
+# Startup / Shutdown
+# -------------------------------------------------
+
 @app.on_event("startup")
-async def startup():
+async def startup() -> None:
+    # Redis
     r = await get_redis()
     await r.ping()
 
+    # Provider client
+    if not settings.odds_api_key:
+        raise RuntimeError("ODDS_API_KEY missing in .env")
+
+    app.state.provider_client = ProviderClient(
+        provider_name="oddsapi",
+        base_url="https://api.the-odds-api.com",
+        api_key=settings.odds_api_key.get_secret_value(),
+        timeout_s=10.0,
+        max_retries=5,
+        backoff_base_s=0.75,
+        backoff_max_s=10.0,
+        jitter=True,
+    )
+    await app.state.provider_client.aopen()
+
+    # Resend
+    if os.getenv("RESEND_API_KEY"):
+        resend.api_key = os.getenv("RESEND_API_KEY")
+
 
 @app.on_event("shutdown")
-async def shutdown():
+async def shutdown() -> None:
+    pc = getattr(app.state, "provider_client", None)
+    if pc:
+        await pc.aclose()
+
     await close_redis()
 
+
+# -------------------------------------------------
+# Health
+# -------------------------------------------------
 
 @app.get("/")
 async def root():
@@ -49,7 +97,10 @@ async def health():
     return {"status": "healthy"}
 
 
-# --- Waitlist ---
+# -------------------------------------------------
+# Waitlist
+# -------------------------------------------------
+
 class WaitlistSignup(BaseModel):
     email: EmailStr
 
@@ -62,8 +113,6 @@ async def waitlist_signup(payload: WaitlistSignup):
 
     if not api_key or not from_email or not notify_email:
         raise HTTPException(status_code=500, detail="Email service not configured.")
-
-    resend.api_key = api_key
 
     try:
         resend.Emails.send(
@@ -83,6 +132,10 @@ async def waitlist_signup(payload: WaitlistSignup):
     return {"status": "ok"}
 
 
-# --- Routers ---
-app.include_router(debug_router)
+# -------------------------------------------------
+# Routers (LAST)
+# -------------------------------------------------
 
+app.include_router(debug_router, prefix="/debug", tags=["debug"])
+app.include_router(sports_router, prefix="/v1", tags=["sports"])
+app.include_router(arbs_router, prefix="/v1", tags=["arbs"])

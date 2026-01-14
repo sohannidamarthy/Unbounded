@@ -1,0 +1,1148 @@
+Diagnostic Report generated: 01/11/2026 17:00:41
+
+==========================================================================================
+SYSTEM: PowerShell + OS
+==========================================================================================
+
+
+Name  : PSVersion
+Key   : PSVersion
+Value : 5.1.26100.7462
+
+Name  : PSEdition
+Key   : PSEdition
+Value : Desktop
+
+Name  : PSCompatibleVersions
+Key   : PSCompatibleVersions
+Value : {1.0, 2.0, 3.0, 4.0...}
+
+Name  : BuildVersion
+Key   : BuildVersion
+Value : 10.0.26100.7462
+
+Name  : CLRVersion
+Key   : CLRVersion
+Value : 4.0.30319.42000
+
+Name  : WSManStackVersion
+Key   : WSManStackVersion
+Value : 3.0
+
+Name  : PSRemotingProtocolVersion
+Key   : PSRemotingProtocolVersion
+Value : 2.3
+
+Name  : SerializationVersion
+Key   : SerializationVersion
+Value : 1.1.0.1
+
+
+
+
+
+OsName         : Microsoft Windows 11 Home
+OsVersion      : 10.0.26100
+OsBuildNumber  : 26100
+WindowsVersion : 2009
+
+
+
+
+
+==========================================================================================
+REPO: Current directory + git status
+==========================================================================================
+PWD: C:\Users\sohan\OneDrive\unboundedBackend
+C:/Users/sohan/OneDrive/unboundedBackend
+## main...origin/main
+ M app/core/config.py
+ M app/db/models/__init__.py
+ M app/db/session.py
+ M app/main.py
+ M app/redis_client.py
+ M app/routes/debug.py
+ M poetry.lock
+ M pyproject.toml
+?? alembic/versions/a7f4af87d967_add_api_keys_table.py
+?? alembic/versions/dcd0fa2faa82_add_odds_snapshots_table.py
+?? app/api/deps/
+?? app/api/sports.py
+?? app/core/api_keys.py
+?? app/core/logger.py
+?? app/core/principal.py
+?? app/core/redis_keys.py
+?? app/core/security.py
+?? app/db/deps.py
+?? app/db/models/api_keys.py
+?? app/db/models/odds_snapshots.py
+?? app/deps/
+?? app/schemas/
+?? app/services/cache_builders/
+?? app/services/ingestion/
+?? app/services/normalizers/
+?? app/services/odds_readthrough.py
+?? app/services/provider_client.py
+?? app/services/rate_limiter.py
+?? app/services/redis_only_read.py
+?? app/services/snapshots/
+?? diag_20260111_170041/
+4cb709f Add schema v1 (users, subscriptions, sports/events/markets) and Redis setup
+50c752c frontend
+0c5ceda Initial backend setup with Docker, Postgres, Redis
+
+
+==========================================================================================
+REPO: File tree (top levels)
+==========================================================================================
+
+Name                 Mode   Length LastWriteTime         
+----                 ----   ------ -------------         
+.git                 darh-l        1/11/2026 5:00:43 PM  
+alembic              dar--l        1/5/2026 12:38:51 PM  
+app                  dar--l        1/11/2026 3:08:30 PM  
+diag_20260111_170041 d-----        1/11/2026 5:00:41 PM  
+frontend             dar--l        1/10/2026 3:38:53 PM  
+tests                dar--l        12/22/2025 12:05:50 PM
+.env                 -a---l 399    1/10/2026 6:58:38 PM  
+.env.example         -a---l 260    1/6/2026 12:17:56 PM  
+.gitignore           -a---l 81     1/5/2026 5:50:34 PM   
+alembic.ini          -a---l 4807   1/5/2026 12:35:06 PM  
+docker-compose.yml   -a---l 822    1/10/2026 3:38:50 PM  
+Dockerfile           -a---l 860    1/5/2026 1:41:56 PM   
+package.json         -a---l 437    1/5/2026 1:33:09 PM   
+poetry.lock          -a---l 122729 1/11/2026 4:51:33 PM  
+pyproject.toml       -a---l 855    1/11/2026 4:51:33 PM  
+README.md            -a---l 408    1/5/2026 5:52:08 PM   
+
+
+
+----
+C:\Users\sohan\OneDrive\unboundedBackend\.git
+C:\Users\sohan\OneDrive\unboundedBackend\alembic
+C:\Users\sohan\OneDrive\unboundedBackend\app
+C:\Users\sohan\OneDrive\unboundedBackend\diag_20260111_170041
+C:\Users\sohan\OneDrive\unboundedBackend\frontend
+C:\Users\sohan\OneDrive\unboundedBackend\tests
+C:\Users\sohan\OneDrive\unboundedBackend\.env
+C:\Users\sohan\OneDrive\unboundedBackend\.env.example
+C:\Users\sohan\OneDrive\unboundedBackend\.gitignore
+C:\Users\sohan\OneDrive\unboundedBackend\alembic.ini
+C:\Users\sohan\OneDrive\unboundedBackend\docker-compose.yml
+C:\Users\sohan\OneDrive\unboundedBackend\Dockerfile
+C:\Users\sohan\OneDrive\unboundedBackend\package.json
+C:\Users\sohan\OneDrive\unboundedBackend\poetry.lock
+C:\Users\sohan\OneDrive\unboundedBackend\pyproject.toml
+C:\Users\sohan\OneDrive\unboundedBackend\README.md
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\versions
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\__pycache__
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\env.py
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\README
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\script.py.mako
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\versions\__pycache__
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\versions\a7f4af87d967_add_api_keys_table.py
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\versions\b8436a79a0e4_add_subscriptions_table.py
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\versions\dcd0fa2faa82_add_odds_snapshots_table.py
+C:\Users\sohan\OneDrive\unboundedBackend\alembic\versions\f869fbe66abc_create_users_table.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\api
+C:\Users\sohan\OneDrive\unboundedBackend\app\core
+C:\Users\sohan\OneDrive\unboundedBackend\app\db
+C:\Users\sohan\OneDrive\unboundedBackend\app\deps
+C:\Users\sohan\OneDrive\unboundedBackend\app\routes
+C:\Users\sohan\OneDrive\unboundedBackend\app\schemas
+C:\Users\sohan\OneDrive\unboundedBackend\app\services
+C:\Users\sohan\OneDrive\unboundedBackend\app\__pycache__
+C:\Users\sohan\OneDrive\unboundedBackend\app\config.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\desktop.ini
+C:\Users\sohan\OneDrive\unboundedBackend\app\main.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\redis_client.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\api\deps
+C:\Users\sohan\OneDrive\unboundedBackend\app\api\health.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\api\sports.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\api\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\api\deps\auth.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\api\deps\limits.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\api\deps\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\__pycache__
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\api_keys.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\config.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\logger.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\principal.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\redis_conventions.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\redis_keys.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\security.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\core\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\__pycache__
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\base.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\deps.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\session.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\__pycache__
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\api_keys.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\events.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\markets.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\odds_snapshots.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\sports.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\subscriptions.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\user.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\db\models\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\deps\provider.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\routes\__pycache__
+C:\Users\sohan\OneDrive\unboundedBackend\app\routes\debug.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\schemas\common.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\schemas\sports.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\schemas\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\cache_builders
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\ingestion
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\normalizers
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\snapshots
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\arbs_cache.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\odds_cache.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\odds_readthrough.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\provider_client.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\rate_limiter.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\redis_only_read.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\cache_builders\build_sports_cache.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\cache_builders\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\ingestion\run_ingestion.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\normalizers\odds_api_normalizer.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\snapshots\__pycache__
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\snapshots\read_snapshots.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\snapshots\rebuild_redis_from_snapshots.py
+C:\Users\sohan\OneDrive\unboundedBackend\app\services\snapshots\write_snapshots.py
+C:\Users\sohan\OneDrive\unboundedBackend\diag_20260111_170041\REPORT.txt
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\app
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\public
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\.eslintrc.json
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\.gitignore
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\next-env.d.ts
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\next.config.js
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\package-lock.json
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\package.json
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\tsconfig.json
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\app\waitlist
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\app\globals.css
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\app\layout.tsx
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\app\page.tsx
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\app\waitlist\page.tsx
+C:\Users\sohan\OneDrive\unboundedBackend\frontend\public\unbounded.jpeg
+C:\Users\sohan\OneDrive\unboundedBackend\tests\integration
+C:\Users\sohan\OneDrive\unboundedBackend\tests\unit
+C:\Users\sohan\OneDrive\unboundedBackend\tests\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\tests\integration\__init__.py
+C:\Users\sohan\OneDrive\unboundedBackend\tests\unit\__init__.py
+
+
+
+==========================================================================================
+DOCKER: Versions
+==========================================================================================
+Client:
+ Version:           29.1.3
+ API version:       1.52
+ Go version:        go1.25.5
+ Git commit:        f52814d
+ Built:             Fri Dec 12 14:51:52 2025
+ OS/Arch:           windows/amd64
+ Context:           desktop-linux
+
+Server: Docker Desktop 4.55.0 (213807)
+ Engine:
+  Version:          29.1.3
+  API version:      1.52 (minimum version 1.44)
+  Go version:       go1.25.5
+  Git commit:       fbf3ed2
+  Built:            Fri Dec 12 14:49:51 2025
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          v2.2.0
+  GitCommit:        1c4457e00facac03ce1d75f7b6777a7a851e5c41
+ runc:
+  Version:          1.3.4
+  GitCommit:        v1.3.4-0-gd6d73eb8
+ docker-init:
+  Version:          0.19.0
+  GitCommit:        de40ad0
+Client:
+ Version:    29.1.3
+ Context:    desktop-linux
+ Debug Mode: false
+ Plugins:
+  ai: Docker AI Agent - Ask Gordon (Docker Inc.)
+    Version:  v1.17.1
+    Path:     C:\Program Files\Docker\cli-plugins\docker-ai.exe
+  buildx: Docker Buildx (Docker Inc.)
+    Version:  v0.30.1-desktop.1
+    Path:     C:\Program Files\Docker\cli-plugins\docker-buildx.exe
+  compose: Docker Compose (Docker Inc.)
+    Version:  v2.40.3-desktop.1
+    Path:     C:\Program Files\Docker\cli-plugins\docker-compose.exe
+  debug: Get a shell into any image or container (Docker Inc.)
+    Version:  0.0.45
+    Path:     C:\Program Files\Docker\cli-plugins\docker-debug.exe
+  desktop: Docker Desktop commands (Docker Inc.)
+    Version:  v0.2.0
+    Path:     C:\Program Files\Docker\cli-plugins\docker-desktop.exe
+  extension: Manages Docker extensions (Docker Inc.)
+    Version:  v0.2.31
+    Path:     C:\Program Files\Docker\cli-plugins\docker-extension.exe
+  init: Creates Docker-related starter files for your project (Docker Inc.)
+    Version:  v1.4.0
+    Path:     C:\Program Files\Docker\cli-plugins\docker-init.exe
+  mcp: Docker MCP Plugin (Docker Inc.)
+    Version:  v0.34.0
+    Path:     C:\Program Files\Docker\cli-plugins\docker-mcp.exe
+  model: Docker Model Runner (Docker Inc.)
+    Version:  v1.0.2
+    Path:     C:\Program Files\Docker\cli-plugins\docker-model.exe
+  offload: Docker Offload (Docker Inc.)
+    Version:  v0.5.33
+    Path:     C:\Program Files\Docker\cli-plugins\docker-offload.exe
+  pass: Docker Pass Secrets Manager Plugin (beta) (Docker Inc.)
+    Version:  v0.0.21
+    Path:     C:\Program Files\Docker\cli-plugins\docker-pass.exe
+  sandbox: Docker Sandbox (Docker Inc.)
+    Version:  v0.6.0
+    Path:     C:\Program Files\Docker\cli-plugins\docker-sandbox.exe
+  sbom: View the packaged-based Software Bill Of Materials (SBOM) for an image (Anchore Inc.)
+    Version:  0.6.0
+    Path:     C:\Program Files\Docker\cli-plugins\docker-sbom.exe
+  scout: Docker Scout (Docker Inc.)
+    Version:  v1.18.3
+    Path:     C:\Program Files\Docker\cli-plugins\docker-scout.exe
+
+Server:
+ Containers: 3
+  Running: 3
+  Paused: 0
+  Stopped: 0
+ Images: 3
+ Server Version: 29.1.3
+ Storage Driver: overlayfs
+  driver-type: io.containerd.snapshotter.v1
+ Logging Driver: json-file
+ Cgroup Driver: cgroupfs
+ Cgroup Version: 2
+ Plugins:
+  Volume: local
+  Network: bridge host ipvlan macvlan null overlay
+  Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+ CDI spec directories:
+  /etc/cdi
+  /var/run/cdi
+ Discovered Devices:
+  cdi: docker.com/gpu=webgpu
+ Swarm: inactive
+ Runtimes: io.containerd.runc.v2 nvidia runc
+ Default Runtime: runc
+ Init Binary: docker-init
+ containerd version: 1c4457e00facac03ce1d75f7b6777a7a851e5c41
+ runc version: v1.3.4-0-gd6d73eb8
+ init version: de40ad0
+ Security Options:
+  seccomp
+   Profile: builtin
+  cgroupns
+ Kernel Version: 6.6.87.2-microsoft-standard-WSL2
+ Operating System: Docker Desktop
+ OSType: linux
+ Architecture: x86_64
+ CPUs: 24
+ Total Memory: 15.35GiB
+ Name: docker-desktop
+ ID: 04d59627-b055-4b7c-b262-064ee1aa6b58
+ Docker Root Dir: /var/lib/docker
+ Debug Mode: false
+ HTTP Proxy: http.docker.internal:3128
+ HTTPS Proxy: http.docker.internal:3128
+ No Proxy: hubproxy.docker.internal
+ Labels:
+  com.docker.desktop.address=npipe://\\.\pipe\docker_cli
+ Experimental: false
+ Insecure Registries:
+  hubproxy.docker.internal:5555
+  ::1/128
+  127.0.0.0/8
+ Live Restore Enabled: false
+ Firewall Backend: iptables
+
+
+
+==========================================================================================
+DOCKER: Running containers
+==========================================================================================
+CONTAINER ID                                                       IMAGE                      COMMAND                                                CREATED        STATUS         PORTS                                         NAMES
+fd75d165e07bedb93118f0609bada6fb6f7311b68b2d9554579124970dd48622   unboundedbackend-backend   "uvicorn app.main:app --host 0.0.0.0 --port 8000"      22 hours ago   Up 7 minutes   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp   backend
+4e700c518405f2924b3feda6762636110e59bac2217e486c63167263bfa74e7a   postgres:16                "docker-entrypoint.sh postgres"                        23 hours ago   Up 23 hours    0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp   postgres
+00dfef0e0f1af63a24baff6fc00fb2b3d6ff23cc1a4fc2e1d8cddda119e96573   redis:7                    "docker-entrypoint.sh redis-server --appendonly yes"   23 hours ago   Up 23 hours    0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp   redis
+
+
+==========================================================================================
+DOCKER: Images (top)
+==========================================================================================
+docker : WARNING: This output is designed for human readability. For machine-readable output, please 
+use --format.
+At line:2 char:3
++   docker images
++   ~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: This o...e use --format.:String) [], RemoteExcept 
+   ion
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+IMAGE                             ID             DISK USAGE   CONTENT SIZE   EXTRA
+postgres:16                       d4c3314b2dd7        641MB          166MB   U    
+redis:7                           d665ad9dd15a        175MB         47.4MB   U    
+unboundedbackend-backend:latest   c70899caaeea        870MB          220MB   U    
+
+
+==========================================================================================
+COMPOSE: Config (redacted)
+==========================================================================================
+name: unboundedbackend
+services:
+  backend:
+    build:
+      context: C:\Users\sohan\OneDrive\unboundedBackend
+      dockerfile: Dockerfile
+    container_name: backend
+    depends_on:
+      db:
+        condition: service_started
+        required: true
+      redis:
+        condition: service_started
+        required: true
+    environment:
+      ACCESS_TOKEN_EXPIRE_MINUTES: "15"
+      CORS_ORIGINS: http://localhost:3000
+      DATABASE_URL: <REDACTED>
+      ENV: development
+      JWT_ALGORITHM: HS256
+      JWT_SECRET: <REDACTED>
+      LOG_LEVEL: INFO
+      ODDS_API_KEY: <REDACTED>
+      ODDS_PROVIDER_BASE_URL: https://api.the-odds-api.com
+      ODDS_PROVIDER_MAX_RETRIES: "5"
+      REDIS_URL: <REDACTED>
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8000
+        published: "8000"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: C:\Users\sohan\OneDrive\unboundedBackend
+        target: /app
+        bind:
+          create_host_path: true
+  db:
+    container_name: postgres
+    environment:
+      POSTGRES_DB: unbounded
+      POSTGRES_PASSWORD: <REDACTED>
+      POSTGRES_USER: postgres
+    image: postgres:16
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 5432
+        published: "5432"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: pgdata
+        target: /var/lib/postgresql/data
+        volume: {}
+  redis:
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+    container_name: redis
+    image: redis:7
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: "6379"
+        protocol: tcp
+    restart: unless-stopped
+    volumes:
+      - type: volume
+        source: redisdata
+        target: /data
+        volume: {}
+networks:
+  default:
+    name: unboundedbackend_default
+volumes:
+  pgdata:
+    name: unboundedbackend_pgdata
+  redisdata:
+    name: unboundedbackend_redisdata
+
+
+
+==========================================================================================
+COMPOSE: Services
+==========================================================================================
+NAME       IMAGE                      COMMAND                  SERVICE   CREATED        STATUS         PORTS
+backend    unboundedbackend-backend   "uvicorn app.main:apGǪ"   backend   22 hours ago   Up 7 minutes   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+postgres   postgres:16                "docker-entrypoint.sGǪ"   db        23 hours ago   Up 23 hours    0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+redis      redis:7                    "docker-entrypoint.sGǪ"   redis     23 hours ago   Up 23 hours    0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+
+
+
+==========================================================================================
+DOCKER: Container logs (last N lines per container)
+==========================================================================================
+----- backend (fd75d165e07b) -----
+docker : INFO:     Started server process [1]
+At line:7 char:5
++     docker logs --tail $MaxLogLines $id 2>&1
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO:     Started server process [1]:String) [], RemoteExc 
+   eption
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1]
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.13/site-packages/uvicorn/protocols/http/h11_impl.py", line 410, in 
+run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        self.scope, self.receive, self.send
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in 
+__call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/fastapi/applications.py", line 1135, in __call__
+    await super().__call__(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/usr/local/lib/python3.13/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/middleware/exceptions.py", line 63, in 
+__call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in 
+wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in 
+wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in 
+__call__
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 119, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/usr/local/lib/python3.13/site-packages/starlette/_exception_handler.py", line 53, in 
+wrapped_app
+    raise exc
+  File "/usr/local/lib/python3.13/site-packages/starlette/_exception_handler.py", line 42, in 
+wrapped_app
+    await app(scope, receive, sender)
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 105, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 426, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+    )
+    ^
+  File "/usr/local/lib/python3.13/site-packages/fastapi/routing.py", line 312, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/routes/debug.py", line 216, in debug_get_odds_fallback
+    odds = await get_odds_readthrough(db, event_id=event_id, market_id=market_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/app/app/services/odds_readthrough.py", line 42, in get_odds_readthrough
+    await upsert_odds(
+          ~~~~~~~~~~~^
+        event_id=str(event_id),
+        ^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        odds_payload=payload,
+        ^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+TypeError: upsert_odds() got an unexpected keyword argument 'odds_payload'
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1]
+INFO:     Started server process [1]
+INFO:     172.18.0.1:35332 - "POST /debug/ingestion/run?sport_key=basketball_nba HTTP/1.1" 200 OK
+INFO:     172.18.0.1:39368 - "GET /debug/odds_fallback/3ff5d013-09e9-4277-8b09-bc08c8409f26/e6995573-6798-4502-b3d7-1eb9abcffc5b HTTP/1.1" 404 Not Found
+INFO:     172.18.0.1:44532 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.18.0.1:33320 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.18.0.1:59376 - "GET /debug/redis HTTP/1.1" 200 OK
+INFO:     172.18.0.1:51810 - "GET /debug/redis HTTP/1.1" 200 OK
+INFO:     172.18.0.1:51810 - "GET /debug/odds_fallback/3ff5d013-09e9-4277-8b09-bc08c8409f26/e6995573-6798-4502-b3d7-1eb9abcffc5b HTTP/1.1" 500 Internal Server Error
+INFO:     172.18.0.1:36592 - "GET /debug/redis HTTP/1.1" 200 OK
+INFO:     172.18.0.1:36592 - "GET /debug/odds_fallback// HTTP/1.1" 404 Not Found
+INFO:     172.18.0.1:52006 - "GET /debug/odds_fallback/3ff5d013-09e9-4277-8b09-bc08c8409f26/e6995573-6798-4502-b3d7-1eb9abcffc5b HTTP/1.1" 200 OK
+INFO:     172.18.0.1:48506 - "GET /sports HTTP/1.1" 404 Not Found
+INFO:     172.18.0.1:51592 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.18.0.1:42236 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.18.0.1:41710 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.18.0.1:53392 - "GET /sports HTTP/1.1" 200 OK
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1]
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [1]
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+
+----- postgres (4e700c518405) -----
+
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+docker : 2026-01-10 23:59:35.529 UTC [1] LOG:  starting PostgreSQL 16.11 (Debian 16.11-1.pgdg13+1) on 
+x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+At line:7 char:5
++     docker logs --tail $MaxLogLines $id 2>&1
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026-01-10 23:5... 14.2.0, 64-bit:String) [], RemoteExcept 
+   ion
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026-01-10 23:59:35.530 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-01-10 23:59:35.530 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-01-10 23:59:35.542 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-01-10 23:59:35.554 UTC [29] LOG:  database system was shut down at 2026-01-10 21:39:06 UTC
+2026-01-10 23:59:35.578 UTC [1] LOG:  database system is ready to accept connections
+2026-01-11 00:04:35.701 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 00:04:35.739 UTC [27] LOG:  checkpoint complete: wrote 3 buffers (0.0%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=0.011 s, sync=0.005 s, total=0.038 s; sync files=2, longest=0.003 
+s, average=0.003 s; distance=0 kB, estimate=0 kB; lsn=0/19EB360, redo lsn=0/19EB328
+2026-01-11 00:29:35.654 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 00:29:36.581 UTC [27] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=0.883 s, sync=0.017 s, total=0.928 s; sync files=7, longest=0.010 
+s, average=0.003 s; distance=15 kB, estimate=15 kB; lsn=0/19EF2C8, redo lsn=0/19EF290
+2026-01-11 00:44:35.365 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 00:44:39.450 UTC [27] LOG:  checkpoint complete: wrote 41 buffers (0.3%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=3.981 s, sync=0.067 s, total=4.085 s; sync files=39, longest=0.008 
+s, average=0.002 s; distance=165 kB, estimate=165 kB; lsn=0/1A18A08, redo lsn=0/1A189D0
+2026-01-11 00:59:35.444 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 00:59:42.499 UTC [27] LOG:  checkpoint complete: wrote 72 buffers (0.4%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=6.985 s, sync=0.045 s, total=7.056 s; sync files=31, longest=0.006 
+s, average=0.002 s; distance=436 kB, estimate=436 kB; lsn=0/1A85B80, redo lsn=0/1A85B48
+2026-01-11 01:04:35.400 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 01:04:40.017 UTC [27] LOG:  checkpoint complete: wrote 47 buffers (0.3%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=4.555 s, sync=0.030 s, total=4.618 s; sync files=16, longest=0.007 
+s, average=0.002 s; distance=333 kB, estimate=426 kB; lsn=0/1AD9088, redo lsn=0/1AD9050
+2026-01-11 01:09:35.621 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 01:09:43.497 UTC [27] LOG:  checkpoint complete: wrote 80 buffers (0.5%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=7.825 s, sync=0.031 s, total=7.876 s; sync files=20, longest=0.005 
+s, average=0.002 s; distance=394 kB, estimate=422 kB; lsn=0/1B3B938, redo lsn=0/1B3B900
+2026-01-11 01:12:06.275 UTC [369] ERROR:  column s.book_markey does not exist at character 90
+2026-01-11 01:12:06.275 UTC [369] HINT:  Perhaps you meant to reference the column "s.book_key".
+2026-01-11 01:12:06.275 UTC [369] STATEMENT:  
+	SELECT DISTINCT ON (s.event_id, s.market_id, s.book_key)
+	  s.event_id,
+	  s.market_id,
+	  s.book_markey,
+	  s.book_title,
+	  s.odds_decimal,
+	  s.odds_american,
+	  s.fetched_at,
+	  s.provider_last_update,
+	  m.market_type,
+	  m.selection,
+	  m.line
+	FROM odds_snapshots s
+	JOIN markets m ON m.id = s.market_id
+	WHERE s.fetched_at >= $1
+	ORDER BY s.event_id, s.market_id, s.book_key, s.fetched_at DESC
+	
+2026-01-11 01:13:50.822 UTC [369] ERROR:  column s.book_markey does not exist at character 90
+2026-01-11 01:13:50.822 UTC [369] HINT:  Perhaps you meant to reference the column "s.book_key".
+2026-01-11 01:13:50.822 UTC [369] STATEMENT:  
+	SELECT DISTINCT ON (s.event_id, s.market_id, s.book_key)
+	  s.event_id,
+	  s.market_id,
+	  s.book_markey,
+	  s.book_title,
+	  s.odds_decimal,
+	  s.odds_american,
+	  s.fetched_at,
+	  s.provider_last_update,
+	  m.market_type,
+	  m.selection,
+	  m.line
+	FROM odds_snapshots s
+	JOIN markets m ON m.id = s.market_id
+	WHERE s.fetched_at >= $1
+	ORDER BY s.event_id, s.market_id, s.book_key, s.fetched_at DESC
+	
+2026-01-11 01:19:36.014 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 01:19:36.828 UTC [27] LOG:  checkpoint complete: wrote 7 buffers (0.0%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=0.775 s, sync=0.012 s, total=0.814 s; sync files=4, longest=0.008 
+s, average=0.003 s; distance=17 kB, estimate=382 kB; lsn=0/1B40130, redo lsn=0/1B400F8
+2026-01-11 01:21:28.658 UTC [420] ERROR:  invalid input syntax for type uuid: "<EVENT_ID>" at character 
+106
+2026-01-11 01:21:28.658 UTC [420] STATEMENT:  
+	SELECT DISTINCT ON (book_key)
+	  book_key, odds_decimal, fetched_at
+	FROM odds_snapshots
+	WHERE event_id = '<EVENT_ID>' AND market_id = '<MARKET_ID>'
+	ORDER BY book_key, fetched_at DESC;
+	
+2026-01-11 01:24:36.117 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 01:24:47.425 UTC [27] LOG:  checkpoint complete: wrote 113 buffers (0.7%); 1 WAL file(s) 
+added, 0 removed, 0 recycled; write=11.213 s, sync=0.030 s, total=11.309 s; sync files=17, 
+longest=0.008 s, average=0.002 s; distance=1081 kB, estimate=1081 kB; lsn=0/1C4E8F0, redo lsn=0/1C4E8B8
+2026-01-11 01:29:37.023 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 01:29:47.232 UTC [27] LOG:  checkpoint complete: wrote 103 buffers (0.6%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=10.134 s, sync=0.041 s, total=10.210 s; sync files=18, 
+longest=0.008 s, average=0.003 s; distance=625 kB, estimate=1036 kB; lsn=0/1CEB0D8, redo lsn=0/1CEB0A0
+2026-01-11 20:35:29.840 UTC [933] FATAL:  database "postgres" does not exist
+2026-01-11 20:38:19.041 UTC [949] ERROR:  column "fetched_at_utc" does not exist at character 39
+2026-01-11 20:38:19.041 UTC [949] STATEMENT:  SELECT *
+	FROM odds_snapshots
+	ORDER BY fetched_at_utc DESC
+	LIMIT 10;
+2026-01-11 20:42:28.584 UTC [992] ERROR:  invalid input syntax for type uuid: "<EVENT_UUID>" at 
+character 120
+2026-01-11 20:42:28.584 UTC [992] STATEMENT:  SELECT DISTINCT ON (book_key)
+	  book_key, odds_decimal, odds_american, fetched_at
+	FROM odds_snapshots
+	WHERE event_id = '<EVENT_UUID>' AND market_id = '<MARKET_UUID>'
+	ORDER BY book_key, fetched_at DESC;
+2026-01-11 20:45:54.355 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 20:45:54.777 UTC [27] LOG:  checkpoint complete: wrote 8 buffers (0.0%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=0.394 s, sync=0.012 s, total=0.424 s; sync files=4, longest=0.008 
+s, average=0.003 s; distance=15 kB, estimate=934 kB; lsn=0/1CEEFA8, redo lsn=0/1CEEF70
+2026-01-11 21:25:55.550 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 21:26:00.791 UTC [27] LOG:  checkpoint complete: wrote 52 buffers (0.3%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=5.151 s, sync=0.052 s, total=5.243 s; sync files=44, longest=0.005 
+s, average=0.002 s; distance=220 kB, estimate=862 kB; lsn=0/1D261C0, redo lsn=0/1D26188
+2026-01-11 22:56:03.448 UTC [27] LOG:  checkpoint starting: time
+2026-01-11 22:56:05.678 UTC [27] LOG:  checkpoint complete: wrote 23 buffers (0.1%); 0 WAL file(s) 
+added, 0 removed, 0 recycled; write=2.216 s, sync=0.007 s, total=2.231 s; sync files=16, longest=0.003 
+s, average=0.001 s; distance=9 kB, estimate=777 kB; lsn=0/1D28748, redo lsn=0/1D28710
+
+----- redis (00dfef0e0f1a) -----
+1:C 10 Jan 2026 23:59:35.317 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+1:C 10 Jan 2026 23:59:35.317 * Redis version=7.4.7, bits=64, commit=00000000, modified=0, pid=1, just started
+1:C 10 Jan 2026 23:59:35.317 * Configuration loaded
+1:M 10 Jan 2026 23:59:35.318 * monotonic clock: POSIX clock_gettime
+1:M 10 Jan 2026 23:59:35.321 * Running mode=standalone, port=6379.
+1:M 10 Jan 2026 23:59:35.321 * Server initialized
+1:M 10 Jan 2026 23:59:35.323 * Reading RDB base file on AOF loading...
+1:M 10 Jan 2026 23:59:35.323 * Loading RDB produced by version 7.4.7
+1:M 10 Jan 2026 23:59:35.323 * RDB age 10312 seconds
+1:M 10 Jan 2026 23:59:35.323 * RDB memory usage when created 0.90 Mb
+1:M 10 Jan 2026 23:59:35.323 * RDB is base AOF
+1:M 10 Jan 2026 23:59:35.323 * Done loading RDB, keys loaded: 0, keys expired: 0.
+1:M 10 Jan 2026 23:59:35.324 * DB loaded from base file appendonly.aof.1.base.rdb: 0.002 seconds
+1:M 10 Jan 2026 23:59:35.328 * DB loaded from incr file appendonly.aof.1.incr.aof: 0.004 seconds
+1:M 10 Jan 2026 23:59:35.328 * DB loaded from append only file: 0.006 seconds
+1:M 10 Jan 2026 23:59:35.328 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+1:M 10 Jan 2026 23:59:35.328 * Ready to accept connections tcp
+1:M 11 Jan 2026 00:59:36.639 * 1 changes in 3600 seconds. Saving...
+1:M 11 Jan 2026 00:59:36.648 * Background saving started by pid 21
+21:C 11 Jan 2026 00:59:36.673 * DB saved on disk
+21:C 11 Jan 2026 00:59:36.673 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 11 Jan 2026 00:59:27.620 * Background saving terminated with success
+1:M 11 Jan 2026 01:05:19.222 * 100 changes in 300 seconds. Saving...
+1:M 11 Jan 2026 01:05:19.224 * Background saving started by pid 22
+22:C 11 Jan 2026 01:05:19.237 * DB saved on disk
+22:C 11 Jan 2026 01:05:19.237 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 11 Jan 2026 01:05:19.325 * Background saving terminated with success
+1:M 11 Jan 2026 01:10:22.660 * 100 changes in 300 seconds. Saving...
+1:M 11 Jan 2026 01:10:22.661 * Background saving started by pid 23
+23:C 11 Jan 2026 01:10:22.669 * DB saved on disk
+23:C 11 Jan 2026 01:10:22.669 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 11 Jan 2026 01:10:13.634 * Background saving terminated with success
+1:M 11 Jan 2026 01:17:31.824 * 100 changes in 300 seconds. Saving...
+1:M 11 Jan 2026 01:17:31.825 * Background saving started by pid 24
+24:C 11 Jan 2026 01:17:31.840 * DB saved on disk
+24:C 11 Jan 2026 01:17:31.840 * Fork CoW for RDB: current 1 MB, peak 1 MB, average 0 MB
+1:M 11 Jan 2026 01:17:31.925 * Background saving terminated with success
+1:M 11 Jan 2026 01:22:33.767 * 100 changes in 300 seconds. Saving...
+1:M 11 Jan 2026 01:22:33.769 * Background saving started by pid 50
+50:C 11 Jan 2026 01:22:33.788 * DB saved on disk
+50:C 11 Jan 2026 01:22:33.788 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 11 Jan 2026 01:22:24.741 * Background saving terminated with success
+1:M 11 Jan 2026 01:27:29.336 * 100 changes in 300 seconds. Saving...
+1:M 11 Jan 2026 01:27:29.338 * Background saving started by pid 51
+51:C 11 Jan 2026 01:27:29.353 * DB saved on disk
+51:C 11 Jan 2026 01:27:29.354 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 11 Jan 2026 01:27:20.312 * Background saving terminated with success
+1:M 11 Jan 2026 20:54:58.013 * 1 changes in 3600 seconds. Saving...
+1:M 11 Jan 2026 20:54:58.015 * Background saving started by pid 58
+58:C 11 Jan 2026 20:54:58.032 * DB saved on disk
+58:C 11 Jan 2026 20:54:58.033 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 11 Jan 2026 20:54:58.125 * Background saving terminated with success
+1:M 11 Jan 2026 22:42:26.684 * 1 changes in 3600 seconds. Saving...
+1:M 11 Jan 2026 22:42:26.685 * Background saving started by pid 77
+77:C 11 Jan 2026 22:42:26.708 * DB saved on disk
+77:C 11 Jan 2026 22:42:26.708 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+1:M 11 Jan 2026 22:42:26.789 * Background saving terminated with success
+
+
+
+==========================================================================================
+REDIS: INFO + keyspace + sample keys
+==========================================================================================
+# Server
+redis_version:7.4.7
+redis_git_sha1:00000000
+redis_git_dirty:0
+redis_build_id:6714cd4c87813c4f
+redis_mode:standalone
+os:Linux 6.6.87.2-microsoft-standard-WSL2 x86_64
+arch_bits:64
+monotonic_clock:POSIX clock_gettime
+multiplexing_api:epoll
+atomicvar_api:c11-builtin
+gcc_version:12.2.0
+process_id:1
+process_supervised:no
+run_id:a585fd7dd2d3413de511d0b0a16998025e1bcf9f
+tcp_port:6379
+server_time_usec:1768172435198570
+uptime_in_seconds:82860
+uptime_in_days:0
+hz:10
+configured_hz:10
+lru_clock:6564755
+executable:/data/redis-server
+config_file:
+io_threads_active:0
+listener0:name=tcp,bind=*,bind=-::*,port=6379
+
+# Clients
+connected_clients:2
+cluster_connections:0
+maxclients:10000
+client_recent_max_input_buffer:8
+client_recent_max_output_buffer:0
+blocked_clients:0
+tracking_clients:0
+pubsub_clients:0
+watching_clients:0
+clients_in_timeout_table:0
+total_watched_keys:0
+total_blocking_keys:0
+total_blocking_keys_on_nokey:0
+
+# Memory
+used_memory:1367648
+used_memory_human:1.30M
+used_memory_rss:11599872
+used_memory_rss_human:11.06M
+used_memory_peak:1567456
+used_memory_peak_human:1.49M
+used_memory_peak_perc:87.25%
+used_memory_overhead:970920
+used_memory_startup:948400
+used_memory_dataset:396728
+used_memory_dataset_perc:94.63%
+allocator_allocated:2123064
+allocator_active:2707456
+allocator_resident:9105408
+allocator_muzzy:0
+total_system_memory:16479571968
+total_system_memory_human:15.35G
+used_memory_lua:34816
+used_memory_vm_eval:34816
+used_memory_lua_human:34.00K
+used_memory_scripts_eval:312
+number_of_cached_scripts:1
+number_of_functions:0
+number_of_libraries:0
+used_memory_vm_functions:33792
+used_memory_vm_total:68608
+used_memory_vm_total_human:67.00K
+used_memory_functions:192
+used_memory_scripts:504
+used_memory_scripts_human:504B
+maxmemory:0
+maxmemory_human:0B
+maxmemory_policy:noeviction
+allocator_frag_ratio:1.31
+allocator_frag_bytes:505672
+allocator_rss_ratio:3.36
+allocator_rss_bytes:6397952
+rss_overhead_ratio:1.27
+rss_overhead_bytes:2494464
+mem_fragmentation_ratio:8.63
+mem_fragmentation_bytes:10255112
+mem_not_counted_for_evict:2048
+mem_replication_backlog:0
+mem_total_replication_buffers:0
+mem_clients_slaves:0
+mem_clients_normal:19216
+mem_cluster_links:0
+mem_aof_buffer:2048
+mem_allocator:jemalloc-5.3.0
+mem_overhead_db_hashtable_rehashing:0
+active_defrag_running:0
+lazyfree_pending_objects:0
+lazyfreed_objects:405
+
+# Persistence
+loading:0
+async_loading:0
+current_cow_peak:0
+current_cow_size:0
+current_cow_size_age:0
+current_fork_perc:0.00
+current_save_keys_processed:0
+current_save_keys_total:0
+rdb_changes_since_last_save:5
+rdb_bgsave_in_progress:0
+rdb_last_save_time:1768171346
+rdb_last_bgsave_status:ok
+rdb_last_bgsave_time_sec:0
+rdb_current_bgsave_time_sec:-1
+rdb_saves:8
+rdb_last_cow_size:585728
+rdb_last_load_keys_expired:0
+rdb_last_load_keys_loaded:0
+aof_enabled:1
+aof_rewrite_in_progress:0
+aof_rewrite_scheduled:0
+aof_last_rewrite_time_sec:-1
+aof_current_rewrite_time_sec:-1
+aof_last_bgrewrite_status:ok
+aof_rewrites:0
+aof_rewrites_consecutive_failures:0
+aof_last_write_status:ok
+aof_last_cow_size:0
+module_fork_in_progress:0
+module_fork_last_cow_size:0
+aof_current_size:1942879
+aof_base_size:88
+aof_pending_rewrite:0
+aof_buffer_length:0
+aof_pending_bio_fsync:0
+aof_delayed_fsync:0
+
+# Stats
+total_connections_received:25
+total_commands_processed:12024
+instantaneous_ops_per_sec:0
+total_net_input_bytes:1912049
+total_net_output_bytes:50748
+total_net_repl_input_bytes:0
+total_net_repl_output_bytes:0
+instantaneous_input_kbps:0.00
+instantaneous_output_kbps:0.00
+instantaneous_input_repl_kbps:0.00
+instantaneous_output_repl_kbps:0.00
+rejected_connections:0
+sync_full:0
+sync_partial_ok:0
+sync_partial_err:0
+expired_subkeys:0
+expired_keys:1259
+expired_stale_perc:0.00
+expired_time_cap_reached_count:0
+expire_cycle_cpu_milliseconds:12594
+evicted_keys:0
+evicted_clients:0
+evicted_scripts:0
+total_eviction_exceeded_time:0
+current_eviction_exceeded_time:0
+keyspace_hits:10
+keyspace_misses:6
+pubsub_channels:0
+pubsub_patterns:0
+pubsubshard_channels:0
+latest_fork_usec:955
+total_forks:8
+migrate_cached_sockets:0
+slave_expires_tracked_keys:0
+active_defrag_hits:0
+active_defrag_misses:0
+active_defrag_key_hits:0
+active_defrag_key_misses:0
+total_active_defrag_time:0
+current_active_defrag_time:0
+tracking_total_keys:0
+tracking_total_items:0
+tracking_total_prefixes:0
+unexpected_error_replies:0
+total_error_replies:0
+dump_payload_sanitizations:0
+total_reads_processed:12035
+total_writes_processed:12011
+io_threaded_reads_processed:0
+io_threaded_writes_processed:0
+client_query_buffer_limit_disconnections:0
+client_output_buffer_limit_disconnections:0
+reply_buffer_shrinks:13
+reply_buffer_expands:0
+eventloop_cycles:211923
+eventloop_duration_sum:86873211
+eventloop_duration_cmd_sum:48594
+instantaneous_eventloop_cycles_per_sec:9
+instantaneous_eventloop_duration_usec:169
+acl_access_denied_auth:0
+acl_access_denied_cmd:0
+acl_access_denied_key:0
+acl_access_denied_channel:0
+
+# Replication
+role:master
+connected_slaves:0
+master_failover_state:no-failover
+master_replid:918e3eccf64dd6b278bdac1981ab8425baea3f21
+master_replid2:0000000000000000000000000000000000000000
+master_repl_offset:11653
+second_repl_offset:-1
+repl_backlog_active:0
+repl_backlog_size:1048576
+repl_backlog_first_byte_offset:0
+repl_backlog_histlen:0
+
+# CPU
+used_cpu_sys:27.646769
+used_cpu_user:65.377638
+used_cpu_sys_children:0.019863
+used_cpu_user_children:0.028740
+used_cpu_sys_main_thread:27.622020
+used_cpu_user_main_thread:65.366167
+
+# Modules
+
+# Errorstats
+
+# Cluster
+cluster_enabled:0
+
+# Keyspace
+db0:keys=2,expires=2,avg_ttl=82419426,subexpiry=0
+
+
+-- DBSIZE --
+2
+
+-- INFO keyspace --
+# Keyspace
+db0:keys=2,expires=2,avg_ttl=82419233,subexpiry=0
+
+-- Sample keys (SCAN) --
+event_markets:3ff5d013-09e9-4277-8b09-bc08c8409f26
+sports:all:v1
+
+
+
+==========================================================================================
+REDIS: Odds/Arb key stats (if your schema exists)
+==========================================================================================
+ERROR: The property 'Count' cannot be found on this object. Verify that the property exists.
+
+==========================================================================================
+POSTGRES: Container env (redacted)
+==========================================================================================
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+HOSTNAME=4e700c518405
+POSTGRES_PASSWORD=<REDACTED>
+POSTGRES_DB=unbounded
+POSTGRES_USER=postgres
+GOSU_VERSION=1.19
+LANG=en_US.utf8
+PG_MAJOR=16
+PG_VERSION=16.11-1.pgdg13+1
+PGDATA=/var/lib/postgresql/data
+HOME=/root
+
+
+
+==========================================================================================
+POSTGRES: List DBs + schema overview (best effort)
+==========================================================================================
+
+-- psql version --
+psql (PostgreSQL) 16.11 (Debian 16.11-1.pgdg13+1)
+
+-- list DBs --
+                                                      List of databases
+   Name    |  Owner   | Encoding | Locale Provider |  Collate   |   Ctype    | ICU Locale | ICU Rules |   Access privileges   
+-----------+----------+----------+-----------------+------------+------------+------------+-----------+-----------------------
+ postgres  | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | 
+ template0 | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | =c/postgres          +
+           |          |          |                 |            |            |            |           | postgres=CTc/postgres
+ template1 | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | =c/postgres          +
+           |          |          |                 |            |            |            |           | postgres=CTc/postgres
+ unbounded | postgres | UTF8     | libc            | en_US.utf8 | en_US.utf8 |            |           | 
+(4 rows)
+
+
+-- list tables (public schema) --
+docker : Did not find any relation named "public.*".
+At line:17 char:5
++     docker exec $pgId psql -U postgres -c "\dt+ public.*" 2>&1
++     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Did not find an...med "public.*".:String) [], RemoteExcept 
+   ion
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+-- describe tables (public) --
+ table_name | column_name | data_type 
+------------+-------------+-----------
+(0 rows)
+
+
+
+==========================================================================================
+APP: Port mappings
+==========================================================================================
+NAMES      PORTS
+backend    0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+postgres   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+redis      0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+

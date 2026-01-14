@@ -1,15 +1,4 @@
 ﻿services:
-  arb_scanner:
-    build: .
-    command: python -m app.workers.arb_scanner
-    environment:
-      REDIS_URL: redis://redis:6379/0
-      DATABASE_URL: postgresql+pg8000://postgres:postgres@db:5432/unbounded
-      ARB_TTL_SECONDS: "900"
-    depends_on:
-      - redis
-      - db
-
   backend:
     build:
       context: .
@@ -32,7 +21,7 @@
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: <REDACTED>
       POSTGRES_DB: unbounded
     ports:
       - "5432:5432"
@@ -45,6 +34,11 @@
     restart: unless-stopped
     ports:
       - "6379:6379"
+    volumes:
+      - redisdata:/data
+    command: ["redis-server", "--appendonly", "yes"]
 
 volumes:
   pgdata:
+  redisdata:
+
