@@ -1,4 +1,4 @@
-﻿import os
+import os
 import json
 import time
 import hashlib
@@ -32,6 +32,7 @@ ODDS_KEY = "odds:latest:{sport}:{event_id}:{market_key}:{market_instance_id}"
 # Output keys
 ARB_DETAIL_KEY = "arb:detail:{arb_id}"
 ARB_FEED_KEY = "arbs:feed:{sport}"
+ARB_UPDATES_CHANNEL = "arb_updates"
 
 
 def now_ms() -> int:
@@ -227,6 +228,12 @@ def write_arb(r: redis.Redis, arb: Dict[str, Any]) -> None:
     pipe.zadd(feed_key, {arb_id: score})
     pipe.expire(feed_key, ARB_TTL_SECONDS) 
     pipe.execute()
+
+    # Week 6: notify live subscribers (Pub/Sub)
+    r.publish(ARB_UPDATES_CHANNEL, json.dumps(arb, separators=(',', ':')))
+
+    # Week 6: notify live subscribers (Pub/Sub)
+    r.publish(ARB_UPDATES_CHANNEL, json.dumps(arb, separators=(",", ":")))
 
 
 

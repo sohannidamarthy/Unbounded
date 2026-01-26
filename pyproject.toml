@@ -22,7 +22,8 @@ dependencies = [
     "resend (>=2.6.0,<3.0.0)",
     "httpx (>=0.28.1,<0.29.0)",
     "passlib[bcrypt] (>=1.7.4,<2.0.0)",
-    "bcrypt (<4)"
+    "bcrypt (<4)",
+    "websockets (>=16.0,<17.0)"
 ]
 
 

@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 import time
@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from app.redis_client import get_redis
 from app.schemas.arbs_quote import QuoteConstraints, QuoteResult
 from app.services.quote_solver import InputLeg, quote_arbitrage
-from app.services.audit_store import insert_quote_snapshot  # <-- we add this next
+from app.services.audit_store import INSERT_QUOTE
 from starlette.concurrency import run_in_threadpool
 
 from app.db.session import SessionLocal
@@ -132,7 +132,7 @@ async def quote_arb(arb_id: str, req: QuoteRequest) -> QuoteResult:
     )
 
     # Durable audit trail (even if quote fails, we store the attempt)
-    insert_quote_snapshot(
+    INSERT_QUOTE(
         arb_id=arb_id,
         quote_payload=result.model_dump(),
     )

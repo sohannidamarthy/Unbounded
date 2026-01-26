@@ -1,4 +1,4 @@
-﻿import os
+import os
 
 import resend
 from fastapi import FastAPI, HTTPException
@@ -13,6 +13,7 @@ from app.services.provider_client import ProviderClient
 from app.routes.debug import router as debug_router
 from app.api.sports import router as sports_router
 from app.api.arbs import router as arbs_router
+from app.api.ws_arbs import router as ws_arbs_router
 
 
 # -------------------------------------------------
@@ -139,3 +140,7 @@ async def waitlist_signup(payload: WaitlistSignup):
 app.include_router(debug_router, prefix="/debug", tags=["debug"])
 app.include_router(sports_router, prefix="/v1", tags=["sports"])
 app.include_router(arbs_router, prefix="/v1", tags=["arbs"])
+
+# Week 6: WebSocket router
+from app.api.ws_arbs import router as ws_arbs_router
+app.include_router(ws_arbs_router)
