@@ -2,6 +2,7 @@
 from sqlalchemy.orm import sessionmaker
 
 from app.core.config import settings
+from app.db.base import Base
 
 engine = create_engine(
     settings.database_url,
@@ -14,3 +15,18 @@ SessionLocal = sessionmaker(
     autocommit=False,
     expire_on_commit=False,
 )
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+def init_db() -> None:
+    """Ensure core tables exist in the configured database."""
+    from app.db import models  # noqa: F401
+
+    Base.metadata.create_all(bind=engine)

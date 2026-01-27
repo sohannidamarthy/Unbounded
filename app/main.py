@@ -5,8 +5,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 
+from app.db.session import init_db
 from app.redis_client import get_redis, close_redis
+from app.routes.auth import router as auth_router
 from app.routes.debug import router as debug_router
+from app.routes.sports import router as sports_router
 
 app = FastAPI(
     title="Unbounded Backend",
@@ -18,10 +21,14 @@ origins_env = os.getenv("FRONTEND_ORIGINS") or os.getenv(
     "CORS_ORIGINS", "http://localhost:3000"
 )
 frontend_origins = [o.strip() for o in origins_env.split(",") if o.strip()]
+allow_origin_regex = None
+if os.getenv("ENV", "development") == "development":
+    allow_origin_regex = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=frontend_origins,
+    allow_origin_regex=allow_origin_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -30,6 +37,7 @@ app.add_middleware(
 # --- Redis lifecycle ---
 @app.on_event("startup")
 async def startup():
+    init_db()
     r = await get_redis()
     await r.ping()
 
@@ -83,6 +91,12 @@ async def waitlist_signup(payload: WaitlistSignup):
     return {"status": "ok"}
 
 
+@app.options("/waitlist")
+async def waitlist_options():
+    return {"status": "ok"}
+
+
 # --- Routers ---
 app.include_router(debug_router)
-
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
+app.include_router(sports_router)
