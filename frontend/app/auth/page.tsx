@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type AuthMode = "login" | "signup";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
+const SAVED_EMAIL_KEY = "unbounded.saved_email";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -17,6 +18,11 @@ export default function AuthPage() {
     "info"
   );
   const [token, setToken] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [rememberEmail, setRememberEmail] = useState(false);
 
   const apiBase = useMemo(() => {
     return (
@@ -31,19 +37,49 @@ export default function AuthPage() {
     process.env.NEXT_PUBLIC_AUTH_SIGNUP_URL || `${apiBase}/auth/signup`;
   const validateEndpoint = `${apiBase}/v1/sports`;
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem(SAVED_EMAIL_KEY);
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberEmail(true);
+    }
+  }, []);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSubmitting) {
       return;
     }
 
-    setIsSubmitting(true);
     setMessage(null);
+    setPasswordError(null);
     const form = event.currentTarget;
 
     const formData = new FormData(form);
-    const email = String(formData.get("email") || "").trim();
+    const emailValue = String(formData.get("email") || "").trim();
     const password = String(formData.get("password") || "");
+    const confirmPassword = String(formData.get("confirm_password") || "");
+
+    if (mode === "signup") {
+      if (password.length < 8) {
+        setPasswordError("Use at least 8 characters for a stronger password.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        setPasswordError("Passwords do not match. Please re-enter to confirm.");
+        return;
+      }
+    }
+
+    if (mode === "login") {
+      if (rememberEmail) {
+        localStorage.setItem(SAVED_EMAIL_KEY, emailValue);
+      } else {
+        localStorage.removeItem(SAVED_EMAIL_KEY);
+      }
+    }
+
+    setIsSubmitting(true);
 
     const endpoint = mode === "login" ? loginEndpoint : signupEndpoint;
 
@@ -84,12 +120,14 @@ export default function AuthPage() {
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email: emailValue, password })
       });
 
       if (response.status === 401) {
         setMessageTone("error");
-        setMessage("Invalid credentials. Double-check your email and password.");
+        setMessage(
+          "Invalid credentials. Double-check your email and password, or sign up if you don't have an account."
+        );
         return;
       }
 
@@ -106,6 +144,13 @@ export default function AuthPage() {
       }
 
       if (!response.ok) {
+        if (mode === "login") {
+          setMessageTone("error");
+          setMessage(
+            "Invalid credentials. Double-check your email and password, or try signing up."
+          );
+          return;
+        }
         const detail = await readErrorMessage(response);
         setMessageTone("error");
         setMessage(detail ? detail : "Something went wrong. Please try again.");
@@ -232,6 +277,12 @@ export default function AuthPage() {
                   setMode("login");
                   setMessage(null);
                   setMessageTone("info");
+                  setPasswordError(null);
+                  const savedEmail = localStorage.getItem(SAVED_EMAIL_KEY);
+                  if (savedEmail) {
+                    setEmail(savedEmail);
+                    setRememberEmail(true);
+                  }
                 }}
               >
                 Log in
@@ -243,6 +294,7 @@ export default function AuthPage() {
                   setMode("signup");
                   setMessage(null);
                   setMessageTone("info");
+                  setPasswordError(null);
                 }}
               >
                 Sign up
@@ -257,25 +309,111 @@ export default function AuthPage() {
                   placeholder="Email or mobile number"
                   autoComplete="email"
                   required
+                  value={email}
+                  onChange={(event) => {
+                    const nextEmail = event.target.value;
+                    setEmail(nextEmail);
+                    if (rememberEmail) {
+                      localStorage.setItem(SAVED_EMAIL_KEY, nextEmail.trim());
+                    }
+                  }}
                 />
               </label>
               <label className="field">
                 <span>Password</span>
-                <input
-                  name="password"
-                  type="password"
-                  placeholder="Password"
-                  autoComplete={mode === "login" ? "current-password" : "new-password"}
-                  required
-                  minLength={8}
-                />
+                <div className="field-input">
+                  <input
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    autoComplete={mode === "login" ? "current-password" : "new-password"}
+                    required
+                    onChange={() => setPasswordError(null)}
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowPassword((current) => !current)}
+                  >
+                    {showPassword ? (
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                        <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                        <path d="M4 4 20 20" />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                        <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
               </label>
+              {mode === "signup" ? (
+                <label className="field">
+                  <span>Confirm password</span>
+                  <div className="field-input">
+                    <input
+                      name="confirm_password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      placeholder="Re-enter password"
+                      autoComplete="new-password"
+                      required
+                      onChange={() => setPasswordError(null)}
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle"
+                      aria-label={
+                        showConfirmPassword ? "Hide confirm password" : "Show confirm password"
+                      }
+                      onClick={() => setShowConfirmPassword((current) => !current)}
+                    >
+                      {showConfirmPassword ? (
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                          <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                          <path d="M4 4 20 20" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                          <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </label>
+              ) : null}
+              {mode === "login" ? (
+                <label className="remember-field">
+                  <input
+                    type="checkbox"
+                    checked={rememberEmail}
+                    onChange={(event) => {
+                      const nextChecked = event.target.checked;
+                      setRememberEmail(nextChecked);
+                      if (nextChecked && email) {
+                        localStorage.setItem(SAVED_EMAIL_KEY, email.trim());
+                      } else {
+                        localStorage.removeItem(SAVED_EMAIL_KEY);
+                      }
+                    }}
+                  />
+                  <span>Remember Me</span>
+                </label>
+              ) : null}
+              {passwordError ? (
+                <div className="field-error">{passwordError}</div>
+              ) : null}
               <button className="auth-primary" type="submit">
                 {isSubmitting
                   ? "Working..."
                   : mode === "login"
-                  ? "Continue"
-                  : "Create account"}
+                    ? "Continue"
+                    : "Create account"}
               </button>
             </form>
             {message ? (

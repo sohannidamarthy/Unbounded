@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 
@@ -54,6 +54,8 @@ export default function Home() {
   const [isPricingSubmitting, setIsPricingSubmitting] = useState(false);
   const [pricingNotified, setPricingNotified] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement | null>(null);
   const heroImage = heroImages[activeHeroIndex];
   const secondaryImage = secondaryImages[activeSecondaryIndex];
   const activeTestimonial = testimonials[activeTestimonialIndex];
@@ -72,6 +74,15 @@ export default function Home() {
   const handleLogout = () => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     setIsAuthenticated(false);
+  };
+
+  const handleAccountToggle = () => {
+    setIsAccountMenuOpen((current) => !current);
+  };
+
+  const handleLogoutClick = () => {
+    handleLogout();
+    setIsAccountMenuOpen(false);
   };
 
   useEffect(() => {
@@ -105,6 +116,31 @@ export default function Home() {
 
     return () => {
       window.clearInterval(intervalId);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (!accountMenuRef.current) {
+        return;
+      }
+      if (!accountMenuRef.current.contains(event.target as Node)) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsAccountMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleDocumentClick);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleDocumentClick);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
@@ -176,14 +212,38 @@ export default function Home() {
         </nav>
         <div className="header-actions">
           {isAuthenticated ? (
-            <>
-              <button className="primary header-primary" type="button">
+            <div className="account-menu" ref={accountMenuRef}>
+              <button
+                className="primary header-primary pulse-on-hover"
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={isAccountMenuOpen}
+                onClick={handleAccountToggle}
+              >
                 Account
               </button>
-              <button className="ghost" type="button" onClick={handleLogout}>
-                Log out
-              </button>
-            </>
+              <div
+                className={`account-dropdown ${isAccountMenuOpen ? "is-open" : ""}`}
+                role="menu"
+              >
+                <a
+                  className="account-dropdown-item"
+                  role="menuitem"
+                  href="#tutorials"
+                  onClick={() => setIsAccountMenuOpen(false)}
+                >
+                  Tutorials
+                </a>
+                <button
+                  className="account-dropdown-item"
+                  type="button"
+                  role="menuitem"
+                  onClick={handleLogoutClick}
+                >
+                  Log out
+                </button>
+              </div>
+            </div>
           ) : (
             <a className="primary header-primary pulse-on-hover" href="/auth">
               Log in / Sign up
