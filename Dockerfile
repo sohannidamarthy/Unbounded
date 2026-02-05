@@ -22,6 +22,7 @@ COPY pyproject.toml poetry.lock ./
 
 # install runtime deps only
 RUN poetry install --only main --no-interaction --no-ansi --no-root
+RUN poetry run pip install --no-cache-dir psycopg2-binary
 
 # copy the rest of your app
 COPY . .

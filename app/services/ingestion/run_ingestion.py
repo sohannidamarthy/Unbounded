@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import asyncio
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
@@ -55,9 +57,11 @@ async def run_ingestion_once(
             fetched_at_utc=meta.fetched_at_utc,
         )
 
-        # 4) Rebuild Redis latest cache (optional but you’re doing it)
+        # 4) Rebuild Redis latest cache
         redis_result = await rebuild_redis_latest_odds(
-            since_minutes=since_minutes_for_redis_rebuild
+            since_minutes=since_minutes_for_redis_rebuild,
+            sport_key=sport_key,
+            league=sport_key.upper(),
         )
 
         ended_at = datetime.now(timezone.utc)
@@ -66,7 +70,7 @@ async def run_ingestion_once(
             "sport_key": sport_key,
             "events_count": len(normalized),
             "odds_rows_inserted": snap_result["inserted"],
-            "redis_writes": redis_result["redis_writes"],
+            "redis_writes": redis_result.get("redis_writes", 0),
             "provider_status_code": meta.status_code,
             "provider_duration_ms": meta.duration_ms,
             "started_at_utc": started_at,
@@ -92,3 +96,37 @@ async def run_ingestion_once(
             elapsed_ms=int((ended_at - started_at).total_seconds() * 1000),
         )
         raise
+
+
+async def _amain() -> Dict[str, Any]:
+    # Defaults (override via docker-compose environment)
+    sport_key = os.getenv("INGEST_SPORT_KEY", "nba")
+    regions = [r.strip() for r in os.getenv("INGEST_REGIONS", "us").split(",") if r.strip()]
+    markets = [m.strip() for m in os.getenv("INGEST_MARKETS", "h2h,spreads,totals").split(",") if m.strip()]
+    since_minutes = int(os.getenv("INGEST_REDIS_REBUILD_SINCE_MIN", "180"))
+
+    provider_name = os.getenv("PROVIDER_NAME", "oddsapi")
+    base_url = os.getenv("PROVIDER_BASE_URL", "https://api.the-odds-api.com")
+    api_key = os.getenv("ODDS_API_KEY", "")
+
+    if not api_key:
+        raise RuntimeError("ODDS_API_KEY missing")
+
+    client = ProviderClient(provider_name=provider_name, base_url=base_url, api_key=api_key)
+    await client.aopen()
+    try:
+        return await run_ingestion_once(
+            client=client,
+            sport_key=sport_key,
+            regions=regions,
+            markets=markets,
+            since_minutes_for_redis_rebuild=since_minutes,
+        )
+    finally:
+        await client.aclose()
+
+
+if __name__ == "__main__":
+    asyncio.run(_amain())
+
+

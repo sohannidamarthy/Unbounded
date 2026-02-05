@@ -1,4 +1,4 @@
-import os
+﻿import os
 
 import resend
 from fastapi import FastAPI, HTTPException
@@ -16,6 +16,7 @@ from app.api.arbs import router as arbs_router
 from app.api.ws_arbs import router as ws_arbs_router
 
 
+from app.api.ws_odds import router as ws_odds_router
 # -------------------------------------------------
 # App (DEFINE ONCE)
 # -------------------------------------------------
@@ -143,4 +144,11 @@ app.include_router(arbs_router, prefix="/v1", tags=["arbs"])
 
 # Week 6: WebSocket router
 from app.api.ws_arbs import router as ws_arbs_router
+from app.api.ws_odds import router as ws_odds_router
 app.include_router(ws_arbs_router)
+app.include_router(ws_odds_router)
+
+
+# --- AUTH ROUTES ---
+from app.routes import auth
+app.include_router(auth.router, prefix="/auth", tags=["auth"])

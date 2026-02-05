@@ -6,3 +6,19 @@ __pycache__/
 .idea/
 .pytest_cache/
 postgres_data/
+# backups / patches
+*.bak*
+*.patch
+
+# local env
+.env
+.env.*
+__pycache__/
+*.pyc
+
+# node
+node_modules/
+
+# build/artifacts
+dist/
+build/

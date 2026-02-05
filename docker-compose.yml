@@ -1,4 +1,21 @@
-﻿services:
+services:
+  ingestion:
+    build: .
+    container_name: ingestion
+    depends_on:
+      - redis
+      - db
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      # Adjust DATABASE_URL if yours differs
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/unbounded
+      ENV: development
+      ODDS_API_KEY: ${ODDS_API_KEY}
+      INGEST_SLEEP_SECONDS: "60"
+      INGEST_SPORT_KEY: "basketball_nba"
+      INGEST_REGIONS: "us"
+      INGEST_MARKETS: "h2h"
+    command: ["bash","-lc","while true; do poetry run python -m app.services.ingestion.run_ingestion; echo 'sleeping...'; sleep ${INGEST_SLEEP_SECONDS:-10}; done"]
   arb_scanner:
     build: .
     command: python -m app.workers.arb_scanner
@@ -6,6 +23,7 @@
       REDIS_URL: redis://redis:6379/0
       DATABASE_URL: postgresql+pg8000://postgres:postgres@db:5432/unbounded
       ARB_TTL_SECONDS: "900"
+      ARB_SPORTS: basketball_nba
     depends_on:
       - redis
       - db
@@ -48,3 +66,8 @@
 
 volumes:
   pgdata:
+
+
+
+
+
