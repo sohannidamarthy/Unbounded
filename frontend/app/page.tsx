@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 
@@ -54,14 +54,14 @@ export default function Home() {
   const [isPricingSubmitting, setIsPricingSubmitting] = useState(false);
   const [pricingNotified, setPricingNotified] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const accountMenuRef = useRef<HTMLDivElement | null>(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
   const heroImage = heroImages[activeHeroIndex];
   const secondaryImage = secondaryImages[activeSecondaryIndex];
   const activeTestimonial = testimonials[activeTestimonialIndex];
 
   useEffect(() => {
     setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
+    setIsAuthReady(true);
     const handleStorage = () => {
       setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
     };
@@ -76,13 +76,8 @@ export default function Home() {
     setIsAuthenticated(false);
   };
 
-  const handleAccountToggle = () => {
-    setIsAccountMenuOpen((current) => !current);
-  };
-
   const handleLogoutClick = () => {
     handleLogout();
-    setIsAccountMenuOpen(false);
   };
 
   useEffect(() => {
@@ -116,31 +111,6 @@ export default function Home() {
 
     return () => {
       window.clearInterval(intervalId);
-    };
-  }, []);
-
-  useEffect(() => {
-    const handleDocumentClick = (event: MouseEvent) => {
-      if (!accountMenuRef.current) {
-        return;
-      }
-      if (!accountMenuRef.current.contains(event.target as Node)) {
-        setIsAccountMenuOpen(false);
-      }
-    };
-
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsAccountMenuOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleDocumentClick);
-    document.addEventListener("keydown", handleEscape);
-
-    return () => {
-      document.removeEventListener("mousedown", handleDocumentClick);
-      document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
@@ -196,12 +166,12 @@ export default function Home() {
           <a className="brand-text brand-home-link" href="/">
             <span>Unbounded</span>
           </a>
-          {isAuthenticated ? null : (
+          {isAuthReady && !isAuthenticated ? (
             <div className="guest-badge">
               <div className="guest-avatar" aria-hidden="true" />
               <span>Guest</span>
             </div>
-          )}
+          ) : null}
         </div>
         <nav className="nav-links">
           <a href="#arbitrage">Arbitrage</a>
@@ -211,43 +181,69 @@ export default function Home() {
           <a href="#tutorials">Tutorials</a>
         </nav>
         <div className="header-actions">
-          {isAuthenticated ? (
-            <div className="account-menu" ref={accountMenuRef}>
-              <button
-                className="primary header-primary pulse-on-hover"
-                type="button"
-                aria-haspopup="menu"
-                aria-expanded={isAccountMenuOpen}
-                onClick={handleAccountToggle}
-              >
-                Account
-              </button>
-              <div
-                className={`account-dropdown ${isAccountMenuOpen ? "is-open" : ""}`}
-                role="menu"
-              >
-                <a
-                  className="account-dropdown-item"
-                  role="menuitem"
-                  href="#tutorials"
-                  onClick={() => setIsAccountMenuOpen(false)}
-                >
-                  Tutorials
-                </a>
+          {isAuthReady ? (
+            isAuthenticated ? (
+              <div className="account-menu">
                 <button
-                  className="account-dropdown-item"
+                  className="primary header-primary pulse-on-hover"
                   type="button"
-                  role="menuitem"
-                  onClick={handleLogoutClick}
+                  aria-haspopup="menu"
                 >
-                  Log out
+                  Account
                 </button>
+                <div className="account-dropdown" role="menu">
+                  <a
+                    className="account-dropdown-item"
+                    role="menuitem"
+                    href="/dashboard"
+                  >
+                    Dashboard
+                  </a>
+                  <button
+                    className="account-dropdown-item"
+                    type="button"
+                    role="menuitem"
+                  >
+                    My plan
+                  </button>
+                  <button
+                    className="account-dropdown-item"
+                    type="button"
+                    role="menuitem"
+                  >
+                    Notifications
+                  </button>
+                  <button
+                    className="account-dropdown-item"
+                    type="button"
+                    role="menuitem"
+                  >
+                    Arbitrage/EV settings
+                  </button>
+                  <button
+                    className="account-dropdown-item"
+                    type="button"
+                    role="menuitem"
+                  >
+                    Referrals
+                  </button>
+                  <button
+                    className="account-dropdown-item"
+                    type="button"
+                    role="menuitem"
+                    onClick={handleLogoutClick}
+                  >
+                    Log out
+                  </button>
+                </div>
               </div>
-            </div>
+            ) : (
+              <a className="primary header-primary pulse-on-hover" href="/auth">
+                Log in / Sign up
+              </a>
+            )
           ) : (
-            <a className="primary header-primary pulse-on-hover" href="/auth">
-              Log in / Sign up
-            </a>
+            <div className="header-actions-placeholder" aria-hidden="true" />
           )}
         </div>
       </header>

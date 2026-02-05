@@ -61,8 +61,11 @@ export default function AuthPage() {
     const confirmPassword = String(formData.get("confirm_password") || "");
 
     if (mode === "signup") {
-      if (password.length < 8) {
-        setPasswordError("Use at least 8 characters for a stronger password.");
+      const hasSymbol = /[^A-Za-z0-9]/.test(password);
+      if (password.length < 10 || !hasSymbol) {
+        setPasswordError(
+          "Password must be at least 10 characters and include a symbol."
+        );
         return;
       }
       if (password !== confirmPassword) {
@@ -172,7 +175,7 @@ export default function AuthPage() {
       setMessageTone("success");
       setMessage("Authenticated! Token stored for protected calls.");
       form?.reset();
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       setMessageTone("error");
       const details =
@@ -386,6 +389,9 @@ export default function AuthPage() {
                     </button>
                   </div>
                 </label>
+              ) : null}
+              {mode === "signup" ? (
+                <div className="field-hint">Use 10+ characters and a symbol.</div>
               ) : null}
               {mode === "login" ? (
                 <label className="remember-field">
