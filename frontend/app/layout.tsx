@@ -12,7 +12,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {process.env.NODE_ENV === "development" ? (
+          <script
+            // Prevent stale localhost service workers from serving old Next chunks.
+            dangerouslySetInnerHTML={{
+              __html:
+                "if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(reg){reg.unregister();});});}"
+            }}
+          />
+        ) : null}
+        {children}
+      </body>
     </html>
   );
 }

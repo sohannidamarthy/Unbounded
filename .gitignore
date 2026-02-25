@@ -6,3 +6,6 @@ __pycache__/
 .idea/
 .pytest_cache/
 postgres_data/
+frontend/.next/
+frontend/tsconfig.tsbuildinfo
+frontend/node_modules/
