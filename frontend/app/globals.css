@@ -4425,6 +4425,39 @@ a {
   font-weight: 700;
 }
 
+.profit-pill--source.profit-pill--live {
+  border-color: rgba(215, 170, 66, 0.45);
+  color: rgba(247, 241, 232, 0.86);
+}
+
+.profit-pill--source.profit-pill--arb {
+  border-color: rgba(98, 215, 137, 0.5);
+  color: rgba(178, 244, 205, 0.92);
+}
+
+.profit-pill--source.profit-pill--ev {
+  border-color: rgba(242, 120, 112, 0.55);
+  color: rgba(255, 196, 190, 0.94);
+}
+
+.profit-pill--source.profit-pill--live.is-active {
+  border-color: rgba(215, 170, 66, 0.9);
+  background: linear-gradient(135deg, #d7aa42, #b6882c);
+  color: #0b2239;
+}
+
+.profit-pill--source.profit-pill--arb.is-active {
+  border-color: rgba(92, 214, 135, 0.95);
+  background: linear-gradient(135deg, #5cd687, #3fa566);
+  color: #062015;
+}
+
+.profit-pill--source.profit-pill--ev.is-active {
+  border-color: rgba(242, 120, 112, 0.95);
+  background: linear-gradient(135deg, #f27870, #cd4a44);
+  color: #280e0d;
+}
+
 .profit-tracker-chart-head {
   display: flex;
   justify-content: space-between;
@@ -4533,39 +4566,60 @@ a {
 }
 
 .profit-chart-dot {
-  fill: #f2d384;
-  stroke: #174570;
-  stroke-width: 0.75;
   cursor: pointer;
-  filter: drop-shadow(0 0 2px rgba(242, 211, 132, 0.5));
-  transition: fill 0.18s ease, stroke 0.18s ease, filter 0.18s ease;
+  transition: fill 0.18s ease, stroke 0.18s ease, filter 0.18s ease,
+    transform 0.18s ease;
 }
 
-.profit-chart-dot:hover {
+.profit-chart-dot--live {
+  fill: #f2d384;
+  stroke: #174570;
+  filter: drop-shadow(0 0 2px rgba(242, 211, 132, 0.5));
+}
+
+.profit-chart-dot--arb {
+  fill: #6ce39c;
+  stroke: #114b35;
+  filter: drop-shadow(0 0 2.8px rgba(98, 215, 137, 0.58));
+}
+
+.profit-chart-dot--ev {
+  fill: #f59a92;
+  stroke: #8a2424;
+  filter: drop-shadow(0 0 2.8px rgba(242, 120, 112, 0.58));
+}
+
+.profit-chart-dot--live:hover {
   fill: #ffdf8f;
   stroke: #1f5a8f;
   filter: drop-shadow(0 0 4px rgba(242, 211, 132, 0.72));
 }
 
-.profit-chart-dot.is-active {
+.profit-chart-dot--arb:hover {
+  fill: #88efb3;
+  stroke: #0f3f2d;
+  filter: drop-shadow(0 0 4.8px rgba(98, 215, 137, 0.7));
+}
+
+.profit-chart-dot--ev:hover {
+  fill: #ffc1b8;
+  stroke: #a23333;
+  filter: drop-shadow(0 0 4.8px rgba(242, 120, 112, 0.72));
+}
+
+.profit-chart-dot--live.is-active {
+  fill: #ffe6a8;
+  stroke: #103356;
+  filter: drop-shadow(0 0 5px rgba(242, 211, 132, 0.76));
+}
+
+.profit-chart-dot--arb.is-active {
   fill: #6ce39c;
   stroke: #103356;
   filter: drop-shadow(0 0 5px rgba(98, 215, 137, 0.62));
 }
 
-.profit-chart-dot.is-ev-loss {
-  fill: #f7aaa1;
-  stroke: #8a2424;
-  filter: drop-shadow(0 0 4px rgba(242, 120, 112, 0.58));
-}
-
-.profit-chart-dot.is-ev-loss:hover {
-  fill: #ffc1b8;
-  stroke: #a23333;
-  filter: drop-shadow(0 0 5px rgba(242, 120, 112, 0.68));
-}
-
-.profit-chart-dot.is-ev-loss.is-active {
+.profit-chart-dot--ev.is-active {
   fill: #ff8f86;
   stroke: #701b1b;
   filter: drop-shadow(0 0 6px rgba(242, 120, 112, 0.76));

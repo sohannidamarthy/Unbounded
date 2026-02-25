@@ -122,6 +122,11 @@ const sourceLabels: Record<Source, string> = {
   ev: "EV",
 };
 
+const sourcePriority: Source[] = ["arb", "ev", "live"];
+
+const getPrimarySource = (event: ProfitEvent): Source =>
+  sourcePriority.find((source) => event.categories.includes(source)) ?? "live";
+
 export default function ProfitTrackerPage() {
   const [period, setPeriod] = useState<Period>("month");
   const [selectedSources, setSelectedSources] = useState<Source[]>([
@@ -430,7 +435,7 @@ export default function ProfitTrackerPage() {
                   <button
                     key={item}
                     type="button"
-                    className={`profit-pill${selectedSources.includes(item) ? " is-active" : ""
+                    className={`profit-pill profit-pill--source profit-pill--${item}${selectedSources.includes(item) ? " is-active" : ""
                       }`}
                     onClick={() => toggleSource(item)}
                   >
@@ -529,8 +534,8 @@ export default function ProfitTrackerPage() {
                       cx={point.x}
                       cy={point.y}
                       r={selectedDotEvent?.id === point.event.id ? 1.25 : 1.05}
-                      className={`profit-chart-dot${selectedDotEvent?.id === point.event.id ? " is-active" : ""
-                        }${point.event.categories.includes("ev") && point.event.net < 0 ? " is-ev-loss" : ""}`}
+                      className={`profit-chart-dot profit-chart-dot--${getPrimarySource(point.event)}${selectedDotEvent?.id === point.event.id ? " is-active" : ""
+                        }`}
                       strokeWidth={0.75}
                       onClick={() => setSelectedDotEvent(point.event)}
                     />
