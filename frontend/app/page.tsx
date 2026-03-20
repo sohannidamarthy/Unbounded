@@ -166,12 +166,6 @@ export default function Home() {
           <a className="brand-text brand-home-link" href="/">
             <span>Unbounded</span>
           </a>
-          {isAuthReady && !isAuthenticated ? (
-            <div className="guest-badge">
-              <div className="guest-avatar" aria-hidden="true" />
-              <span>Guest</span>
-            </div>
-          ) : null}
         </div>
         <nav className="nav-links">
           <a href="#arbitrage">Arbitrage</a>

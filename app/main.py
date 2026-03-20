@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 
+from app.api.ws_arbs import router as ws_arbs_router
 from app.db.session import init_db
 from app.redis_client import get_redis, close_redis
 from app.routes.auth import router as auth_router
@@ -97,6 +98,7 @@ async def waitlist_options():
 
 
 # --- Routers ---
+app.include_router(ws_arbs_router)
 app.include_router(debug_router)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(sports_router)

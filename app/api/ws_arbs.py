@@ -1,40 +1,52 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import os
 import time
-from typing import Optional
 
 import redis.asyncio as redis
 from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 CHANNEL = "arb_updates"
+PING_INTERVAL_SECONDS = 15.0
 
 MAX_SENDS_PER_SEC = 5
 MIN_INTERVAL = 1.0 / MAX_SENDS_PER_SEC
+
 
 def _redis() -> redis.Redis:
     # Comes from docker compose environment: REDIS_URL: redis://redis:6379/0
     url = os.getenv("REDIS_URL", "redis://redis:6379/0")
     return redis.from_url(url, decode_responses=True)
 
+
+def _coerce_payload(payload: str) -> str:
+    try:
+        json.loads(payload)
+        return payload
+    except Exception:
+        return json.dumps({"type": "arb_update", "raw": str(payload)})
+
+
 @router.websocket("/ws/arbs")
 async def ws_arbs(websocket: WebSocket):
-    await websocket.accept()
-
     r = _redis()
     pubsub = r.pubsub()
     await pubsub.subscribe(CHANNEL)
+    await websocket.accept()
 
     stop = asyncio.Event()
     last_send = 0.0
-    latest_payload: Optional[str] = None
+    last_ping = time.monotonic()
+    latest_payload: str | None = None
 
-    async def reader():
+    async def reader() -> None:
         nonlocal latest_payload
         try:
             async for msg in pubsub.listen():
@@ -45,58 +57,65 @@ async def ws_arbs(websocket: WebSocket):
                 data = msg.get("data")
                 if data is None:
                     continue
-                latest_payload = data
+                latest_payload = str(data)
         except Exception:
-            stop.set()
+            if not stop.is_set():
+                logger.exception("WebSocket Redis reader for %s failed", CHANNEL)
+                stop.set()
 
-    async def sender():
-        nonlocal last_send, latest_payload
+    async def sender() -> None:
+        nonlocal last_send, last_ping, latest_payload
         try:
             while not stop.is_set():
+                now = time.monotonic()
+                if latest_payload is not None and now - last_send >= MIN_INTERVAL:
+                    payload = latest_payload
+                    latest_payload = None
+                    last_send = now
+                    await websocket.send_text(_coerce_payload(payload))
+
+                if now - last_ping >= PING_INTERVAL_SECONDS:
+                    await websocket.send_text(json.dumps({"type": "ping"}))
+                    last_ping = now
+
                 await asyncio.sleep(0.02)
-                if latest_payload is None:
-                    continue
-
-                now = time.time()
-                if now - last_send < MIN_INTERVAL:
-                    continue
-
-                payload = latest_payload
-                latest_payload = None
-                last_send = now
-
-                try:
-                    json.loads(payload)
-                    await websocket.send_text(payload)
-                except Exception:
-                    await websocket.send_text(json.dumps({"type": "arb_update", "raw": str(payload)}))
         except WebSocketDisconnect:
             stop.set()
         except Exception:
-            stop.set()
+            if not stop.is_set():
+                logger.exception("WebSocket sender for %s failed", CHANNEL)
+                stop.set()
 
-    t1 = asyncio.create_task(reader())
-    t2 = asyncio.create_task(sender())
+    reader_task = asyncio.create_task(reader())
+    sender_task = asyncio.create_task(sender())
 
     try:
         while not stop.is_set():
-            await asyncio.sleep(15)
-            await websocket.send_text(json.dumps({"type": "ping"}))
+            await asyncio.sleep(0.1)
     except WebSocketDisconnect:
-        stop.set()
+        logger.info("WebSocket client disconnected from %s", CHANNEL)
+    except Exception:
+        logger.exception("WebSocket stream for %s failed", CHANNEL)
     finally:
         stop.set()
-        t1.cancel()
-        t2.cancel()
+        reader_task.cancel()
+        sender_task.cancel()
+        for task in (reader_task, sender_task):
+            try:
+                await task
+            except asyncio.CancelledError:
+                pass
+            except Exception:
+                logger.debug("WebSocket task shutdown for %s failed", CHANNEL, exc_info=True)
         try:
             await pubsub.unsubscribe(CHANNEL)
         except Exception:
-            pass
+            logger.debug("Failed to unsubscribe from %s", CHANNEL, exc_info=True)
         try:
-            await pubsub.close()
+            await pubsub.aclose()
         except Exception:
-            pass
+            logger.debug("Failed to close Redis pubsub", exc_info=True)
         try:
-            await r.close()
+            await r.aclose()
         except Exception:
-            pass
+            logger.debug("Failed to close Redis client", exc_info=True)

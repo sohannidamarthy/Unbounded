@@ -1,15 +1,11 @@
 "use client";
 
-import Image from "next/image";
-import { Fragment, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Fragment, useState } from "react";
 
-const TOKEN_STORAGE_KEY = "unbounded.access_token";
+import { DashboardHeader } from "../components/DashboardHeader";
+import { DraggableBetCalculatorPopup } from "../components/DraggableBetCalculatorPopup";
 
 export default function DashboardPage() {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAuthReady, setIsAuthReady] = useState(false);
   const showSidebar = true;
   const sportOptions = ["Basketball", "Football", "Baseball", "Soccer"] as const;
   const liveSportTabs = ["All", ...sportOptions] as const;
@@ -461,41 +457,6 @@ export default function DashboardPage() {
     },
   };
 
-  useEffect(() => {
-    setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
-    setIsAuthReady(true);
-    const handleStorage = () => {
-      setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-    };
-  }, []);
-  useEffect(() => {
-    if (!isBetCalculatorOpen) {
-      return;
-    }
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsBetCalculatorOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handleEscape);
-    return () => {
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, [isBetCalculatorOpen]);
-
-  const handleLogout = () => {
-    localStorage.removeItem(TOKEN_STORAGE_KEY);
-    setIsAuthenticated(false);
-  };
-
-  const handleLogoutClick = () => {
-    handleLogout();
-    router.push("/");
-  };
   const toDecimalOdds = (americanOdds: string) => {
     const value = Number(americanOdds);
     if (Number.isNaN(value) || value === 0) {
@@ -679,159 +640,10 @@ export default function DashboardPage() {
   };
   const isCurrentTabTracked =
     arbEvView === "arb" ? arbTabProfitTracker : evTabProfitTracker;
-  const calculatorStakeValue = Math.max(0, Number(betCalculatorStake || 0));
-  const calculatorDecimalOddsA = toDecimalOdds(betCalculatorOddsA);
-  const calculatorDecimalOddsB = toDecimalOdds(betCalculatorOddsB);
-  const canCalculate =
-    Boolean(calculatorDecimalOddsA && calculatorDecimalOddsB) &&
-    calculatorStakeValue > 0;
-  const impliedProbabilitySum =
-    canCalculate && calculatorDecimalOddsA && calculatorDecimalOddsB
-      ? 1 / calculatorDecimalOddsA + 1 / calculatorDecimalOddsB
-      : null;
-  const hasArbitrage = impliedProbabilitySum !== null && impliedProbabilitySum < 1;
-  const arbStakeA =
-    canCalculate && calculatorDecimalOddsA && calculatorDecimalOddsB
-      ? (calculatorStakeValue * calculatorDecimalOddsB) /
-        (calculatorDecimalOddsA + calculatorDecimalOddsB)
-      : 0;
-  const arbStakeB = canCalculate ? calculatorStakeValue - arbStakeA : 0;
-  const arbPayout =
-    canCalculate && calculatorDecimalOddsA ? arbStakeA * calculatorDecimalOddsA : 0;
-  const arbNetProfit = arbPayout - calculatorStakeValue;
-  const evProfitSideA =
-    canCalculate && calculatorDecimalOddsA
-      ? calculatorStakeValue * (calculatorDecimalOddsA - 1)
-      : 0;
-  const evProfitSideB =
-    canCalculate && calculatorDecimalOddsB
-      ? calculatorStakeValue * (calculatorDecimalOddsB - 1)
-      : 0;
-  const formatSignedUsd = (value: number) =>
-    `${value >= 0 ? "+" : "-"}$${Math.abs(value).toFixed(2)}`;
 
   return (
     <div className="site dashboard-page">
-      <header className="site-header">
-        <div className="brand">
-          <a className="brand-home-link" href="/" aria-label="Unbounded home">
-            <Image
-              src="/unbounded.jpeg"
-              alt="Unbounded logo"
-              width={56}
-              height={56}
-              priority
-            />
-          </a>
-          <a className="brand-text brand-home-link" href="/">
-            <span>Unbounded</span>
-          </a>
-          {isAuthReady && !isAuthenticated ? (
-            <div className="guest-badge">
-              <div className="guest-avatar" aria-hidden="true" />
-              <span>Guest</span>
-            </div>
-          ) : null}
-        </div>
-        <nav className="nav-links">
-          <a href="#arbitrage-bets">Arbitrage Bets</a>
-          <a href="#ev-bets">EV Bets</a>
-          <a href="/profit-tracker">Profit Tracker</a>
-          <a
-            href="#bet-calculator"
-            onClick={(event) => {
-              event.preventDefault();
-              setIsBetCalculatorOpen(true);
-            }}
-          >
-            Bet Calculator
-          </a>
-          <a href="#tools">Tools</a>
-        </nav>
-        <div className="header-actions header-actions--split">
-          <div className="dashboard-top-filters" aria-label="Dashboard filters">
-            <label className="dashboard-top-filter">
-              <span>Sport</span>
-              <select defaultValue="All sports">
-                <option>All sports</option>
-                <option>Basketball</option>
-                <option>Football</option>
-                <option>Baseball</option>
-                <option>Soccer</option>
-              </select>
-            </label>
-            <label className="dashboard-top-filter">
-              <span>Books</span>
-              <select defaultValue="All books">
-                <option>All books</option>
-                <option>Primebook</option>
-                <option>Skyline</option>
-                <option>Jetline</option>
-                <option>Northstar</option>
-              </select>
-            </label>
-          </div>
-          {isAuthReady ? (
-            isAuthenticated ? (
-              <>
-                <div className="account-menu">
-                  <button
-                    className="primary header-primary pulse-on-hover"
-                    type="button"
-                    aria-haspopup="menu"
-                  >
-                    Account
-                  </button>
-                  <div className="account-dropdown" role="menu">
-                    <button
-                      className="account-dropdown-item"
-                      type="button"
-                      role="menuitem"
-                    >
-                      My plan
-                    </button>
-                    <button
-                      className="account-dropdown-item"
-                      type="button"
-                      role="menuitem"
-                    >
-                      Notifications
-                    </button>
-                    <button
-                      className="account-dropdown-item"
-                      type="button"
-                      role="menuitem"
-                    >
-                      Settings
-                    </button>
-                    <button
-                      className="account-dropdown-item"
-                      type="button"
-                      role="menuitem"
-                    >
-                      Referrals
-                    </button>
-                    <button
-                      className="account-dropdown-item"
-                      type="button"
-                      role="menuitem"
-                      onClick={handleLogoutClick}
-                    >
-                      Log out
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <a className="primary header-primary pulse-on-hover" href="/auth">
-                Log in / Sign up
-              </a>
-            )
-          ) : (
-            <div className="header-actions-placeholder" aria-hidden="true" />
-          )}
-        </div>
-      </header>
+      <DashboardHeader onOpenBetCalculator={() => setIsBetCalculatorOpen(true)} />
 
       <main className="dashboard-main">
         <div
@@ -2238,137 +2050,18 @@ export default function DashboardPage() {
           </section>
         </div>
       </main>
-      {isBetCalculatorOpen ? (
-        <div
-          className="dashboard-betcalc-overlay"
-          role="presentation"
-          onClick={() => setIsBetCalculatorOpen(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 120,
-            background: "rgba(4, 12, 20, 0.76)",
-            display: "grid",
-            placeItems: "center",
-            padding: "18px",
-          }}
-        >
-          <div
-            className="dashboard-betcalc-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Bet calculator"
-            onClick={(event) => event.stopPropagation()}
-            style={{
-              width: "min(560px, 100%)",
-              borderRadius: "18px",
-              border: "1px solid rgba(215, 170, 66, 0.75)",
-              background:
-                "linear-gradient(165deg, rgba(8, 24, 40, 0.98), rgba(6, 18, 31, 0.98))",
-              boxShadow:
-                "0 28px 50px rgba(0, 0, 0, 0.48), inset 0 0 0 1px rgba(215, 170, 66, 0.18)",
-              padding: "18px",
-            }}
-          >
-            <div className="dashboard-betcalc-head">
-              <div>
-                <span>Bet calculator</span>
-                <h3>Arb / EV</h3>
-              </div>
-              <button
-                type="button"
-                aria-label="Close bet calculator"
-                onClick={() => setIsBetCalculatorOpen(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="dashboard-betcalc-toggle">
-              <button
-                type="button"
-                className={betCalculatorMode === "arb" ? "is-active" : "is-off"}
-                onClick={() => setBetCalculatorMode("arb")}
-              >
-                Arb
-              </button>
-              <button
-                type="button"
-                className={betCalculatorMode === "ev" ? "is-active" : "is-off"}
-                onClick={() => setBetCalculatorMode("ev")}
-              >
-                EV
-              </button>
-            </div>
-            <div className="dashboard-betcalc-inputs">
-              <label className="dashboard-betcalc-field">
-                <span>Odds side A</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="+110"
-                  value={betCalculatorOddsA}
-                  onChange={(event) => setBetCalculatorOddsA(event.target.value)}
-                />
-              </label>
-              <label className="dashboard-betcalc-field">
-                <span>Odds side B</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="-110"
-                  value={betCalculatorOddsB}
-                  onChange={(event) => setBetCalculatorOddsB(event.target.value)}
-                />
-              </label>
-              <label className="dashboard-betcalc-field">
-                <span>Total stake</span>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="100"
-                  value={betCalculatorStake}
-                  onChange={(event) => setBetCalculatorStake(event.target.value)}
-                />
-              </label>
-            </div>
-            <div className="dashboard-betcalc-result">
-              {!canCalculate ? (
-                <p>Enter valid + / - American odds for both sides and a stake.</p>
-              ) : betCalculatorMode === "arb" ? (
-                <div className="dashboard-betcalc-arb-result">
-                  <div className={`dashboard-betcalc-status${hasArbitrage ? " is-yes" : ""}`}>
-                    Arbitrage: {hasArbitrage ? "Yes" : "No"}
-                  </div>
-                  {hasArbitrage ? (
-                    <>
-                      <strong>Net profit: {formatSignedUsd(arbNetProfit)}</strong>
-                      <div className="dashboard-betcalc-meta">
-                        <span>Stake A: ${arbStakeA.toFixed(2)}</span>
-                        <span>Stake B: ${arbStakeB.toFixed(2)}</span>
-                      </div>
-                    </>
-                  ) : (
-                    <strong>Net profit: none</strong>
-                  )}
-                </div>
-              ) : (
-                <div className="dashboard-betcalc-ev-result">
-                  <div className="dashboard-betcalc-ev-row">
-                    <span>If side A wins</span>
-                    <strong>Profit A: {formatSignedUsd(evProfitSideA)}</strong>
-                    <strong>Loss B: {formatSignedUsd(-calculatorStakeValue)}</strong>
-                  </div>
-                  <div className="dashboard-betcalc-ev-row">
-                    <span>If side B wins</span>
-                    <strong>Profit B: {formatSignedUsd(evProfitSideB)}</strong>
-                    <strong>Loss A: {formatSignedUsd(-calculatorStakeValue)}</strong>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <DraggableBetCalculatorPopup
+        isOpen={isBetCalculatorOpen}
+        mode={betCalculatorMode}
+        stake={betCalculatorStake}
+        oddsA={betCalculatorOddsA}
+        oddsB={betCalculatorOddsB}
+        onClose={() => setIsBetCalculatorOpen(false)}
+        onModeChange={setBetCalculatorMode}
+        onStakeChange={setBetCalculatorStake}
+        onOddsAChange={setBetCalculatorOddsA}
+        onOddsBChange={setBetCalculatorOddsB}
+      />
 
       <footer className="site-footer">
         <div>

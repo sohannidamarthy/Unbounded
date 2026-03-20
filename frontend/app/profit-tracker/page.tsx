@@ -1,7 +1,9 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+
+import { DashboardHeader } from "../components/DashboardHeader";
+import { DraggableBetCalculatorPopup } from "../components/DraggableBetCalculatorPopup";
 
 type Source = "live" | "arb" | "ev";
 type Period = "day" | "week" | "month" | "year";
@@ -294,99 +296,15 @@ export default function ProfitTrackerPage() {
       return [...current, source];
     });
   };
-  const toDecimalOdds = (americanOdds: string) => {
-    const value = Number(americanOdds);
-    if (Number.isNaN(value) || value === 0) {
-      return null;
-    }
-    return value > 0 ? 1 + value / 100 : 1 + 100 / Math.abs(value);
-  };
-  const calculatorDecimalOddsA = toDecimalOdds(betCalculatorOddsA.trim());
-  const calculatorDecimalOddsB = toDecimalOdds(betCalculatorOddsB.trim());
-  const calculatorStakeValue = Math.max(0, Number(betCalculatorStake || 0));
-  const canCalculate = Boolean(
-    calculatorDecimalOddsA && calculatorDecimalOddsB && calculatorStakeValue > 0
-  );
-  const impliedA = calculatorDecimalOddsA ? 1 / calculatorDecimalOddsA : 0;
-  const impliedB = calculatorDecimalOddsB ? 1 / calculatorDecimalOddsB : 0;
-  const impliedTotal = impliedA + impliedB;
-  const hasArbitrage = canCalculate && impliedTotal < 1;
-  const arbStakeA =
-    canCalculate && impliedTotal > 0 ? (calculatorStakeValue * impliedA) / impliedTotal : 0;
-  const arbStakeB = calculatorStakeValue - arbStakeA;
-  const arbPayout =
-    canCalculate && calculatorDecimalOddsA ? arbStakeA * calculatorDecimalOddsA : 0;
-  const arbNetProfit = arbPayout - calculatorStakeValue;
-  const evProfitSideA =
-    canCalculate && calculatorDecimalOddsA
-      ? calculatorStakeValue * (calculatorDecimalOddsA - 1)
-      : 0;
-  const evProfitSideB =
-    canCalculate && calculatorDecimalOddsB
-      ? calculatorStakeValue * (calculatorDecimalOddsB - 1)
-      : 0;
-  const formatSignedUsd = (value: number) =>
-    `${value >= 0 ? "+" : "-"}$${Math.abs(value).toFixed(2)}`;
-
   useEffect(() => {
     if (window.location.hash === "#bet-calculator") {
       setIsBetCalculatorOpen(true);
     }
   }, []);
 
-  useEffect(() => {
-    if (!isBetCalculatorOpen) {
-      return;
-    }
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsBetCalculatorOpen(false);
-      }
-    };
-    window.addEventListener("keydown", handleEscape);
-    return () => {
-      window.removeEventListener("keydown", handleEscape);
-    };
-  }, [isBetCalculatorOpen]);
-
   return (
-    <div className="site profit-tracker-page">
-      <header className="site-header">
-        <div className="brand">
-          <a className="brand-home-link" href="/" aria-label="Unbounded home">
-            <Image
-              src="/unbounded.jpeg"
-              alt="Unbounded logo"
-              width={56}
-              height={56}
-              priority
-            />
-          </a>
-          <a className="brand-text brand-home-link" href="/">
-            <span>Unbounded</span>
-          </a>
-        </div>
-        <nav className="nav-links">
-          <a href="/dashboard#arbitrage-bets">Arbitrage Bets</a>
-          <a href="/dashboard#ev-bets">EV Bets</a>
-          <a href="/profit-tracker">Profit Tracker</a>
-          <a
-            href="#bet-calculator"
-            onClick={(event) => {
-              event.preventDefault();
-              setIsBetCalculatorOpen(true);
-            }}
-          >
-            Bet Calculator
-          </a>
-          <a href="/dashboard#tools">Tools</a>
-        </nav>
-        <div className="header-actions">
-          <a className="primary header-primary pulse-on-hover" href="/dashboard">
-            Back to Dashboard
-          </a>
-        </div>
-      </header>
+    <div className="site dashboard-page profit-tracker-page">
+      <DashboardHeader onOpenBetCalculator={() => setIsBetCalculatorOpen(true)} />
 
       <main className="profit-tracker-main">
         <div className="profit-tracker-shell">
@@ -732,137 +650,19 @@ export default function ProfitTrackerPage() {
           </aside>
         </div>
       ) : null}
-      {isBetCalculatorOpen ? (
-        <div
-          className="dashboard-betcalc-overlay"
-          role="presentation"
-          onClick={() => setIsBetCalculatorOpen(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 120,
-            background: "rgba(4, 12, 20, 0.76)",
-            display: "grid",
-            placeItems: "center",
-            padding: "18px",
-          }}
-        >
-          <div
-            className="dashboard-betcalc-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Bet calculator"
-            onClick={(event) => event.stopPropagation()}
-            style={{
-              width: "min(560px, 100%)",
-              borderRadius: "18px",
-              border: "1px solid rgba(215, 170, 66, 0.75)",
-              background:
-                "linear-gradient(165deg, rgba(8, 24, 40, 0.98), rgba(6, 18, 31, 0.98))",
-              boxShadow:
-                "0 28px 50px rgba(0, 0, 0, 0.48), inset 0 0 0 1px rgba(215, 170, 66, 0.18)",
-              padding: "18px",
-            }}
-          >
-            <div className="dashboard-betcalc-head">
-              <div>
-                <span>Bet calculator</span>
-                <h3>Arb / EV</h3>
-              </div>
-              <button
-                type="button"
-                aria-label="Close bet calculator"
-                onClick={() => setIsBetCalculatorOpen(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="dashboard-betcalc-toggle">
-              <button
-                type="button"
-                className={betCalculatorMode === "arb" ? "is-active" : "is-off"}
-                onClick={() => setBetCalculatorMode("arb")}
-              >
-                Arb
-              </button>
-              <button
-                type="button"
-                className={betCalculatorMode === "ev" ? "is-active" : "is-off"}
-                onClick={() => setBetCalculatorMode("ev")}
-              >
-                EV
-              </button>
-            </div>
-            <div className="dashboard-betcalc-inputs">
-              <label className="dashboard-betcalc-field">
-                <span>Odds side A</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="+110"
-                  value={betCalculatorOddsA}
-                  onChange={(event) => setBetCalculatorOddsA(event.target.value)}
-                />
-              </label>
-              <label className="dashboard-betcalc-field">
-                <span>Odds side B</span>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  placeholder="-110"
-                  value={betCalculatorOddsB}
-                  onChange={(event) => setBetCalculatorOddsB(event.target.value)}
-                />
-              </label>
-              <label className="dashboard-betcalc-field">
-                <span>Total stake</span>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="100"
-                  value={betCalculatorStake}
-                  onChange={(event) => setBetCalculatorStake(event.target.value)}
-                />
-              </label>
-            </div>
-            <div className="dashboard-betcalc-result">
-              {!canCalculate ? (
-                <p>Enter valid + / - American odds for both sides and a stake.</p>
-              ) : betCalculatorMode === "arb" ? (
-                <div className="dashboard-betcalc-arb-result">
-                  <div className={`dashboard-betcalc-status${hasArbitrage ? " is-yes" : ""}`}>
-                    Arbitrage: {hasArbitrage ? "Yes" : "No"}
-                  </div>
-                  {hasArbitrage ? (
-                    <>
-                      <strong>Net profit: {formatSignedUsd(arbNetProfit)}</strong>
-                      <div className="dashboard-betcalc-meta">
-                        <span>Stake A: ${arbStakeA.toFixed(2)}</span>
-                        <span>Stake B: ${arbStakeB.toFixed(2)}</span>
-                      </div>
-                    </>
-                  ) : (
-                    <strong>Net profit: none</strong>
-                  )}
-                </div>
-              ) : (
-                <div className="dashboard-betcalc-ev-result">
-                  <div className="dashboard-betcalc-ev-row">
-                    <span>If side A wins</span>
-                    <strong>Profit A: {formatSignedUsd(evProfitSideA)}</strong>
-                    <strong>Loss B: {formatSignedUsd(-calculatorStakeValue)}</strong>
-                  </div>
-                  <div className="dashboard-betcalc-ev-row">
-                    <span>If side B wins</span>
-                    <strong>Profit B: {formatSignedUsd(evProfitSideB)}</strong>
-                    <strong>Loss A: {formatSignedUsd(-calculatorStakeValue)}</strong>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <DraggableBetCalculatorPopup
+        isOpen={isBetCalculatorOpen}
+        mode={betCalculatorMode}
+        stake={betCalculatorStake}
+        oddsA={betCalculatorOddsA}
+        oddsB={betCalculatorOddsB}
+        disableBackdropBlur
+        onClose={() => setIsBetCalculatorOpen(false)}
+        onModeChange={setBetCalculatorMode}
+        onStakeChange={setBetCalculatorStake}
+        onOddsAChange={setBetCalculatorOddsA}
+        onOddsBChange={setBetCalculatorOddsB}
+      />
     </div>
   );
 }

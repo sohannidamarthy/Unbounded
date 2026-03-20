@@ -18,6 +18,11 @@ class AuthPayload(BaseModel):
     password: str = Field(min_length=8)
 
 
+class SignupPayload(BaseModel):
+    email: EmailStr
+    password: str = Field(min_length=10, max_length=100)
+
+
 class AuthResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
@@ -30,7 +35,8 @@ class UserProfile(BaseModel):
     is_admin: bool
 
 
-class SignupResponse(AuthResponse):
+class SignupResponse(BaseModel):
+    message: str
     user: UserProfile
 
 
@@ -43,9 +49,44 @@ def _find_user_by_email(db: Session, email: str) -> Optional[User]:
     return db.scalar(stmt)
 
 
+def _validate_signup_password(password: str) -> Optional[str]:
+    profanity_patterns = (
+        "fuck",
+        "shit",
+        "bitch",
+        "asshole",
+        "bastard",
+        "cunt",
+        "dick",
+        "whore",
+        "slut",
+    )
+
+    if len(password) < 10 or len(password) > 100:
+        return "Password must be 10 to 100 characters."
+    if any(char.isspace() for char in password):
+        return "Password cannot include spaces."
+    if not any(char.isupper() for char in password):
+        return "Password must include at least one uppercase letter."
+    if not any(char.isdigit() for char in password):
+        return "Password must include at least one number."
+    if password.isalnum():
+        return "Password must include at least one symbol."
+    lowered = password.lower()
+    if any(pattern in lowered for pattern in profanity_patterns):
+        return "Password cannot include profanity."
+    return None
+
+
 @router.post("/signup", response_model=SignupResponse)
-def signup(payload: AuthPayload, db: Session = Depends(get_db)):
+def signup(payload: SignupPayload, db: Session = Depends(get_db)):
     email = _normalize_email(payload.email)
+    password_error = _validate_signup_password(payload.password)
+    if password_error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=password_error,
+        )
     existing = _find_user_by_email(db, email)
     if existing:
         raise HTTPException(
@@ -71,10 +112,8 @@ def signup(payload: AuthPayload, db: Session = Depends(get_db)):
         )
 
     db.refresh(user)
-    token = create_access_token(str(user.id))
-
     return SignupResponse(
-        access_token=token,
+        message="Account created. Please log in to continue.",
         user=UserProfile(
             id=str(user.id),
             email=user.email,

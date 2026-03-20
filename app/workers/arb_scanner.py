@@ -230,9 +230,6 @@ def write_arb(r: redis.Redis, arb: Dict[str, Any]) -> None:
     pipe.execute()
 
     # Week 6: notify live subscribers (Pub/Sub)
-    r.publish(ARB_UPDATES_CHANNEL, json.dumps(arb, separators=(',', ':')))
-
-    # Week 6: notify live subscribers (Pub/Sub)
     r.publish(ARB_UPDATES_CHANNEL, json.dumps(arb, separators=(",", ":")))
 
 

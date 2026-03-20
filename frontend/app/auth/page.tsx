@@ -5,24 +5,499 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type AuthMode = "login" | "signup";
+type MessageTone = "success" | "error" | "info";
+type SignupStep = 1 | 2 | 3;
+
+type TutorialItem = {
+  eyebrow: string;
+  title: string;
+  duration: string;
+  description: string;
+  points: string[];
+};
+
+type SignupFormState = {
+  email: string;
+  username: string;
+  promoCode: string;
+  password: string;
+  confirmPassword: string;
+  country: string;
+  state: string;
+  maxBet: string;
+  experienceLevel: string;
+  bettingGoal: string;
+  yearlyProfitTarget: string;
+  betFrequency: string;
+};
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 const SAVED_EMAIL_KEY = "unbounded.saved_email";
 
+const COUNTRY_OPTIONS = [
+  { value: "US", label: "United States" },
+  { value: "CA", label: "Canada" },
+  { value: "UK", label: "United Kingdom" },
+  { value: "AU", label: "Australia" }
+];
+
+const REGION_OPTIONS: Record<string, { value: string; label: string }[]> = {
+  US: [
+    { value: "AL", label: "Alabama" },
+    { value: "AK", label: "Alaska" },
+    { value: "AZ", label: "Arizona" },
+    { value: "AR", label: "Arkansas" },
+    { value: "CA", label: "California" },
+    { value: "CO", label: "Colorado" },
+    { value: "CT", label: "Connecticut" },
+    { value: "DE", label: "Delaware" },
+    { value: "FL", label: "Florida" },
+    { value: "GA", label: "Georgia" },
+    { value: "HI", label: "Hawaii" },
+    { value: "ID", label: "Idaho" },
+    { value: "IL", label: "Illinois" },
+    { value: "IN", label: "Indiana" },
+    { value: "IA", label: "Iowa" },
+    { value: "KS", label: "Kansas" },
+    { value: "KY", label: "Kentucky" },
+    { value: "LA", label: "Louisiana" },
+    { value: "MA", label: "Massachusetts" },
+    { value: "MD", label: "Maryland" },
+    { value: "ME", label: "Maine" },
+    { value: "MI", label: "Michigan" },
+    { value: "MN", label: "Minnesota" },
+    { value: "MO", label: "Missouri" },
+    { value: "MS", label: "Mississippi" },
+    { value: "MT", label: "Montana" },
+    { value: "NC", label: "North Carolina" },
+    { value: "ND", label: "North Dakota" },
+    { value: "NE", label: "Nebraska" },
+    { value: "NH", label: "New Hampshire" },
+    { value: "NJ", label: "New Jersey" },
+    { value: "NM", label: "New Mexico" },
+    { value: "NY", label: "New York" },
+    { value: "NV", label: "Nevada" },
+    { value: "OH", label: "Ohio" },
+    { value: "OK", label: "Oklahoma" },
+    { value: "OR", label: "Oregon" },
+    { value: "PA", label: "Pennsylvania" },
+    { value: "RI", label: "Rhode Island" },
+    { value: "SC", label: "South Carolina" },
+    { value: "SD", label: "South Dakota" },
+    { value: "TN", label: "Tennessee" },
+    { value: "TX", label: "Texas" },
+    { value: "UT", label: "Utah" },
+    { value: "VA", label: "Virginia" },
+    { value: "VT", label: "Vermont" },
+    { value: "WA", label: "Washington" },
+    { value: "WI", label: "Wisconsin" },
+    { value: "WV", label: "West Virginia" },
+    { value: "WY", label: "Wyoming" }
+  ],
+  CA: [
+    { value: "AB", label: "Alberta" },
+    { value: "BC", label: "British Columbia" },
+    { value: "ON", label: "Ontario" },
+    { value: "QC", label: "Quebec" }
+  ],
+  UK: [
+    { value: "ENG", label: "England" },
+    { value: "NIR", label: "Northern Ireland" },
+    { value: "SCT", label: "Scotland" },
+    { value: "WLS", label: "Wales" }
+  ],
+  AU: [
+    { value: "NSW", label: "New South Wales" },
+    { value: "QLD", label: "Queensland" },
+    { value: "SA", label: "South Australia" },
+    { value: "VIC", label: "Victoria" },
+    { value: "WA", label: "Western Australia" }
+  ]
+};
+
+const GLOBAL_SPORTSBOOKS = [
+  "Bet365",
+  "BetMGM",
+  "BetRivers",
+  "Caesars",
+  "DraftKings",
+  "ESPN BET",
+  "Fanatics",
+  "FanDuel",
+  "Hard Rock Bet",
+  "Paddy Power",
+  "PointsBet",
+  "Sportsbet",
+  "TAB",
+  "William Hill"
+];
+
+const SPORTSBOOKS_BY_COUNTRY: Record<string, string[]> = {
+  US: [
+    "FanDuel",
+    "DraftKings",
+    "BetMGM",
+    "Caesars",
+    "ESPN BET",
+    "Fanatics",
+    "BetRivers",
+    "Hard Rock Bet",
+    "PointsBet",
+    "Bet365"
+  ],
+  CA: ["Bet365", "BetMGM", "DraftKings", "FanDuel", "BetRivers"],
+  UK: ["Bet365", "Betfair", "Paddy Power", "William Hill", "Ladbrokes"],
+  AU: ["Sportsbet", "TAB", "Neds", "Ladbrokes", "Bet365"]
+};
+
+const LEGAL_SPORTSBOOKS_BY_REGION: Record<string, string[]> = {
+  US: ["FanDuel", "DraftKings", "BetMGM", "Caesars", "BetRivers"],
+  "US:AZ": ["FanDuel", "DraftKings", "BetMGM", "Caesars", "ESPN BET"],
+  "US:CO": ["FanDuel", "DraftKings", "BetMGM", "Caesars", "Bet365", "Fanatics"],
+  "US:IL": ["FanDuel", "DraftKings", "BetMGM", "Caesars", "Fanatics", "BetRivers"],
+  "US:NJ": ["FanDuel", "DraftKings", "BetMGM", "Caesars", "Bet365", "Hard Rock Bet"],
+  "US:NY": ["FanDuel", "DraftKings", "BetMGM", "Caesars", "BetRivers"],
+  "US:PA": ["FanDuel", "DraftKings", "BetMGM", "Caesars", "BetRivers", "ESPN BET"],
+  CA: ["Bet365", "BetMGM", "DraftKings", "BetRivers"],
+  UK: ["Bet365", "Betfair", "Paddy Power", "William Hill"],
+  AU: ["Sportsbet", "TAB", "Neds", "Ladbrokes", "Bet365"]
+};
+
+const EXPERIENCE_OPTIONS = ["Beginner", "Intermediate", "Advanced", "Sharp"];
+const BET_FREQUENCY_OPTIONS = [
+  "A few bets per week",
+  "Daily",
+  "A few times a day",
+  "High volume"
+];
+const GOAL_OPTIONS = [
+  "Find the best odds",
+  "Build steady profit",
+  "Track promos and boosts",
+  "Learn EV and arbitrage"
+];
+
+const MAX_PASSWORD_LENGTH = 100;
+const MAX_USERNAME_LENGTH = 24;
+const PROFANITY_PATTERNS = [
+  "fuck",
+  "shit",
+  "bitch",
+  "asshole",
+  "bastard",
+  "cunt",
+  "dick",
+  "whore",
+  "slut"
+];
+const PASSWORD_REQUIREMENTS = [
+  "10 to 100 characters",
+  "At least 1 uppercase letter",
+  "At least 1 number",
+  "At least 1 symbol",
+  "No spaces",
+  "No profanity"
+];
+
+const DEFAULT_TUTORIALS: TutorialItem[] = [
+  {
+    eyebrow: "Recommended tutorial",
+    title: "How Unbounded finds strong daily spots",
+    duration: "6 min",
+    description:
+      "Start with the dashboard workflow so you know where to scan, what to ignore, and how to move quickly between boards.",
+    points: [
+      "Reading the main boards",
+      "Filtering by books and sports",
+      "Knowing which numbers matter first"
+    ]
+  },
+  {
+    eyebrow: "Recommended tutorial",
+    title: "Turning raw odds into cleaner decisions",
+    duration: "8 min",
+    description:
+      "Learn the basic rhythm for checking odds, sizing bets, and deciding whether a line is worth your time.",
+    points: [
+      "Quick sanity checks",
+      "Comparing books without overthinking",
+      "Logging decisions so you improve faster"
+    ]
+  },
+  {
+    eyebrow: "Recommended tutorial",
+    title: "Tracking profit and closing the loop",
+    duration: "5 min",
+    description:
+      "Use profit tracking to keep your results honest and spot where your process is actually working.",
+    points: [
+      "What to log after each bet",
+      "How to read your profit curve",
+      "Finding leaks in your routine"
+    ]
+  }
+];
+
+const TUTORIALS_BY_EXPERIENCE: Record<string, TutorialItem[]> = {
+  Beginner: [
+    {
+      eyebrow: "Beginner path",
+      title: "Arb and EV basics without the noise",
+      duration: "7 min",
+      description:
+        "A clean intro to the two core bet types, what makes them different, and how to avoid rookie mistakes.",
+      points: [
+        "What arbitrage means in practice",
+        "Why EV can lose in the short term",
+        "How to think in samples, not single bets"
+      ]
+    },
+    {
+      eyebrow: "Beginner path",
+      title: "Reading odds in under five minutes",
+      duration: "5 min",
+      description:
+        "Get comfortable with American odds, implied probability, and the numbers you should compare first.",
+      points: [
+        "Converting odds mentally",
+        "Spotting price differences quickly",
+        "Knowing when a line is too thin"
+      ]
+    },
+    {
+      eyebrow: "Beginner path",
+      title: "First-week setup for tracking results",
+      duration: "6 min",
+      description:
+        "Build a simple routine so your early bets teach you something useful instead of becoming random history.",
+      points: [
+        "Setting a practical max bet",
+        "Choosing realistic goals",
+        "Using the tracker without overcomplicating it"
+      ]
+    }
+  ],
+  Intermediate: [
+    {
+      eyebrow: "Intermediate path",
+      title: "Finding higher-quality EV faster",
+      duration: "8 min",
+      description:
+        "Tighten your filtering so you spend less time scrolling and more time acting on the right opportunities.",
+      points: [
+        "Prioritizing the best markets",
+        "Using book filters effectively",
+        "Avoiding stale numbers"
+      ]
+    },
+    {
+      eyebrow: "Intermediate path",
+      title: "Sizing bets with discipline",
+      duration: "7 min",
+      description:
+        "Move from flat betting toward a more deliberate staking process that still stays practical.",
+      points: [
+        "Balancing edge and bankroll",
+        "When to pass instead of force volume",
+        "How bet frequency changes your plan"
+      ]
+    },
+    {
+      eyebrow: "Intermediate path",
+      title: "Using the profit tracker to adjust strategy",
+      duration: "6 min",
+      description:
+        "Look at your historical results the way a sharper bettor would and make changes based on evidence.",
+      points: [
+        "Separating signal from variance",
+        "Comparing books and markets",
+        "Refining your process month to month"
+      ]
+    }
+  ],
+  Advanced: [
+    {
+      eyebrow: "Advanced path",
+      title: "Reducing friction in your daily workflow",
+      duration: "9 min",
+      description:
+        "Build a faster routine across filters, calculators, and trackers so execution keeps up with your edge.",
+      points: [
+        "Moving between tools without context loss",
+        "Prioritizing books by value and speed",
+        "Cleaning up your daily process"
+      ]
+    },
+    {
+      eyebrow: "Advanced path",
+      title: "Protecting edge with better review loops",
+      duration: "8 min",
+      description:
+        "Use your own history to check whether your volume, bet size, and market mix still make sense.",
+      points: [
+        "Auditing your assumptions",
+        "Detecting soft regressions early",
+        "Separating process drift from variance"
+      ]
+    },
+    {
+      eyebrow: "Advanced path",
+      title: "Scaling without getting sloppy",
+      duration: "7 min",
+      description:
+        "Advanced workflows break when execution quality drops. This tutorial focuses on keeping your process tight.",
+      points: [
+        "Managing more books cleanly",
+        "Keeping limits and goals aligned",
+        "Staying selective at higher volume"
+      ]
+    }
+  ],
+  Sharp: [
+    {
+      eyebrow: "Sharp path",
+      title: "Workflow tuning for high-volume users",
+      duration: "9 min",
+      description:
+        "This is the fast path for users who already know the concepts and want the platform workflow optimized.",
+      points: [
+        "Compressing scan-to-bet time",
+        "Structuring filters by decision priority",
+        "Using tracking as an execution audit"
+      ]
+    },
+    {
+      eyebrow: "Sharp path",
+      title: "Improving review quality, not just volume",
+      duration: "6 min",
+      description:
+        "Use tighter post-bet review loops so your edge stays durable instead of turning into noise.",
+      points: [
+        "Reviewing market mix and hold",
+        "Spotting weak bet clusters",
+        "Keeping your process adaptive"
+      ]
+    },
+    {
+      eyebrow: "Sharp path",
+      title: "Getting more from the calculator and tracker",
+      duration: "5 min",
+      description:
+        "A short workflow tutorial focused on the tools that matter once you already understand the underlying math.",
+      points: [
+        "Faster verification workflows",
+        "Cleaner profit-tracking discipline",
+        "Making the tools work like a single system"
+      ]
+    }
+  ]
+};
+
+const DEFAULT_SIGNUP_FORM: SignupFormState = {
+  email: "",
+  username: "",
+  promoCode: "",
+  password: "",
+  confirmPassword: "",
+  country: "US",
+  state: "",
+  maxBet: "",
+  experienceLevel: "",
+  bettingGoal: "",
+  yearlyProfitTarget: "",
+  betFrequency: ""
+};
+
+function getRegionLabel(country: string) {
+  if (country === "CA") {
+    return "Province";
+  }
+  if (country === "UK" || country === "AU") {
+    return "Region";
+  }
+  return "State";
+}
+
+function uniqueValues(values: string[]) {
+  return Array.from(new Set(values));
+}
+
+function getEmailForApi(value: string) {
+  const normalized = value.trim();
+  return normalized.includes("@") ? normalized : null;
+}
+
+function includesProfanity(value: string) {
+  const normalized = value.toLowerCase();
+  return PROFANITY_PATTERNS.some((pattern) => normalized.includes(pattern));
+}
+
+function validateUsername(value: string) {
+  const username = value.trim();
+
+  if (username.length < 3 || username.length > MAX_USERNAME_LENGTH) {
+    return `Username must be 3 to ${MAX_USERNAME_LENGTH} characters.`;
+  }
+
+  if (/\s/.test(username)) {
+    return "Username cannot include spaces.";
+  }
+
+  if (!/^[A-Za-z0-9._-]+$/.test(username)) {
+    return "Username can only use letters, numbers, periods, underscores, and hyphens.";
+  }
+
+  if (includesProfanity(username)) {
+    return "Choose a different username.";
+  }
+
+  return null;
+}
+
+function validatePassword(value: string) {
+  if (value.length < 10 || value.length > MAX_PASSWORD_LENGTH) {
+    return `Password must be 10 to ${MAX_PASSWORD_LENGTH} characters.`;
+  }
+
+  if (/\s/.test(value)) {
+    return "Password cannot include spaces.";
+  }
+
+  if (!/[A-Z]/.test(value)) {
+    return "Password must include at least one uppercase letter.";
+  }
+
+  if (!/[0-9]/.test(value)) {
+    return "Password must include at least one number.";
+  }
+
+  if (!/[^A-Za-z0-9]/.test(value)) {
+    return "Password must include at least one symbol.";
+  }
+
+  if (includesProfanity(value)) {
+    return "Password cannot include profanity.";
+  }
+
+  return null;
+}
+
 export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("login");
+  const [signupStep, setSignupStep] = useState<SignupStep>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [messageTone, setMessageTone] = useState<"success" | "error" | "info">(
-    "info"
-  );
-  const [token, setToken] = useState<string | null>(null);
+  const [messageTone, setMessageTone] = useState<MessageTone>("info");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
   const [rememberEmail, setRememberEmail] = useState(false);
+  const [signupForm, setSignupForm] = useState<SignupFormState>(DEFAULT_SIGNUP_FORM);
+  const [selectedSportsbooks, setSelectedSportsbooks] = useState<string[]>([]);
+  const [tutorialIndex, setTutorialIndex] = useState(0);
 
   const apiBase = useMemo(() => {
     return (
@@ -35,7 +510,32 @@ export default function AuthPage() {
     process.env.NEXT_PUBLIC_AUTH_LOGIN_URL || `${apiBase}/auth/login`;
   const signupEndpoint =
     process.env.NEXT_PUBLIC_AUTH_SIGNUP_URL || `${apiBase}/auth/signup`;
-  const validateEndpoint = `${apiBase}/v1/sports`;
+
+  const regionOptions = REGION_OPTIONS[signupForm.country] || [];
+  const regionLabel = getRegionLabel(signupForm.country);
+
+  const sportsbookOptions = useMemo(() => {
+    return uniqueValues([
+      ...(SPORTSBOOKS_BY_COUNTRY[signupForm.country] || []),
+      ...GLOBAL_SPORTSBOOKS
+    ]).sort((left, right) => left.localeCompare(right));
+  }, [signupForm.country]);
+
+  const legalSportsbooks = useMemo(() => {
+    if (signupForm.state) {
+      return LEGAL_SPORTSBOOKS_BY_REGION[`${signupForm.country}:${signupForm.state}`] || [];
+    }
+
+    return LEGAL_SPORTSBOOKS_BY_REGION[signupForm.country] || [];
+  }, [signupForm.country, signupForm.state]);
+
+  const recommendedTutorials = useMemo(() => {
+    return (
+      TUTORIALS_BY_EXPERIENCE[signupForm.experienceLevel] || DEFAULT_TUTORIALS
+    );
+  }, [signupForm.experienceLevel]);
+
+  const activeTutorial = recommendedTutorials[tutorialIndex] || recommendedTutorials[0];
 
   useEffect(() => {
     const savedEmail = localStorage.getItem(SAVED_EMAIL_KEY);
@@ -45,6 +545,212 @@ export default function AuthPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!regionOptions.some((option) => option.value === signupForm.state)) {
+      setSignupForm((current) => ({ ...current, state: "" }));
+    }
+  }, [regionOptions, signupForm.state]);
+
+  const readErrorMessage = async (response: Response) => {
+    const contentType = response.headers.get("content-type") || "";
+
+    try {
+      if (contentType.includes("application/json")) {
+        const data = await response.json();
+        if (typeof data?.detail === "string") {
+          return data.detail;
+        }
+        if (Array.isArray(data?.detail)) {
+          const detailText = data.detail
+            .map((item: { msg?: string }) => item?.msg)
+            .filter(Boolean)
+            .join(" ");
+          if (detailText) {
+            return detailText;
+          }
+        }
+        if (typeof data?.message === "string") {
+          return data.message;
+        }
+      } else {
+        const text = await response.text();
+        if (text) {
+          return text.slice(0, 240);
+        }
+      }
+    } catch {
+      return null;
+    }
+
+    return null;
+  };
+
+  const resetSignupFlow = () => {
+    setSignupStep(1);
+    setSignupForm(DEFAULT_SIGNUP_FORM);
+    setSelectedSportsbooks([]);
+    setTutorialIndex(0);
+    setPasswordError(null);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
+  };
+
+  const handleModeChange = (nextMode: AuthMode) => {
+    setMode(nextMode);
+    setMessage(null);
+    setMessageTone("info");
+    setPasswordError(null);
+
+    if (nextMode === "login") {
+      const savedEmail = localStorage.getItem(SAVED_EMAIL_KEY);
+      if (savedEmail) {
+        setEmail(savedEmail);
+        setRememberEmail(true);
+      }
+      setLoginPassword("");
+      resetSignupFlow();
+      return;
+    }
+
+    resetSignupFlow();
+  };
+
+  const updateSignupField = (field: keyof SignupFormState, value: string) => {
+    setSignupForm((current) => ({ ...current, [field]: value }));
+    if (field === "username" || field === "password" || field === "confirmPassword") {
+      setPasswordError(null);
+    }
+    if (field === "country") {
+      setSelectedSportsbooks([]);
+    }
+    if (field === "state") {
+      setSelectedSportsbooks([]);
+    }
+  };
+
+  const validateSignupStepOne = () => {
+    const usernameError = validateUsername(signupForm.username);
+    if (usernameError) {
+      setPasswordError(usernameError);
+      return false;
+    }
+
+    const passwordValidation = validatePassword(signupForm.password);
+    if (passwordValidation) {
+      setSignupForm((current) => ({
+        ...current,
+        password: "",
+        confirmPassword: ""
+      }));
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+      setPasswordError(`${passwordValidation} Password fields were cleared.`);
+      return false;
+    }
+    if (signupForm.password !== signupForm.confirmPassword) {
+      setSignupForm((current) => ({
+        ...current,
+        password: "",
+        confirmPassword: ""
+      }));
+      setShowPassword(false);
+      setShowConfirmPassword(false);
+      setPasswordError(
+        "Passwords did not match. Password fields were cleared so you can re-enter them."
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const hydrateLegalSportsbooks = () => {
+    setSelectedSportsbooks((current) => {
+      if (current.length > 0) {
+        return current;
+      }
+      return legalSportsbooks;
+    });
+  };
+
+  const goToTutorialStep = () => {
+    setSignupStep(3);
+    setTutorialIndex(0);
+  };
+
+  const completeSignup = async (skipPreferences: boolean) => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    setMessage(null);
+    setPasswordError(null);
+
+    try {
+      const emailForApi = getEmailForApi(signupForm.email);
+      if (!emailForApi) {
+        setMessageTone("error");
+        setMessage("Use an email address for signup for now.");
+        return;
+      }
+
+      const response = await fetch(signupEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: emailForApi,
+          password: signupForm.password
+        })
+      });
+
+      if (response.status === 429) {
+        setMessageTone("error");
+        setMessage("Too many attempts. Please wait a minute and try again.");
+        return;
+      }
+
+      if (response.status === 503) {
+        setMessageTone("error");
+        setMessage("Auth is warming up. Please try again in a moment.");
+        return;
+      }
+
+      if (!response.ok) {
+        const detail = await readErrorMessage(response);
+        setMessageTone("error");
+        setMessage(detail || "Something went wrong. Please try again.");
+        return;
+      }
+
+      setMode("login");
+      setSignupStep(1);
+      setEmail(signupForm.email.trim());
+      setLoginPassword("");
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
+
+      if (rememberEmail) {
+        localStorage.setItem(SAVED_EMAIL_KEY, signupForm.email.trim());
+      }
+
+      resetSignupFlow();
+      setMessageTone("success");
+      setMessage(
+        skipPreferences
+          ? "Account created. You skipped setup for now. Log in to continue."
+          : "Account created. Log in with your email and password to continue."
+      );
+    } catch (error) {
+      const details =
+        error instanceof Error ? error.message : String(error ?? "");
+      setMessageTone("error");
+      setMessage(
+        `Network error${details ? ` (${details})` : ""}. API: ${signupEndpoint}`
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isSubmitting) {
@@ -53,84 +759,59 @@ export default function AuthPage() {
 
     setMessage(null);
     setPasswordError(null);
-    const form = event.currentTarget;
 
-    const formData = new FormData(form);
-    const emailValue = String(formData.get("email") || "").trim();
-    const password = String(formData.get("password") || "");
-    const confirmPassword = String(formData.get("confirm_password") || "");
-
-    if (mode === "signup") {
-      const hasSymbol = /[^A-Za-z0-9]/.test(password);
-      if (password.length < 10 || !hasSymbol) {
-        setPasswordError(
-          "Password must be at least 10 characters and include a symbol."
-        );
+    if (mode === "signup" && signupStep === 1) {
+      if (!validateSignupStepOne()) {
         return;
       }
-      if (password !== confirmPassword) {
-        setPasswordError("Passwords do not match. Please re-enter to confirm.");
-        return;
-      }
+      setSignupStep(2);
+      hydrateLegalSportsbooks();
+      return;
     }
 
-    if (mode === "login") {
-      if (rememberEmail) {
-        localStorage.setItem(SAVED_EMAIL_KEY, emailValue);
-      } else {
-        localStorage.removeItem(SAVED_EMAIL_KEY);
+    if (mode === "signup" && signupStep === 2) {
+      if (selectedSportsbooks.length === 0) {
+        setMessageTone("error");
+        setMessage("Select at least one sportsbook or press Skip.");
+        return;
       }
+      goToTutorialStep();
+      return;
+    }
+
+    if (mode === "signup") {
+      await completeSignup(false);
+      return;
+    }
+
+    const emailValue = getEmailForApi(email);
+
+    if (!emailValue) {
+      setMessageTone("error");
+      setMessage("Use an email address to log in for now.");
+      return;
+    }
+
+    if (rememberEmail) {
+      localStorage.setItem(SAVED_EMAIL_KEY, emailValue);
+    } else {
+      localStorage.removeItem(SAVED_EMAIL_KEY);
     }
 
     setIsSubmitting(true);
 
-    const endpoint = mode === "login" ? loginEndpoint : signupEndpoint;
-
-    const readErrorMessage = async (response: Response) => {
-      const contentType = response.headers.get("content-type") || "";
-      try {
-        if (contentType.includes("application/json")) {
-          const data = await response.json();
-          if (typeof data?.detail === "string") {
-            return data.detail;
-          }
-          if (Array.isArray(data?.detail)) {
-            const detailText = data.detail
-              .map((item: { msg?: string }) => item?.msg)
-              .filter(Boolean)
-              .join(" ");
-            if (detailText) {
-              return detailText;
-            }
-          }
-          if (typeof data?.message === "string") {
-            return data.message;
-          }
-        } else {
-          const text = await response.text();
-          if (text) {
-            return text.slice(0, 240);
-          }
-        }
-      } catch (error) {
-        return null;
-      }
-
-      return null;
-    };
-
     try {
-      const response = await fetch(endpoint, {
+      const response = await fetch(loginEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: emailValue, password })
+        body: JSON.stringify({ email: emailValue, password: loginPassword })
       });
 
       if (response.status === 401) {
+        setEmail("");
+        setLoginPassword("");
         setMessageTone("error");
-        setMessage(
-          "Invalid credentials. Double-check your email and password, or sign up if you don't have an account."
-        );
+        setMessage("Wrong username / password.");
         return;
       }
 
@@ -147,16 +828,10 @@ export default function AuthPage() {
       }
 
       if (!response.ok) {
-        if (mode === "login") {
-          setMessageTone("error");
-          setMessage(
-            "Invalid credentials. Double-check your email and password, or try signing up."
-          );
-          return;
-        }
-        const detail = await readErrorMessage(response);
+        setEmail("");
+        setLoginPassword("");
         setMessageTone("error");
-        setMessage(detail ? detail : "Something went wrong. Please try again.");
+        setMessage("Wrong username / password.");
         return;
       }
 
@@ -171,68 +846,32 @@ export default function AuthPage() {
       }
 
       localStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
-      setToken(accessToken);
       setMessageTone("success");
-      setMessage("Authenticated! Token stored for protected calls.");
-      form?.reset();
+      setMessage("Authenticated. Redirecting to dashboard...");
+      setLoginPassword("");
       router.push("/dashboard");
     } catch (error) {
-      setMessageTone("error");
       const details =
         error instanceof Error ? error.message : String(error ?? "");
+      setMessageTone("error");
       setMessage(
-        `Network error${details ? ` (${details})` : ""}. API: ${endpoint}`
+        `Network error${details ? ` (${details})` : ""}. API: ${loginEndpoint}`
       );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleValidate = async () => {
-    const storedToken = token || localStorage.getItem(TOKEN_STORAGE_KEY);
-    if (!storedToken) {
-      setMessageTone("info");
-      setMessage("No token found yet. Log in first.");
-      return;
-    }
-
-    setMessage(null);
-    try {
-      const response = await fetch(validateEndpoint, {
-        headers: { Authorization: `Bearer ${storedToken}` }
-      });
-
-      if (response.status === 401) {
-        setMessageTone("error");
-        setMessage("Token rejected (401). Please log in again.");
-        return;
-      }
-
-      if (response.status === 429) {
-        setMessageTone("error");
-        setMessage("Rate limited. Try again in a minute.");
-        return;
-      }
-
-      if (response.status === 503) {
-        setMessageTone("error");
-        setMessage("Cache not ready. Try again soon.");
-        return;
-      }
-
-      if (!response.ok) {
-        setMessageTone("error");
-        setMessage("Validation failed. Check the endpoint response.");
-        return;
-      }
-
-      setMessageTone("success");
-      setMessage("Token looks valid. Session confirmed.");
-    } catch (error) {
-      setMessageTone("error");
-      setMessage("Network error. Could not reach the validation endpoint.");
-    }
+  const toggleSportsbook = (sportsbook: string) => {
+    setSelectedSportsbooks((current) =>
+      current.includes(sportsbook)
+        ? current.filter((item) => item !== sportsbook)
+        : [...current, sportsbook]
+    );
   };
+
+  const isSignupStepTwo = mode === "signup" && signupStep === 2;
+  const isSignupStepThree = mode === "signup" && signupStep === 3;
 
   return (
     <div className="site auth-page">
@@ -248,15 +887,10 @@ export default function AuthPage() {
           <a className="brand-text brand-home-link" href="/">
             <span>Unbounded</span>
           </a>
-          <div className="guest-badge">
-            <div className="guest-avatar" aria-hidden="true" />
-            <span>Guest</span>
-          </div>
         </div>
         <nav className="nav-links">
           <a href="/">Arbitrage</a>
           <a href="/">Value Bets</a>
-          <a href="/">Tools</a>
           <a href="/">Pricing</a>
           <a href="/">Tutorials</a>
         </nav>
@@ -264,167 +898,553 @@ export default function AuthPage() {
       <main>
         <div className="auth-shell">
           <section className="auth-panel">
+            <div className="auth-panel-topline">
+              <div className="auth-step-marker">
+                {mode === "login"
+                  ? "Account access"
+                  : `Signup step ${signupStep} of 3`}
+              </div>
+              {isSignupStepTwo ? (
+                <button
+                  type="button"
+                  className="auth-skip"
+                  onClick={goToTutorialStep}
+                  disabled={isSubmitting}
+                >
+                  Skip
+                </button>
+              ) : null}
+            </div>
+
             <h1>
-              Enter your info to {mode === "login" ? "sign in" : "sign up"}
+              {mode === "login"
+                ? "Log in to Unbounded"
+                : signupStep === 1
+                  ? "Create your account"
+                  : signupStep === 2
+                    ? "Finish your setup"
+                    : "Recommended tutorials"}
             </h1>
+
             <p className="auth-subtitle">
               {mode === "login"
-                ? "Or get started with a new account."
-                : "Already have an account? Sign in."}
+                ? "Use the account you already created to continue into the dashboard."
+                : signupStep === 1
+                  ? "Start with your account details. You can set books and goals on the next screen."
+                  : signupStep === 2
+                    ? `Choose the sportsbooks and betting preferences that fit ${signupForm.state || "your market"}.`
+                    : `Based on your ${signupForm.experienceLevel || "current"} experience level, start here to learn the workflow faster.`}
             </p>
+
             <div className="auth-toggle-simple">
               <button
                 type="button"
                 className={mode === "login" ? "active" : ""}
-                onClick={() => {
-                  setMode("login");
-                  setMessage(null);
-                  setMessageTone("info");
-                  setPasswordError(null);
-                  const savedEmail = localStorage.getItem(SAVED_EMAIL_KEY);
-                  if (savedEmail) {
-                    setEmail(savedEmail);
-                    setRememberEmail(true);
-                  }
-                }}
+                onClick={() => handleModeChange("login")}
               >
                 Log in
               </button>
               <button
                 type="button"
                 className={mode === "signup" ? "active" : ""}
-                onClick={() => {
-                  setMode("signup");
-                  setMessage(null);
-                  setMessageTone("info");
-                  setPasswordError(null);
-                }}
+                onClick={() => handleModeChange("signup")}
               >
                 Sign up
               </button>
             </div>
+
             <form className="auth-form-simple" onSubmit={handleSubmit}>
-              <label className="field">
-                <span>Email</span>
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Email or mobile number"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(event) => {
-                    const nextEmail = event.target.value;
-                    setEmail(nextEmail);
-                    if (rememberEmail) {
-                      localStorage.setItem(SAVED_EMAIL_KEY, nextEmail.trim());
-                    }
-                  }}
-                />
-              </label>
-              <label className="field">
-                <span>Password</span>
-                <div className="field-input">
-                  <input
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="Password"
-                    autoComplete={mode === "login" ? "current-password" : "new-password"}
-                    required
-                    onChange={() => setPasswordError(null)}
-                  />
-                  <button
-                    type="button"
-                    className="password-toggle"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    onClick={() => setShowPassword((current) => !current)}
-                  >
-                    {showPassword ? (
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
-                        <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
-                        <path d="M4 4 20 20" />
-                      </svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
-                        <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </label>
-              {mode === "signup" ? (
-                <label className="field">
-                  <span>Confirm password</span>
-                  <div className="field-input">
+              {mode === "login" ? (
+                <>
+                  <label className="field">
+                    <span>Email or mobile number</span>
                     <input
-                      name="confirm_password"
-                      type={showConfirmPassword ? "text" : "password"}
-                      placeholder="Re-enter password"
-                      autoComplete="new-password"
+                      name="email"
+                      type="text"
+                      placeholder="Email or mobile number"
+                      autoComplete="username"
                       required
-                      onChange={() => setPasswordError(null)}
+                      value={email}
+                      onChange={(event) => {
+                        const nextEmail = event.target.value;
+                        setEmail(nextEmail);
+                        if (rememberEmail) {
+                          localStorage.setItem(SAVED_EMAIL_KEY, nextEmail.trim());
+                        }
+                      }}
                     />
+                  </label>
+
+                  <label className="field">
+                    <span>Password</span>
+                    <div className="field-input">
+                      <input
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Password"
+                        autoComplete="current-password"
+                        required
+                        value={loginPassword}
+                        onChange={(event) => setLoginPassword(event.target.value)}
+                      />
+                      <button
+                        type="button"
+                        className="password-toggle"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        onClick={() => setShowPassword((current) => !current)}
+                      >
+                        {showPassword ? (
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                            <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                            <path d="M4 4 20 20" />
+                          </svg>
+                        ) : (
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                            <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </label>
+
+                  <label className="remember-field">
+                    <input
+                      type="checkbox"
+                      checked={rememberEmail}
+                      onChange={(event) => {
+                        const nextChecked = event.target.checked;
+                        setRememberEmail(nextChecked);
+                        if (nextChecked && email) {
+                          localStorage.setItem(SAVED_EMAIL_KEY, email.trim());
+                        } else {
+                          localStorage.removeItem(SAVED_EMAIL_KEY);
+                        }
+                      }}
+                    />
+                    <span>Remember email on this device</span>
+                  </label>
+                </>
+              ) : signupStep === 1 ? (
+                <>
+                  <div className="auth-grid">
+                    <label className="field">
+                      <span>Email or mobile number</span>
+                      <input
+                        type="text"
+                        placeholder="you@example.com or +1 555 555 5555"
+                        autoComplete="username"
+                        required
+                        value={signupForm.email}
+                        onChange={(event) =>
+                          updateSignupField("email", event.target.value)
+                        }
+                      />
+                    </label>
+
+                    <div className="field-stack">
+                      <label className="field">
+                        <span>Username</span>
+                        <input
+                          type="text"
+                          placeholder="Pick a username"
+                          autoComplete="username"
+                          required
+                          maxLength={MAX_USERNAME_LENGTH}
+                          value={signupForm.username}
+                          onChange={(event) =>
+                            updateSignupField("username", event.target.value)
+                          }
+                        />
+                      </label>
+
+                      <label className="field">
+                        <span>Promo code</span>
+                        <input
+                          type="text"
+                          placeholder="Optional promo code"
+                          autoComplete="off"
+                          value={signupForm.promoCode}
+                          onChange={(event) =>
+                            updateSignupField("promoCode", event.target.value)
+                          }
+                        />
+                      </label>
+                    </div>
+
+                    <label className="field">
+                      <span>Country</span>
+                      <select
+                        required
+                        value={signupForm.country}
+                        onChange={(event) =>
+                          updateSignupField("country", event.target.value)
+                        }
+                      >
+                        {COUNTRY_OPTIONS.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="field">
+                      <span>{regionLabel}</span>
+                      <select
+                        required
+                        value={signupForm.state}
+                        onChange={(event) =>
+                          updateSignupField("state", event.target.value)
+                        }
+                      >
+                        <option value="">Select {regionLabel.toLowerCase()}</option>
+                        {regionOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="auth-grid auth-grid-tight">
+                    <label className="field">
+                      <span>Password</span>
+                      <div className="field-input field-input--with-info">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Create password"
+                          autoComplete="new-password"
+                          required
+                          maxLength={MAX_PASSWORD_LENGTH}
+                          value={signupForm.password}
+                          onChange={(event) =>
+                            updateSignupField("password", event.target.value)
+                          }
+                        />
+                        {signupForm.password ? null : (
+                          <div className="auth-requirements">
+                            <button
+                              type="button"
+                              className="auth-requirements-trigger"
+                              aria-label="Password requirements"
+                            >
+                              i
+                            </button>
+                            <div className="auth-requirements-popover">
+                              <strong>Password requirements</strong>
+                              <ul>
+                                {PASSWORD_REQUIREMENTS.map((requirement) => (
+                                  <li key={requirement}>{requirement}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          className="password-toggle"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          onClick={() => setShowPassword((current) => !current)}
+                        >
+                          {showPassword ? (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                              <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                              <path d="M4 4 20 20" />
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                              <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </label>
+
+                    <label className="field">
+                      <span>Confirm password</span>
+                      <div className="field-input">
+                        <input
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Re-enter password"
+                          autoComplete="new-password"
+                          required
+                          maxLength={MAX_PASSWORD_LENGTH}
+                          value={signupForm.confirmPassword}
+                          onChange={(event) =>
+                            updateSignupField("confirmPassword", event.target.value)
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="password-toggle"
+                          aria-label={
+                            showConfirmPassword
+                              ? "Hide confirm password"
+                              : "Show confirm password"
+                          }
+                          onClick={() =>
+                            setShowConfirmPassword((current) => !current)
+                          }
+                        >
+                          {showConfirmPassword ? (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                              <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                              <path d="M4 4 20 20" />
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                              <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div className="field-hint">
+                    Use a capital letter, at least 10 characters and include at least one symbol.
+                  </div>
+                </>
+              ) : isSignupStepTwo ? (
+                <>
+                  <div className="auth-section">
+                    <div className="auth-section-head">
+                      <div>
+                        <strong>Preferred sportsbooks</strong>
+                        <p>
+                          Legal books for your selected market are highlighted first,
+                          but you can choose any combination.
+                        </p>
+                      </div>
+                      <div className="auth-selection-count">
+                        {selectedSportsbooks.length} selected
+                      </div>
+                    </div>
+
+                    <div className="auth-chip-grid">
+                      {sportsbookOptions.map((sportsbook) => {
+                        const isSelected = selectedSportsbooks.includes(sportsbook);
+                        const isLegal = legalSportsbooks.includes(sportsbook);
+                        return (
+                          <button
+                            key={sportsbook}
+                            type="button"
+                            className={`auth-chip ${isSelected ? "selected" : ""} ${isLegal ? "legal" : ""}`}
+                            onClick={() => toggleSportsbook(sportsbook)}
+                          >
+                            <span>{sportsbook}</span>
+                            {isLegal ? (
+                              <span className="auth-chip-note">Legal</span>
+                            ) : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="auth-grid">
+                    <label className="field">
+                      <span>Max bet</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        placeholder="250"
+                        required
+                        value={signupForm.maxBet}
+                        onChange={(event) =>
+                          updateSignupField("maxBet", event.target.value)
+                        }
+                      />
+                    </label>
+
+                    <label className="field">
+                      <span>Experience level</span>
+                      <select
+                        required
+                        value={signupForm.experienceLevel}
+                        onChange={(event) =>
+                          updateSignupField("experienceLevel", event.target.value)
+                        }
+                      >
+                        <option value="">Select level</option>
+                        {EXPERIENCE_OPTIONS.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label className="field">
+                      <span>Yearly profit target</span>
+                      <input
+                        type="number"
+                        min="0"
+                        step="100"
+                        placeholder="5000"
+                        required
+                        value={signupForm.yearlyProfitTarget}
+                        onChange={(event) =>
+                          updateSignupField("yearlyProfitTarget", event.target.value)
+                        }
+                      />
+                    </label>
+
+                    <label className="field">
+                      <span>Bet frequency</span>
+                      <select
+                        required
+                        value={signupForm.betFrequency}
+                        onChange={(event) =>
+                          updateSignupField("betFrequency", event.target.value)
+                        }
+                      >
+                        <option value="">Select frequency</option>
+                        {BET_FREQUENCY_OPTIONS.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <label className="field">
+                    <span>Betting goal</span>
+                    <select
+                      required
+                      value={signupForm.bettingGoal}
+                      onChange={(event) =>
+                        updateSignupField("bettingGoal", event.target.value)
+                      }
+                    >
+                      <option value="">Select a goal</option>
+                      {GOAL_OPTIONS.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </>
+              ) : (
+                <div className="auth-tutorial-stage">
+                  <div className="auth-tutorial-frame">
+                    <div className="auth-tutorial-card">
+                      <span className="auth-tutorial-eyebrow">
+                        {activeTutorial.eyebrow}
+                      </span>
+                      <h2>{activeTutorial.title}</h2>
+                      <p>{activeTutorial.description}</p>
+
+                      <div className="auth-tutorial-meta">
+                        <span>{activeTutorial.duration}</span>
+                        <span>{signupForm.experienceLevel || "General track"}</span>
+                      </div>
+
+                      <ul className="auth-tutorial-points">
+                        {activeTutorial.points.map((point) => (
+                          <li key={point}>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="auth-tutorial-footer">
+                    <div className="auth-tutorial-nav">
+                      <button
+                        type="button"
+                        className="auth-tutorial-arrow"
+                        onClick={() =>
+                          setTutorialIndex((current) =>
+                            current === 0 ? recommendedTutorials.length - 1 : current - 1
+                          )
+                        }
+                        aria-label="Previous tutorial"
+                      >
+                        ←
+                      </button>
+
+                      <div className="auth-tutorial-dots" aria-label="Tutorial selection">
+                        {recommendedTutorials.map((tutorial, index) => (
+                          <button
+                            key={tutorial.title}
+                            type="button"
+                            className={`auth-tutorial-dot ${index === tutorialIndex ? "active" : ""}`}
+                            onClick={() => setTutorialIndex(index)}
+                            aria-label={`Show tutorial ${index + 1}`}
+                          />
+                        ))}
+                      </div>
+
+                      <button
+                        type="button"
+                        className="auth-tutorial-arrow"
+                        onClick={() =>
+                          setTutorialIndex((current) =>
+                            current === recommendedTutorials.length - 1 ? 0 : current + 1
+                          )
+                        }
+                        aria-label="Next tutorial"
+                      >
+                        →
+                      </button>
+                    </div>
+
                     <button
                       type="button"
-                      className="password-toggle"
-                      aria-label={
-                        showConfirmPassword ? "Hide confirm password" : "Show confirm password"
-                      }
-                      onClick={() => setShowConfirmPassword((current) => !current)}
+                      className="auth-link-chip"
+                      onClick={() => void completeSignup(true)}
+                      disabled={isSubmitting}
                     >
-                      {showConfirmPassword ? (
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
-                          <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
-                          <path d="M4 4 20 20" />
-                        </svg>
-                      ) : (
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
-                          <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
-                        </svg>
-                      )}
+                      Skip tutorials
                     </button>
                   </div>
-                </label>
-              ) : null}
-              {mode === "signup" ? (
-                <div className="field-hint">Use 10+ characters and a symbol.</div>
-              ) : null}
-              {mode === "login" ? (
-                <label className="remember-field">
-                  <input
-                    type="checkbox"
-                    checked={rememberEmail}
-                    onChange={(event) => {
-                      const nextChecked = event.target.checked;
-                      setRememberEmail(nextChecked);
-                      if (nextChecked && email) {
-                        localStorage.setItem(SAVED_EMAIL_KEY, email.trim());
-                      } else {
-                        localStorage.removeItem(SAVED_EMAIL_KEY);
-                      }
-                    }}
-                  />
-                  <span>Remember Me</span>
-                </label>
-              ) : null}
-              {passwordError ? (
-                <div className="field-error">{passwordError}</div>
-              ) : null}
-              <button className="auth-primary" type="submit">
-                {isSubmitting
-                  ? "Working..."
-                  : mode === "login"
-                    ? "Continue"
-                    : "Create account"}
-              </button>
+                </div>
+              )}
+
+              {passwordError ? <div className="field-error">{passwordError}</div> : null}
+
+              <div className="auth-form-actions">
+                {mode === "signup" && signupStep > 1 ? (
+                  <button
+                    type="button"
+                    className="auth-secondary"
+                    onClick={() =>
+                      setSignupStep((current) => (current === 3 ? 2 : 1))
+                    }
+                    disabled={isSubmitting}
+                  >
+                    Back
+                  </button>
+                ) : null}
+
+                <button className="auth-primary" type="submit" disabled={isSubmitting}>
+                  {isSubmitting
+                    ? "Working..."
+                    : mode === "login"
+                      ? "Continue"
+                      : signupStep === 1
+                        ? "Continue signup"
+                        : signupStep === 2
+                          ? "Next"
+                          : "Create account"}
+                </button>
+              </div>
             </form>
+
             {message ? (
               <div className={`auth-message ${messageTone}`}>{message}</div>
             ) : null}
+
             <div className="auth-actions" />
           </section>
         </div>
