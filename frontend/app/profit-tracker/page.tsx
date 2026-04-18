@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { ALL_BET_TYPES, BET_TYPE_LABELS, BET_TYPE_OPTIONS, type BetType } from "../components/betTypeConfig";
 import { DashboardHeader } from "../components/DashboardHeader";
 import { DraggableBetCalculatorPopup } from "../components/DraggableBetCalculatorPopup";
 
@@ -13,6 +14,7 @@ type ProfitEvent = {
   settledAt: string;
   matchup: string;
   sport: string;
+  betType: BetType;
   odds: string;
   net: number;
   categories: Source[];
@@ -26,6 +28,7 @@ const events: ProfitEvent[] = [
     settledAt: "2026-02-16T22:10:00.000Z",
     matchup: "Pacers vs Lakers",
     sport: "Basketball",
+    betType: "moneyline",
     odds: "+110",
     net: 50,
     categories: ["live", "arb"],
@@ -35,6 +38,7 @@ const events: ProfitEvent[] = [
     settledAt: "2026-02-16T20:00:00.000Z",
     matchup: "Heat vs Celtics",
     sport: "Basketball",
+    betType: "player-prop",
     odds: "+145",
     net: -30,
     categories: ["live", "ev"],
@@ -44,6 +48,7 @@ const events: ProfitEvent[] = [
     settledAt: "2026-02-15T18:40:00.000Z",
     matchup: "Wolves vs Reapers",
     sport: "Football",
+    betType: "spread",
     odds: "+120",
     net: 62,
     categories: ["arb"],
@@ -53,6 +58,7 @@ const events: ProfitEvent[] = [
     settledAt: "2026-02-13T14:20:00.000Z",
     matchup: "Dodgers vs Mets",
     sport: "Baseball",
+    betType: "total",
     odds: "+105",
     net: 18,
     categories: ["ev"],
@@ -62,6 +68,7 @@ const events: ProfitEvent[] = [
     settledAt: "2026-02-10T03:15:00.000Z",
     matchup: "Chiefs vs Bills",
     sport: "Football",
+    betType: "spread",
     odds: "-108",
     net: 40,
     categories: ["live", "arb"],
@@ -71,6 +78,7 @@ const events: ProfitEvent[] = [
     settledAt: "2026-02-07T01:45:00.000Z",
     matchup: "Northbridge FC vs Harbor",
     sport: "Soccer",
+    betType: "alt-line",
     odds: "+118",
     net: -22,
     categories: ["live", "ev"],
@@ -80,6 +88,7 @@ const events: ProfitEvent[] = [
     settledAt: "2026-01-27T22:05:00.000Z",
     matchup: "Skyline Kings vs Harbor Jets",
     sport: "Basketball",
+    betType: "player-prop",
     odds: "+142",
     net: 90,
     categories: ["arb"],
@@ -89,6 +98,7 @@ const events: ProfitEvent[] = [
     settledAt: "2026-01-16T13:50:00.000Z",
     matchup: "Prime-time lock",
     sport: "Football",
+    betType: "moneyline",
     odds: "+135",
     net: 44,
     categories: ["ev"],
@@ -98,6 +108,7 @@ const events: ProfitEvent[] = [
     settledAt: "2025-11-20T08:10:00.000Z",
     matchup: "Slugger stack",
     sport: "Baseball",
+    betType: "player-prop",
     odds: "+240",
     net: 75,
     categories: ["live", "ev"],
@@ -136,6 +147,9 @@ export default function ProfitTrackerPage() {
     "arb",
     "ev",
   ]);
+  const [selectedBetTypes, setSelectedBetTypes] = useState<BetType[]>([
+    ...ALL_BET_TYPES,
+  ]);
   const [selectedDotEvent, setSelectedDotEvent] = useState<ProfitEvent | null>(null);
   const [isChartMinimized, setIsChartMinimized] = useState(false);
   const [isTableMinimized, setIsTableMinimized] = useState(false);
@@ -160,11 +174,12 @@ export default function ProfitTrackerPage() {
         .filter((entry) =>
           entry.categories.some((category) => selectedSources.includes(category))
         )
+        .filter((entry) => selectedBetTypes.includes(entry.betType))
         .sort(
           (a, b) =>
             new Date(a.settledAt).getTime() - new Date(b.settledAt).getTime()
         ),
-    [rangeStart, selectedSources]
+    [rangeStart, selectedBetTypes, selectedSources]
   );
 
   const totalNet = useMemo(
@@ -296,6 +311,18 @@ export default function ProfitTrackerPage() {
       return [...current, source];
     });
   };
+  const toggleBetType = (betType: BetType) => {
+    setSelectedBetTypes((current) => {
+      if (current.includes(betType)) {
+        if (current.length === 1) {
+          return current;
+        }
+        return current.filter((item) => item !== betType);
+      }
+      return [...current, betType];
+    });
+  };
+  const allBetTypesSelected = selectedBetTypes.length === ALL_BET_TYPES.length;
   useEffect(() => {
     if (window.location.hash === "#bet-calculator") {
       setIsBetCalculatorOpen(true);
@@ -358,6 +385,33 @@ export default function ProfitTrackerPage() {
                     onClick={() => toggleSource(item)}
                   >
                     {sourceLabels[item]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="profit-tracker-control-group">
+              <span>Bet type</span>
+              <div className="profit-tracker-pill-group">
+                <button
+                  type="button"
+                  className={`profit-pill profit-pill--bet-type${
+                    allBetTypesSelected ? " is-active" : ""
+                  }`}
+                  onClick={() => setSelectedBetTypes([...ALL_BET_TYPES])}
+                >
+                  All bets
+                </button>
+                {BET_TYPE_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    className={`profit-pill profit-pill--bet-type${
+                      selectedBetTypes.includes(option.value) ? " is-active" : ""
+                    }`}
+                    onClick={() => toggleBetType(option.value)}
+                  >
+                    {option.label}
                   </button>
                 ))}
               </div>
@@ -564,7 +618,12 @@ export default function ProfitTrackerPage() {
                   .map((entry) => (
                     <div key={entry.id} className="profit-row">
                       <span>{new Date(entry.settledAt).toLocaleDateString()}</span>
-                      <span>{entry.categories.join(" / ").toUpperCase()}</span>
+                      <span>
+                        {entry.categories.join(" / ").toUpperCase()}
+                        <em className="profit-row-bet-type">
+                          {BET_TYPE_LABELS[entry.betType]}
+                        </em>
+                      </span>
                       <span>{entry.matchup}</span>
                       <span>
                         {entry.odds} Net: {entry.net >= 0 ? "+" : "-"}$
@@ -633,7 +692,10 @@ export default function ProfitTrackerPage() {
               </div>
               <div>
                 <span>Type</span>
-                <strong>{selectedDotEvent.categories.join(" / ").toUpperCase()}</strong>
+                <strong>
+                  {selectedDotEvent.categories.join(" / ").toUpperCase()} ·{" "}
+                  {BET_TYPE_LABELS[selectedDotEvent.betType]}
+                </strong>
               </div>
               <div>
                 <span>Odds</span>

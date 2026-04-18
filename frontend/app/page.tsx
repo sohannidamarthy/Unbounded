@@ -168,11 +168,11 @@ export default function Home() {
           </a>
         </div>
         <nav className="nav-links">
-          <a href="#arbitrage">Arbitrage</a>
-          <a href="#value-bets">Value Bets</a>
-          <a href="#tools">Tools</a>
+          <a href="/arbitrage">Arbitrage</a>
+          <a href="/positive-ev">Positive EV</a>
+          <a href="/tools">Tools</a>
+          <a href="/tutorials">Tutorials</a>
           <a href="#pricing">Pricing</a>
-          <a href="#tutorials">Tutorials</a>
         </nav>
         <div className="header-actions">
           {isAuthReady ? (
@@ -193,34 +193,15 @@ export default function Home() {
                   >
                     Dashboard
                   </a>
-                  <button
-                    className="account-dropdown-item"
-                    type="button"
-                    role="menuitem"
-                  >
-                    My plan
+                  <button className="account-dropdown-item" type="button" role="menuitem">
+                    Settings
                   </button>
-                  <button
-                    className="account-dropdown-item"
-                    type="button"
-                    role="menuitem"
-                  >
-                    Notifications
+                  <button className="account-dropdown-item" type="button" role="menuitem">
+                    Billing and User payment
                   </button>
-                  <button
-                    className="account-dropdown-item"
-                    type="button"
-                    role="menuitem"
-                  >
-                    Arbitrage/EV settings
-                  </button>
-                  <button
-                    className="account-dropdown-item"
-                    type="button"
-                    role="menuitem"
-                  >
-                    Referrals
-                  </button>
+                  <a className="account-dropdown-item" role="menuitem" href="/tutorials">
+                    Tutorials
+                  </a>
                   <button
                     className="account-dropdown-item"
                     type="button"
@@ -522,10 +503,10 @@ export default function Home() {
           <strong>Unbounded</strong>
         </div>
         <div className="footer-links">
-          <a href="#">Contact</a>
-          <a href="#">Terms and services</a>
-          <a href="#">Blog</a>
-          <a href="#">About</a>
+          <a href="/arbitrage">Arbitrage</a>
+          <a href="/positive-ev">Positive EV</a>
+          <a href="/tools">Tools</a>
+          <a href="/tutorials">Tutorials</a>
         </div>
       </footer>
     </div>

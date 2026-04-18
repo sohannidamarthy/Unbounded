@@ -21,6 +21,10 @@ VALID_MARKETS = {
     "moneyline",
     "spread",
     "total",
+    "alt_spread",
+    "alt_total",
+    "player_prop",
+    "team_prop",
 }
 
 # Books should be stable short codes.

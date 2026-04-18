@@ -1,12 +1,37 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState, type Dispatch, type SetStateAction } from "react";
+import { useRouter } from "next/navigation";
 
+import { ALL_BET_TYPES, BET_TYPE_LABELS, BET_TYPE_OPTIONS, type BetType } from "../components/betTypeConfig";
 import { DashboardHeader } from "../components/DashboardHeader";
 import { DraggableBetCalculatorPopup } from "../components/DraggableBetCalculatorPopup";
 
+const SAVED_EMAIL_KEY = "unbounded.saved_email";
+
+function formatDisplayName(value: string | null) {
+  if (!value) {
+    return "You";
+  }
+
+  const base = value.split("@")[0]?.trim();
+  if (!base) {
+    return "You";
+  }
+
+  const cleaned = base.replace(/[._-]+/g, " ").replace(/\s+/g, " ").trim();
+  if (!cleaned) {
+    return "You";
+  }
+
+  return cleaned
+    .split(" ")
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .join(" ");
+}
+
 export default function DashboardPage() {
-  const showSidebar = true;
+  const router = useRouter();
   const sportOptions = ["Basketball", "Football", "Baseball", "Soccer"] as const;
   const liveSportTabs = ["All", ...sportOptions] as const;
   const filterOptions = ["Trending", "High payout", "Live now"] as const;
@@ -31,8 +56,6 @@ export default function DashboardPage() {
   const [expandedPanel, setExpandedPanel] = useState<
     | null
     | "live"
-    | "leaderboard"
-    | "arb-ev"
     | "withdrawal"
     | "tools"
     | "chat"
@@ -40,11 +63,15 @@ export default function DashboardPage() {
   const [arbEvView, setArbEvView] = useState<"arb" | "ev">("arb");
   const [activeSport, setActiveSport] = useState<LiveSportTab>("All");
   const [activeFilter, setActiveFilter] = useState<LiveFilter>("Trending");
-  const [arbWays, setArbWays] = useState("2-way");
-  const [favoriteArb, setFavoriteArb] = useState("No");
-  const [evIncludeLimits, setEvIncludeLimits] = useState("On");
-  const [evType, setEvType] = useState("+EV");
-  const [favoriteEv, setFavoriteEv] = useState("No");
+  const [selectedLiveBetTypes, setSelectedLiveBetTypes] = useState<BetType[]>([
+    ...ALL_BET_TYPES,
+  ]);
+  const [selectedArbBetTypes, setSelectedArbBetTypes] = useState<BetType[]>([
+    ...ALL_BET_TYPES,
+  ]);
+  const [selectedEvBetTypes, setSelectedEvBetTypes] = useState<BetType[]>([
+    ...ALL_BET_TYPES,
+  ]);
   const [withdrawalSpeed, setWithdrawalSpeed] = useState("Instant");
   const [withdrawalMethod, setWithdrawalMethod] = useState("Bank");
   const [withdrawalAuto, setWithdrawalAuto] = useState("Yes");
@@ -61,9 +88,9 @@ export default function DashboardPage() {
   const [betCalculatorStake, setBetCalculatorStake] = useState("100");
   const [betCalculatorOddsA, setBetCalculatorOddsA] = useState("");
   const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
+  const [includeSelfInLeaderboard, setIncludeSelfInLeaderboard] = useState(false);
+  const [currentUserName, setCurrentUserName] = useState("You");
   const isLiveExpanded = expandedPanel === "live";
-  const isLeaderboardExpanded = expandedPanel === "leaderboard";
-  const isArbEvExpanded = expandedPanel === "arb-ev";
   const isWithdrawalExpanded = expandedPanel === "withdrawal";
   const isToolsExpanded = expandedPanel === "tools";
   const isChatExpanded = expandedPanel === "chat";
@@ -130,40 +157,80 @@ export default function DashboardPage() {
       sport: "Basketball",
       league: "NBA",
       match: "Pacers (+110) vs. Lakers (-110)",
+      betType: "moneyline" as BetType,
     },
     {
       start: "1:30 AM CT",
       sport: "Basketball",
       league: "NBA",
       match: "Heat (+145) vs. Celtics (-160)",
+      betType: "player-prop" as BetType,
     },
     {
       start: "3:15 PM CT",
       sport: "Football",
       league: "NFL",
       match: "Wolves (+120) vs. Reapers (-130)",
+      betType: "spread" as BetType,
     },
     {
       start: "6:10 PM CT",
       sport: "Baseball",
       league: "MLB",
       match: "Dodgers (-105) vs. Mets (+102)",
+      betType: "total" as BetType,
     },
     {
       start: "7:45 PM CT",
       sport: "Soccer",
       league: "MLS",
       match: "Harbor FC (+180) vs. Northbridge (-190)",
+      betType: "alt-line" as BetType,
     },
   ];
-  const visibleArbRows = isArbEvExpanded
-    ? arbTableRows
-    : arbTableRows.slice(0, 3);
+  const leaderboardPreviewBoards = [
+    {
+      label: "24h cash",
+      title: "Top earners",
+      highlight: "NovaSkies",
+      value: "+$4,820",
+    },
+    {
+      label: "Locked in",
+      title: "Win streaks",
+      highlight: "JetPulse",
+      value: "13 wins",
+    },
+    {
+      label: "Efficiency",
+      title: "ROI leaders",
+      highlight: "SignalMint",
+      value: "28.4%",
+    },
+    {
+      label: "Momentum",
+      title: "Climb watch",
+      highlight: "PrimeRally",
+      value: "+8",
+    },
+  ] as const;
+  const dashboardSelfLeaderboardEntry = {
+    rank: "142",
+    name: currentUserName,
+    focus: "Your tracked bets",
+    rate: "54%",
+    value: "+$1,180",
+  };
+
+  useEffect(() => {
+    setCurrentUserName(formatDisplayName(window.localStorage.getItem(SAVED_EMAIL_KEY)));
+  }, []);
   const liveTableRows: {
     start: string;
     sport: Sport;
     league: string;
     match: string;
+    betType: BetType;
     odds: string;
     edge: string;
     payoutBoost: number;
@@ -174,6 +241,7 @@ export default function DashboardPage() {
       sport: "Basketball",
       league: "NBA",
       match: "Warriors vs Suns",
+      betType: "moneyline",
       odds: "-115",
       edge: "+4.8%",
       payoutBoost: 0.12,
@@ -184,6 +252,7 @@ export default function DashboardPage() {
       sport: "Football",
       league: "NFL",
       match: "Chiefs vs Bills",
+      betType: "spread",
       odds: "+145",
       edge: "+3.6%",
       payoutBoost: 0.3,
@@ -194,6 +263,7 @@ export default function DashboardPage() {
       sport: "Baseball",
       league: "MLB",
       match: "Dodgers vs Mets",
+      betType: "player-prop",
       odds: "+105",
       edge: "+4.9%",
       payoutBoost: 0.18,
@@ -204,6 +274,7 @@ export default function DashboardPage() {
       sport: "Soccer",
       league: "MLS",
       match: "Northbridge FC vs Harbor",
+      betType: "total",
       odds: "+118",
       edge: "+4.7%",
       payoutBoost: 0.22,
@@ -214,6 +285,7 @@ export default function DashboardPage() {
       sport: "Basketball",
       league: "NBA",
       match: "Kings vs Storm",
+      betType: "alt-line",
       odds: "+136",
       edge: "+5.3%",
       payoutBoost: 0.4,
@@ -224,6 +296,7 @@ export default function DashboardPage() {
       sport: "Football",
       league: "NFL",
       match: "Wolves vs Reapers",
+      betType: "spread",
       odds: "-108",
       edge: "+4.0%",
       payoutBoost: 0.1,
@@ -233,11 +306,21 @@ export default function DashboardPage() {
   const filteredLiveRows = liveTableRows.filter(
     (row) =>
       (activeSport === "All" || row.sport === activeSport) &&
+      selectedLiveBetTypes.includes(row.betType) &&
       row.tags.includes(activeFilter)
   );
-  const visibleLiveRows = liveTableRows.slice(0, 3);
+  const visibleLiveRows = liveTableRows
+    .filter((row) => selectedLiveBetTypes.includes(row.betType))
+    .slice(0, 3);
+  const activeArbBetTypes = arbEvView === "arb" ? selectedArbBetTypes : selectedEvBetTypes;
+  const filteredArbRows = arbTableRows.filter((row) =>
+    activeArbBetTypes.includes(row.betType)
+  );
+  const visibleArbRows = filteredArbRows.slice(0, 3);
   const liveDataSport: Sport =
     activeSport === "All" ? "Basketball" : activeSport;
+  const allLiveBetTypesSelected = selectedLiveBetTypes.length === ALL_BET_TYPES.length;
+  const allArbBetTypesSelected = activeArbBetTypes.length === ALL_BET_TYPES.length;
 
   const liveData: Record<
     Sport,
@@ -638,6 +721,27 @@ export default function DashboardPage() {
       </div>
     );
   };
+  const toggleBetTypeSelection = (
+    betType: BetType,
+    setSelected: Dispatch<SetStateAction<BetType[]>>
+  ) => {
+    setSelected((current) => {
+      if (current.includes(betType)) {
+        if (current.length === 1) {
+          return current;
+        }
+        return current.filter((item) => item !== betType);
+      }
+      return [...current, betType];
+    });
+  };
+  const setActiveArbEvBetTypes = (next: BetType[]) => {
+    if (arbEvView === "arb") {
+      setSelectedArbBetTypes(next);
+      return;
+    }
+    setSelectedEvBetTypes(next);
+  };
   const isCurrentTabTracked =
     arbEvView === "arb" ? arbTabProfitTracker : evTabProfitTracker;
 
@@ -648,34 +752,9 @@ export default function DashboardPage() {
       <main className="dashboard-main">
         <div
           className={`dashboard-layout${
-            showSidebar ? "" : " dashboard-layout--compact"
-          }${expandedPanel ? " dashboard-layout--expanded" : ""}`}
+            expandedPanel ? " dashboard-layout--expanded" : ""
+          }`}
         >
-          {showSidebar ? (
-            <aside className="dashboard-sidebar" aria-label="My bets">
-              <div className="dashboard-sidebar-title">My bets</div>
-              <div className="dashboard-sidebar-items">
-                <a className="dashboard-sidebar-item" href="#">
-                  Tutorials
-                </a>
-                <a className="dashboard-sidebar-item" href="#">
-                  Bet Validator
-                </a>
-                <a className="dashboard-sidebar-item" href="#">
-                  Daily Bets
-                </a>
-                <a className="dashboard-sidebar-item" href="#">
-                  Your live ROI
-                </a>
-                <a className="dashboard-sidebar-item" href="#">
-                  Chats
-                </a>
-                <a className="dashboard-sidebar-item" href="#">
-                  Withdrawals
-                </a>
-              </div>
-            </aside>
-          ) : null}
           <section
             className={`dashboard-content${
               expandedPanel ? " dashboard-content--expanded" : ""
@@ -733,6 +812,31 @@ export default function DashboardPage() {
                 )}
               </div>
               <div className="dashboard-panel-body">
+                <div className="dashboard-bet-type-filter-row">
+                  <button
+                    type="button"
+                    className={`dashboard-bet-type-pill${
+                      allLiveBetTypesSelected ? " is-active" : ""
+                    }`}
+                    onClick={() => setSelectedLiveBetTypes([...ALL_BET_TYPES])}
+                  >
+                    All bets
+                  </button>
+                  {BET_TYPE_OPTIONS.map((option) => (
+                    <button
+                      key={`live-${option.value}`}
+                      type="button"
+                      className={`dashboard-bet-type-pill${
+                        selectedLiveBetTypes.includes(option.value) ? " is-active" : ""
+                      }`}
+                      onClick={() =>
+                        toggleBetTypeSelection(option.value, setSelectedLiveBetTypes)
+                      }
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
                 {!isLiveExpanded ? (
                   <div
                     className="dashboard-arb-table"
@@ -753,6 +857,11 @@ export default function DashboardPage() {
                         <span>Match</span>
                       </span>
                     </div>
+                    {visibleLiveRows.length === 0 ? (
+                      <div className="dashboard-bet-type-empty" role="row">
+                        No live bets match the selected bet types.
+                      </div>
+                    ) : null}
                     {visibleLiveRows.map((row) => (
                       <Fragment key={`${row.start}-${row.match}`}>
                         <div
@@ -784,6 +893,9 @@ export default function DashboardPage() {
                           <span className="dashboard-arb-league">{row.league}</span>
                           <span className="dashboard-arb-match">{row.match}</span>
                           <span className="dashboard-arb-sport">{row.sport}</span>
+                          <span className="dashboard-bet-type-badge dashboard-bet-type-badge--inline">
+                            {BET_TYPE_LABELS[row.betType]}
+                          </span>
                         </span>
                         </div>
                         {renderEventDropdown(`live-${row.start}-${row.match}`)}
@@ -835,7 +947,6 @@ export default function DashboardPage() {
                         ))}
                       </div>
                     </div>
-
                     <div className="dashboard-live-hero">
                       <div>
                         <div className="dashboard-live-hero-title">
@@ -869,6 +980,11 @@ export default function DashboardPage() {
                         <span role="columnheader">League</span>
                         <span role="columnheader">Match</span>
                       </div>
+                      {filteredLiveRows.length === 0 ? (
+                        <div className="dashboard-bet-type-empty" role="row">
+                          No live bets match the current sport, board, and bet-type filters.
+                        </div>
+                      ) : null}
                       {filteredLiveRows.map((row) => (
                         <Fragment key={`${row.start}-${row.match}`}>
                           <div
@@ -901,7 +1017,10 @@ export default function DashboardPage() {
                             {row.league}
                           </span>
                           <span className="dashboard-arb-cell dashboard-arb-cell--match">
-                            {row.match}
+                            <span>{row.match}</span>
+                            <span className="dashboard-bet-type-badge">
+                              {BET_TYPE_LABELS[row.betType]}
+                            </span>
                           </span>
                           </div>
                           {renderEventDropdown(`live-${row.start}-${row.match}`)}
@@ -916,141 +1035,113 @@ export default function DashboardPage() {
               </div>
             </section>
             <section
-              className={`dashboard-leaderboard dashboard-expandable${
-                isLeaderboardExpanded ? " is-expanded" : ""
-              }`}
-              aria-label="Leaderboard top earners"
+              className="dashboard-leaderboard dashboard-leaderboard--compact dashboard-expandable"
+              aria-label="Leaderboard preview"
             >
               <div className="dashboard-leaderboard-header">
                 <div className="dashboard-arb-header-left">
-                  <h3>Leaderboard top earners</h3>
-                  <p>Rolling 24-hour earnings across live slips.</p>
+                  <h3>Leaderboard hub</h3>
+                  <p>Quick snapshot of the boards. Open the full hub for rankings and details.</p>
                 </div>
-                <span className="dashboard-leaderboard-pill">Updated 5m ago</span>
+                <div className="dashboard-leaderboard-header-actions">
+                  <div className="dashboard-leaderboard-self-toggle">
+                    <div>
+                      <span>Include yourself</span>
+                      <p>Add your row to the board.</p>
+                    </div>
+                    <button
+                      type="button"
+                      className={`dashboard-event-toggle${
+                        includeSelfInLeaderboard ? " is-on" : " is-off"
+                      }`}
+                      aria-pressed={includeSelfInLeaderboard}
+                      aria-label="Include yourself in dashboard leaderboard"
+                      onClick={() => setIncludeSelfInLeaderboard((current) => !current)}
+                    >
+                      <span className="dashboard-event-toggle-knob" aria-hidden="true" />
+                    </button>
+                  </div>
+                  <span className="dashboard-leaderboard-pill">Updated 5m ago</span>
+                </div>
               </div>
-              {isLeaderboardExpanded ? (
-                <button
-                  className="dashboard-panel-close"
-                  type="button"
-                  aria-label="Close leaderboard"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setExpandedPanel(null);
-                  }}
-                >
-                  ×
-                </button>
-              ) : (
-                <button
-                  className="dashboard-panel-close"
-                  type="button"
-                  aria-label="Expand leaderboard"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setExpandedPanel("leaderboard");
-                  }}
-                >
-                  +
-                </button>
-              )}
-              <div className="dashboard-leaderboard-table">
+              <button
+                className="dashboard-panel-close"
+                type="button"
+                aria-label="Open leaderboard page"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  router.push("/leaderboard");
+                }}
+              >
+                +
+              </button>
+              <div className="dashboard-leaderboard-mini-grid">
+                {leaderboardPreviewBoards.map((board) => (
+                  <div className="dashboard-leaderboard-mini-card" key={board.title}>
+                    <span>{board.label}</span>
+                    <strong>{board.title}</strong>
+                    <div className="dashboard-leaderboard-mini-card-row">
+                      <span>{board.highlight}</span>
+                      <span>{board.value}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="dashboard-leaderboard-table dashboard-leaderboard-table--compact">
                 <div className="dashboard-leaderboard-row header">
                   <span>Rank</span>
                   <span>Player</span>
-                  <span>Sport</span>
-                  <span>Win rate</span>
-                  <span>Earnings</span>
+                  <span>Focus</span>
+                  <span>Hit rate</span>
+                  <span>24h profit</span>
                 </div>
                 {[
                   {
                     rank: "01",
                     name: "NovaSkies",
-                    sport: "Basketball",
+                    focus: "Basketball live",
                     rate: "68%",
-                    earnings: "$4,820",
+                    value: "+$4,820",
                   },
                   {
                     rank: "02",
                     name: "IceLine",
-                    sport: "Football",
+                    focus: "Football alt lines",
                     rate: "64%",
-                    earnings: "$4,120",
+                    value: "+$4,120",
                   },
                   {
                     rank: "03",
                     name: "CoastEdge",
-                    sport: "Soccer",
+                    focus: "Soccer totals",
                     rate: "61%",
-                    earnings: "$3,760",
-                  },
-                  {
-                    rank: "04",
-                    name: "SignalForge",
-                    sport: "Baseball",
-                    rate: "59%",
-                    earnings: "$3,210",
-                  },
-                  {
-                    rank: "05",
-                    name: "HighRoller",
-                    sport: activeSport === "All" ? "Basketball" : activeSport,
-                    rate: "57%",
-                    earnings: "$2,980",
+                    value: "+$3,760",
                   },
                 ].map((entry) => (
                   <div className="dashboard-leaderboard-row" key={entry.rank}>
                     <span>{entry.rank}</span>
                     <span>{entry.name}</span>
-                    <span>{entry.sport}</span>
+                    <span>{entry.focus}</span>
                     <span>{entry.rate}</span>
-                    <span>{entry.earnings}</span>
+                    <span>{entry.value}</span>
                   </div>
                 ))}
+                {includeSelfInLeaderboard ? (
+                  <div className="dashboard-leaderboard-row dashboard-leaderboard-row--self">
+                    <span>{dashboardSelfLeaderboardEntry.rank}</span>
+                    <span>{dashboardSelfLeaderboardEntry.name}</span>
+                    <span>{dashboardSelfLeaderboardEntry.focus}</span>
+                    <span>{dashboardSelfLeaderboardEntry.rate}</span>
+                    <span>{dashboardSelfLeaderboardEntry.value}</span>
+                  </div>
+                ) : null}
               </div>
-              {isLeaderboardExpanded ? (
-                <div
-                  className="dashboard-leaderboard-expanded"
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <div className="dashboard-leaderboard-cards">
-                    <div className="dashboard-leaderboard-card">
-                      <span>Biggest streak</span>
-                      <strong>11 wins</strong>
-                      <p>NovaSkies • +$1,420</p>
-                    </div>
-                    <div className="dashboard-leaderboard-card">
-                      <span>Fastest climb</span>
-                      <strong>+7 ranks</strong>
-                      <p>IceLine • +$860</p>
-                    </div>
-                    <div className="dashboard-leaderboard-card">
-                      <span>Hot sport</span>
-                      <strong>Basketball</strong>
-                      <p>62% win rate</p>
-                    </div>
-                  </div>
-                  <div className="dashboard-leaderboard-feed">
-                    <div className="dashboard-leaderboard-feed-row">
-                      <span>CoastEdge hit +210 live ML</span>
-                      <span>+$420</span>
-                    </div>
-                    <div className="dashboard-leaderboard-feed-row">
-                      <span>SignalForge 4-leg parlay</span>
-                      <span>+$610</span>
-                    </div>
-                    <div className="dashboard-leaderboard-feed-row">
-                      <span>HighRoller sweep</span>
-                      <span>+$390</span>
-                    </div>
-                  </div>
-                </div>
-              ) : null}
             </section>
             <section
               id="arbitrage-bets"
               className={`${
                 arbEvView === "arb" ? "dashboard-arb" : "dashboard-ev"
-              } dashboard-expandable${isArbEvExpanded ? " is-expanded" : ""}`}
+              } dashboard-expandable dashboard-arb-ev-preview`}
               aria-label={
                 arbEvView === "arb" ? "Arbitrage bets per day" : "EV bets per day"
               }
@@ -1087,63 +1178,27 @@ export default function DashboardPage() {
                   <h3>
                     {arbEvView === "arb"
                       ? "Arbitrage bets per day"
-                      : "EV bets per day"}
+                      : "Positive EV bets"}
                   </h3>
                   <p>
                     {arbEvView === "arb"
-                      ? "Track your daily arbitrage bets and settings."
-                      : "Track your daily EV bets and settings."}
+                      ? "Three fast looks from the current arb board."
+                      : "Three quick positive EV looks from the current board."}
                   </p>
                 </div>
-                <div
-                  className={
-                    arbEvView === "arb"
-                      ? "dashboard-arb-controls"
-                      : "dashboard-ev-controls"
-                  }
-                >
-                  <label
-                    className={
-                      arbEvView === "arb"
-                        ? "dashboard-arb-field"
-                        : "dashboard-ev-field"
-                    }
-                  >
-                    <span>Date</span>
-                    <input type="date" />
-                  </label>
-                  <label
-                    className={
-                      arbEvView === "arb"
-                        ? "dashboard-arb-field"
-                        : "dashboard-ev-field"
-                    }
-                  >
-                    <span>Sport</span>
-                    <select defaultValue="All sports">
-                      <option>All sports</option>
-                      <option>Basketball</option>
-                      <option>Football</option>
-                      <option>Baseball</option>
-                      <option>Soccer</option>
-                    </select>
-                  </label>
-                  <label
-                    className={
-                      arbEvView === "arb"
-                        ? "dashboard-arb-field"
-                        : "dashboard-ev-field"
-                    }
-                  >
-                    <span>Books</span>
-                    <select defaultValue="All books">
-                      <option>All books</option>
-                      <option>Primebook</option>
-                      <option>Skyline</option>
-                      <option>Jetline</option>
-                      <option>Northstar</option>
-                    </select>
-                  </label>
+                <div className="dashboard-compact-stats">
+                  <div className="dashboard-compact-stat">
+                    <span>{arbEvView === "arb" ? "Live arbs" : "Live +EV"}</span>
+                    <strong>{arbEvView === "arb" ? "18" : "27"}</strong>
+                  </div>
+                  <div className="dashboard-compact-stat">
+                    <span>Top sport</span>
+                    <strong>Basketball</strong>
+                  </div>
+                  <div className="dashboard-compact-stat">
+                    <span>Best edge</span>
+                    <strong>{arbEvView === "arb" ? "4.8%" : "+6.2%"}</strong>
+                  </div>
                 </div>
               </div>
               <div
@@ -1164,450 +1219,85 @@ export default function DashboardPage() {
                       setEvTabProfitTracker((prev) => !prev);
                     }
                   }}
-                >
-                  <span className="dashboard-event-toggle-knob" aria-hidden="true" />
+              >
+                <span className="dashboard-event-toggle-knob" aria-hidden="true" />
                 </button>
               </div>
-              {isArbEvExpanded ? (
-                <button
-                  className="dashboard-panel-close"
-                  type="button"
-                  aria-label={`Close ${arbEvView === "arb" ? "arbitrage" : "EV"} bets`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setExpandedPanel(null);
-                  }}
-                >
-                  ×
-                </button>
-              ) : (
-                <button
-                  className="dashboard-panel-close"
-                  type="button"
-                  aria-label={`Expand ${arbEvView === "arb" ? "arbitrage" : "EV"} bets`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setExpandedPanel("arb-ev");
-                  }}
-                >
-                  +
-                </button>
-              )}
-              {arbEvView === "arb" ? (
-                <>
-                  <div
-                    className={`dashboard-arb-table${
-                      isArbEvExpanded ? " is-expanded" : ""
+              <button
+                className="dashboard-panel-close"
+                type="button"
+                aria-label={`Open ${arbEvView === "arb" ? "arbitrage" : "positive EV"} page`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  router.push(arbEvView === "arb" ? "/arbitrage-bets" : "/ev-bets");
+                }}
+              >
+                +
+              </button>
+              <div
+                className="dashboard-arb-table dashboard-arb-table--compact"
+                role="table"
+                aria-label={arbEvView === "arb" ? "Arbitrage preview board" : "EV preview board"}
+              >
+                <div className="dashboard-bet-type-filter-row dashboard-bet-type-filter-row--compact">
+                  <button
+                    type="button"
+                    className={`dashboard-bet-type-pill${
+                      allArbBetTypesSelected ? " is-active" : ""
                     }`}
-                    role="table"
-                    aria-label="Arbitrage betting board"
+                    onClick={() => setActiveArbEvBetTypes([...ALL_BET_TYPES])}
                   >
-                    {isArbEvExpanded ? (
-                      <>
-                        <div
-                          className="dashboard-arb-row dashboard-arb-row--header"
-                          role="row"
-                        >
-                          <span role="columnheader">Match starts</span>
-                          <span role="columnheader">Sport</span>
-                          <span role="columnheader">League</span>
-                          <span role="columnheader">Match</span>
-                        </div>
-                        {visibleArbRows.map((row) => (
-                          <Fragment key={`${row.start}-${row.match}`}>
-                            <div
-                            className={`dashboard-arb-row${
-                              eventPopout?.id === `arb-${row.start}-${row.match}`
-                                ? " is-selected"
-                                : ""
-                            }`}
-                            role="row"
-                            key={`${row.start}-${row.match}`}
-                            onClick={() =>
-                              openEventPopout(
-                                buildEventPopout({
-                                  id: `arb-${row.start}-${row.match}`,
-                                  board: "Arbitrage",
-                                  start: row.start,
-                                  sport: row.sport,
-                                  league: row.league,
-                                  match: row.match,
-                                })
-                              )
-                            }
-                          >
-                            <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                              {row.start}
-                            </span>
-                            <span className="dashboard-arb-cell">{row.sport}</span>
-                            <span className="dashboard-arb-cell dashboard-arb-cell--league">
-                              {row.league}
-                            </span>
-                            <span className="dashboard-arb-cell dashboard-arb-cell--match">
-                              {row.match}
-                            </span>
-                            </div>
-                            {renderEventDropdown(`arb-${row.start}-${row.match}`)}
-                          </Fragment>
-                        ))}
-                      </>
-                    ) : (
-                      <>
-                        <div
-                          className="dashboard-arb-row dashboard-arb-row--header"
-                          role="row"
-                        >
-                          <span role="columnheader">Match starts</span>
-                          <span
-                            className="dashboard-arb-header-group"
-                            role="columnheader"
-                          >
-                            <span>Sport</span>
-                            <span>League</span>
-                            <span>Match</span>
-                          </span>
-                        </div>
-                        {visibleArbRows.map((row) => (
-                          <Fragment key={`${row.start}-${row.match}`}>
-                            <div
-                            className={`dashboard-arb-row${
-                              eventPopout?.id === `arb-${row.start}-${row.match}`
-                                ? " is-selected"
-                                : ""
-                            }`}
-                            role="row"
-                            key={`${row.start}-${row.match}`}
-                            onClick={() =>
-                              openEventPopout(
-                                buildEventPopout({
-                                  id: `arb-${row.start}-${row.match}`,
-                                  board: "Arbitrage",
-                                  start: row.start,
-                                  sport: row.sport,
-                                  league: row.league,
-                                  match: row.match,
-                                })
-                              )
-                            }
-                          >
-                            <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                              {row.start}
-                            </span>
-                            <span className="dashboard-arb-cell dashboard-arb-cell--details">
-                              <span className="dashboard-arb-league">{row.league}</span>
-                              <span className="dashboard-arb-match">{row.match}</span>
-                              <span className="dashboard-arb-sport">{row.sport}</span>
-                            </span>
-                            </div>
-                            {renderEventDropdown(`arb-${row.start}-${row.match}`)}
-                          </Fragment>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                  {isArbEvExpanded ? (
-                    <div
-                      className="dashboard-arb-options"
-                      onClick={(event) => event.stopPropagation()}
+                    All bets
+                  </button>
+                  {BET_TYPE_OPTIONS.map((option) => (
+                    <button
+                      key={`${arbEvView}-${option.value}`}
+                      type="button"
+                      className={`dashboard-bet-type-pill${
+                        activeArbBetTypes.includes(option.value) ? " is-active" : ""
+                      }`}
+                      onClick={() => {
+                        const setter =
+                          arbEvView === "arb" ? setSelectedArbBetTypes : setSelectedEvBetTypes;
+                        toggleBetTypeSelection(option.value, setter);
+                      }}
                     >
-                      <div className="dashboard-arb-body">
-                        <div className="dashboard-arb-left">
-                          <div className="dashboard-arb-limit">
-                            <span>Include bet limits</span>
-                            <div className="dashboard-arb-toggle-group">
-                              <button
-                                type="button"
-                                className="dashboard-arb-toggle is-active"
-                              >
-                                On
-                              </button>
-                              <button
-                                type="button"
-                                className="dashboard-arb-toggle is-off"
-                              >
-                                Off
-                              </button>
-                            </div>
-                          </div>
-                          <div className="dashboard-arb-metric">
-                            <span>Arb ways</span>
-                            <div className="dashboard-arb-ways">
-                              <button
-                                type="button"
-                                className={`dashboard-arb-way${
-                                  arbWays === "2-way" ? " is-active" : ""
-                                }`}
-                                onClick={() => setArbWays("2-way")}
-                              >
-                                2-way
-                              </button>
-                              <button
-                                type="button"
-                                className={`dashboard-arb-way${
-                                  arbWays === "3-way" ? " is-active" : ""
-                                }`}
-                                onClick={() => setArbWays("3-way")}
-                              >
-                                3-way
-                              </button>
-                              <button
-                                type="button"
-                                className={`dashboard-arb-way${
-                                  arbWays === "4-way" ? " is-active" : ""
-                                }`}
-                                onClick={() => setArbWays("4-way")}
-                              >
-                                4-way
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="dashboard-arb-right">
-                          <div className="dashboard-arb-preference">
-                            <div>
-                              <span>Favorite arb technique</span>
-                              <p>Use my preferred books + sport stacks.</p>
-                            </div>
-                            <div className="dashboard-arb-actions">
-                              <button
-                                type="button"
-                                className={`dashboard-arb-toggle${
-                                  favoriteArb === "Yes" ? " is-active" : " is-off"
-                                }`}
-                                onClick={() => setFavoriteArb("Yes")}
-                              >
-                                Yes
-                              </button>
-                              <button
-                                type="button"
-                                className={`dashboard-arb-toggle${
-                                  favoriteArb === "No" ? " is-active" : " is-off"
-                                }`}
-                                onClick={() => setFavoriteArb("No")}
-                              >
-                                No
-                              </button>
-                              <button type="button" className="dashboard-arb-link">
-                                Change settings
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <>
-                  <div
-                    className={`dashboard-arb-table${
-                      isArbEvExpanded ? " is-expanded" : ""
-                    }`}
-                    role="table"
-                    aria-label="EV betting board"
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="dashboard-arb-row dashboard-arb-row--header" role="row">
+                  <span role="columnheader">Match starts</span>
+                  <span
+                    className="dashboard-arb-header-group"
+                    role="columnheader"
                   >
-                  {isArbEvExpanded ? (
-                    <>
-                      <div
-                        className="dashboard-arb-row dashboard-arb-row--header"
-                        role="row"
-                      >
-                        <span role="columnheader">Match starts</span>
-                        <span role="columnheader">Sport</span>
-                        <span role="columnheader">League</span>
-                        <span role="columnheader">Match</span>
-                      </div>
-                      {visibleArbRows.map((row) => (
-                        <Fragment key={`${row.start}-${row.match}`}>
-                          <div
-                          className={`dashboard-arb-row${
-                            eventPopout?.id === `ev-${row.start}-${row.match}`
-                              ? " is-selected"
-                              : ""
-                          }`}
-                          role="row"
-                          key={`${row.start}-${row.match}`}
-                          onClick={() =>
-                            openEventPopout(
-                              buildEventPopout({
-                                id: `ev-${row.start}-${row.match}`,
-                                board: "EV",
-                                start: row.start,
-                                sport: row.sport,
-                                league: row.league,
-                                match: row.match,
-                              })
-                            )
-                          }
-                        >
-                          <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                            {row.start}
-                          </span>
-                          <span className="dashboard-arb-cell">{row.sport}</span>
-                          <span className="dashboard-arb-cell dashboard-arb-cell--league">
-                            {row.league}
-                          </span>
-                          <span className="dashboard-arb-cell dashboard-arb-cell--match">
-                            {row.match}
-                          </span>
-                          </div>
-                          {renderEventDropdown(`ev-${row.start}-${row.match}`)}
-                        </Fragment>
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      <div
-                        className="dashboard-arb-row dashboard-arb-row--header"
-                        role="row"
-                      >
-                        <span role="columnheader">Match starts</span>
-                        <span
-                          className="dashboard-arb-header-group"
-                          role="columnheader"
-                        >
-                          <span>Sport</span>
-                          <span>League</span>
-                          <span>Match</span>
-                        </span>
-                      </div>
-                      {visibleArbRows.map((row) => (
-                        <Fragment key={`${row.start}-${row.match}`}>
-                          <div
-                          className={`dashboard-arb-row${
-                            eventPopout?.id === `ev-${row.start}-${row.match}`
-                              ? " is-selected"
-                              : ""
-                          }`}
-                          role="row"
-                          key={`${row.start}-${row.match}`}
-                          onClick={() =>
-                            openEventPopout(
-                              buildEventPopout({
-                                id: `ev-${row.start}-${row.match}`,
-                                board: "EV",
-                                start: row.start,
-                                sport: row.sport,
-                                league: row.league,
-                                match: row.match,
-                              })
-                            )
-                          }
-                        >
-                          <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                            {row.start}
-                          </span>
-                          <span className="dashboard-arb-cell dashboard-arb-cell--details">
-                            <span className="dashboard-arb-league">{row.league}</span>
-                            <span className="dashboard-arb-match">{row.match}</span>
-                            <span className="dashboard-arb-sport">{row.sport}</span>
-                          </span>
-                          </div>
-                          {renderEventDropdown(`ev-${row.start}-${row.match}`)}
-                        </Fragment>
-                      ))}
-                    </>
-                  )}
+                    <span>Sport</span>
+                    <span>League</span>
+                    <span>Match</span>
+                  </span>
+                </div>
+                {visibleArbRows.length === 0 ? (
+                  <div className="dashboard-bet-type-empty" role="row">
+                    No {arbEvView === "arb" ? "arbitrage" : "positive EV"} bets match the selected bet types.
                   </div>
-                  {isArbEvExpanded ? (
-                    <div
-                      className="dashboard-ev-options"
-                      onClick={(event) => event.stopPropagation()}
-                    >
-                      <div className="dashboard-ev-body">
-                        <div className="dashboard-ev-left">
-                          <div className="dashboard-ev-limit">
-                            <span>Include bet limits</span>
-                            <div className="dashboard-ev-toggle-group">
-                              <button
-                                type="button"
-                                className={`dashboard-ev-toggle${
-                                  evIncludeLimits === "On" ? " is-active" : " is-off"
-                                }`}
-                                onClick={() => setEvIncludeLimits("On")}
-                              >
-                                On
-                              </button>
-                              <button
-                                type="button"
-                                className={`dashboard-ev-toggle${
-                                  evIncludeLimits === "Off" ? " is-active" : " is-off"
-                                }`}
-                                onClick={() => setEvIncludeLimits("Off")}
-                              >
-                                Off
-                              </button>
-                            </div>
-                          </div>
-                          <div className="dashboard-ev-metric">
-                            <span>EV types</span>
-                            <div className="dashboard-ev-ways">
-                              <button
-                                type="button"
-                                className={`dashboard-ev-way${
-                                  evType === "+EV" ? " is-active" : ""
-                                }`}
-                                onClick={() => setEvType("+EV")}
-                              >
-                                +EV
-                              </button>
-                              <button
-                                type="button"
-                                className={`dashboard-ev-way${
-                                  evType === "Boosted" ? " is-active" : ""
-                                }`}
-                                onClick={() => setEvType("Boosted")}
-                              >
-                                Boosted
-                              </button>
-                              <button
-                                type="button"
-                                className={`dashboard-ev-way${
-                                  evType === "Alt lines" ? " is-active" : ""
-                                }`}
-                                onClick={() => setEvType("Alt lines")}
-                              >
-                                Alt lines
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="dashboard-ev-right">
-                          <div className="dashboard-ev-preference">
-                            <div>
-                              <span>Favorite EV technique</span>
-                              <p>Keep my preferred books + models active.</p>
-                            </div>
-                            <div className="dashboard-ev-actions">
-                              <button
-                                type="button"
-                                className={`dashboard-ev-toggle${
-                                  favoriteEv === "Yes" ? " is-active" : " is-off"
-                                }`}
-                                onClick={() => setFavoriteEv("Yes")}
-                              >
-                                Yes
-                              </button>
-                              <button
-                                type="button"
-                                className={`dashboard-ev-toggle${
-                                  favoriteEv === "No" ? " is-active" : " is-off"
-                                }`}
-                                onClick={() => setFavoriteEv("No")}
-                              >
-                                No
-                              </button>
-                              <button type="button" className="dashboard-ev-link">
-                                Change settings
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : null}
-                </>
-              )}
+                ) : null}
+                {visibleArbRows.map((row) => (
+                  <div className="dashboard-arb-row" role="row" key={`${arbEvView}-${row.start}-${row.match}`}>
+                    <span className="dashboard-arb-cell dashboard-arb-cell--time">
+                      {row.start}
+                    </span>
+                    <span className="dashboard-arb-cell dashboard-arb-cell--details">
+                      <span className="dashboard-arb-league">{row.league}</span>
+                      <span className="dashboard-arb-match">{row.match}</span>
+                      <span className="dashboard-arb-sport">{row.sport}</span>
+                      <span className="dashboard-bet-type-badge dashboard-bet-type-badge--inline">
+                        {BET_TYPE_LABELS[row.betType]}
+                      </span>
+                    </span>
+                  </div>
+                ))}
+              </div>
             </section>
             <section
               className={`dashboard-withdrawal dashboard-expandable${

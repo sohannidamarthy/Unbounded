@@ -23,6 +23,7 @@ def market_instance_id_for(market_key: str, line: Optional[float]) -> str:
       moneyline -> "main"
       total -> "total:{line}"
       spread -> "spread:{line}"
+      alt_spread / alt_total / props -> "{market_key}:{line}"
     """
     mk = normalize_market(market_key)
     if mk in ("moneyline", "h2h"):

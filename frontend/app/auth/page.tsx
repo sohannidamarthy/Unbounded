@@ -4,9 +4,12 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import { getSportsbookMeta, SportsbookLogo } from "../components/sportsbookMeta";
+
 type AuthMode = "login" | "signup";
 type MessageTone = "success" | "error" | "info";
 type SignupStep = 1 | 2 | 3;
+type TierOption = "" | "select" | "premium" | "executive";
 
 type TutorialItem = {
   eyebrow: string;
@@ -18,8 +21,10 @@ type TutorialItem = {
 
 type SignupFormState = {
   email: string;
+  tier: TierOption;
   username: string;
   promoCode: string;
+  dateOfBirth: string;
   password: string;
   confirmPassword: string;
   country: string;
@@ -175,6 +180,12 @@ const GOAL_OPTIONS = [
   "Build steady profit",
   "Track promos and boosts",
   "Learn EV and arbitrage"
+];
+const INITIAL_VISIBLE_SPORTSBOOKS = 8;
+const TIER_OPTIONS: { value: Exclude<TierOption, "">; label: string; accent: string }[] = [
+  { value: "select", label: "Select", accent: "red" },
+  { value: "premium", label: "Premium", accent: "silver" },
+  { value: "executive", label: "Executive", accent: "gold" }
 ];
 
 const MAX_PASSWORD_LENGTH = 100;
@@ -395,8 +406,10 @@ const TUTORIALS_BY_EXPERIENCE: Record<string, TutorialItem[]> = {
 
 const DEFAULT_SIGNUP_FORM: SignupFormState = {
   email: "",
+  tier: "",
   username: "",
   promoCode: "",
+  dateOfBirth: "",
   password: "",
   confirmPassword: "",
   country: "US",
@@ -482,6 +495,31 @@ function validatePassword(value: string) {
   return null;
 }
 
+function validateDateOfBirth(value: string) {
+  if (!value) {
+    return "Date of birth is required for age verification.";
+  }
+
+  const today = new Date();
+  const dob = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(dob.getTime()) || dob > today) {
+    return "Enter a valid date of birth.";
+  }
+
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDelta = today.getMonth() - dob.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < dob.getDate())) {
+    age -= 1;
+  }
+
+  if (age < 18) {
+    return "You must be at least 18 years old to create an account.";
+  }
+
+  return null;
+}
+
 export default function AuthPage() {
   const router = useRouter();
   const [mode, setMode] = useState<AuthMode>("login");
@@ -497,7 +535,11 @@ export default function AuthPage() {
   const [rememberEmail, setRememberEmail] = useState(false);
   const [signupForm, setSignupForm] = useState<SignupFormState>(DEFAULT_SIGNUP_FORM);
   const [selectedSportsbooks, setSelectedSportsbooks] = useState<string[]>([]);
+  const [sportsbookSearch, setSportsbookSearch] = useState("");
+  const [showAllSportsbooks, setShowAllSportsbooks] = useState(false);
   const [tutorialIndex, setTutorialIndex] = useState(0);
+  const [didSkipPreferences, setDidSkipPreferences] = useState(false);
+  const todayIso = useMemo(() => new Date().toISOString().slice(0, 10), []);
 
   const apiBase = useMemo(() => {
     return (
@@ -528,6 +570,37 @@ export default function AuthPage() {
 
     return LEGAL_SPORTSBOOKS_BY_REGION[signupForm.country] || [];
   }, [signupForm.country, signupForm.state]);
+
+  const filteredSportsbookOptions = useMemo(() => {
+    const normalizedSearch = sportsbookSearch.trim().toLowerCase();
+    const filtered = sportsbookOptions.filter((sportsbook) =>
+      sportsbook.toLowerCase().includes(normalizedSearch)
+    );
+
+    return [...filtered].sort((left, right) => {
+      const leftLegal = legalSportsbooks.includes(left) ? 1 : 0;
+      const rightLegal = legalSportsbooks.includes(right) ? 1 : 0;
+
+      if (leftLegal !== rightLegal) {
+        return rightLegal - leftLegal;
+      }
+
+      return left.localeCompare(right);
+    });
+  }, [legalSportsbooks, sportsbookOptions, sportsbookSearch]);
+
+  const visibleSportsbookOptions = useMemo(() => {
+    if (showAllSportsbooks || sportsbookSearch.trim()) {
+      return filteredSportsbookOptions;
+    }
+
+    return filteredSportsbookOptions.slice(0, INITIAL_VISIBLE_SPORTSBOOKS);
+  }, [filteredSportsbookOptions, showAllSportsbooks, sportsbookSearch]);
+  const allFilteredSportsbooksSelected =
+    filteredSportsbookOptions.length > 0 &&
+    filteredSportsbookOptions.every((sportsbook) =>
+      selectedSportsbooks.includes(sportsbook)
+    );
 
   const recommendedTutorials = useMemo(() => {
     return (
@@ -590,9 +663,12 @@ export default function AuthPage() {
     setSignupForm(DEFAULT_SIGNUP_FORM);
     setSelectedSportsbooks([]);
     setTutorialIndex(0);
+    setSportsbookSearch("");
+    setShowAllSportsbooks(false);
     setPasswordError(null);
     setShowPassword(false);
     setShowConfirmPassword(false);
+    setDidSkipPreferences(false);
   };
 
   const handleModeChange = (nextMode: AuthMode) => {
@@ -622,13 +698,23 @@ export default function AuthPage() {
     }
     if (field === "country") {
       setSelectedSportsbooks([]);
+      setSportsbookSearch("");
+      setShowAllSportsbooks(false);
     }
     if (field === "state") {
       setSelectedSportsbooks([]);
+      setSportsbookSearch("");
+      setShowAllSportsbooks(false);
     }
   };
 
   const validateSignupStepOne = () => {
+    const dobError = validateDateOfBirth(signupForm.dateOfBirth);
+    if (dobError) {
+      setPasswordError(dobError);
+      return false;
+    }
+
     const usernameError = validateUsername(signupForm.username);
     if (usernameError) {
       setPasswordError(usernameError);
@@ -672,12 +758,13 @@ export default function AuthPage() {
     });
   };
 
-  const goToTutorialStep = () => {
+  const goToTutorialStep = (skippedPreferences: boolean) => {
     setSignupStep(3);
     setTutorialIndex(0);
+    setDidSkipPreferences(skippedPreferences);
   };
 
-  const completeSignup = async (skipPreferences: boolean) => {
+  const completeSignup = async (skippedTutorials: boolean) => {
     if (isSubmitting) {
       return;
     }
@@ -699,7 +786,31 @@ export default function AuthPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: emailForApi,
-          password: signupForm.password
+          password: signupForm.password,
+          tier: signupForm.tier || null,
+          username: signupForm.username.trim(),
+          promo_code: signupForm.promoCode.trim() || null,
+          date_of_birth: signupForm.dateOfBirth,
+          country: signupForm.country,
+          state: signupForm.state,
+          max_bet: signupForm.maxBet,
+          experience_level: signupForm.experienceLevel,
+          betting_goal: signupForm.bettingGoal,
+          yearly_profit_target: signupForm.yearlyProfitTarget,
+          bet_frequency: signupForm.betFrequency,
+          preferred_sportsbooks: selectedSportsbooks,
+          legal_sportsbooks: legalSportsbooks,
+          recommended_tutorial_titles: recommendedTutorials.map(
+            (tutorial) => tutorial.title
+          ),
+          active_tutorial_title: activeTutorial?.title || null,
+          active_tutorial_index: activeTutorial
+            ? recommendedTutorials.findIndex(
+                (tutorial) => tutorial.title === activeTutorial.title
+              )
+            : null,
+          skipped_preferences: didSkipPreferences,
+          skipped_tutorials: skippedTutorials
         })
       });
 
@@ -735,8 +846,8 @@ export default function AuthPage() {
       resetSignupFlow();
       setMessageTone("success");
       setMessage(
-        skipPreferences
-          ? "Account created. You skipped setup for now. Log in to continue."
+        skippedTutorials
+          ? "Account created. You skipped tutorials for now. Log in to continue."
           : "Account created. Log in with your email and password to continue."
       );
     } catch (error) {
@@ -764,6 +875,7 @@ export default function AuthPage() {
       if (!validateSignupStepOne()) {
         return;
       }
+      setDidSkipPreferences(false);
       setSignupStep(2);
       hydrateLegalSportsbooks();
       return;
@@ -775,7 +887,7 @@ export default function AuthPage() {
         setMessage("Select at least one sportsbook or press Skip.");
         return;
       }
-      goToTutorialStep();
+      goToTutorialStep(false);
       return;
     }
 
@@ -908,7 +1020,7 @@ export default function AuthPage() {
                 <button
                   type="button"
                   className="auth-skip"
-                  onClick={goToTutorialStep}
+                  onClick={() => goToTutorialStep(true)}
                   disabled={isSubmitting}
                 >
                   Skip
@@ -1028,20 +1140,51 @@ export default function AuthPage() {
                 </>
               ) : signupStep === 1 ? (
                 <>
-                  <div className="auth-grid">
-                    <label className="field">
-                      <span>Email or mobile number</span>
-                      <input
-                        type="text"
-                        placeholder="you@example.com or +1 555 555 5555"
-                        autoComplete="username"
-                        required
-                        value={signupForm.email}
-                        onChange={(event) =>
-                          updateSignupField("email", event.target.value)
-                        }
-                      />
-                    </label>
+                  <div className="auth-grid auth-grid--signup">
+                    <div className="field-stack">
+                      <label className="field">
+                        <span>Email or mobile number</span>
+                        <input
+                          type="text"
+                          placeholder="you@example.com or +1 555 555 5555"
+                          autoComplete="username"
+                          required
+                          value={signupForm.email}
+                          onChange={(event) =>
+                            updateSignupField("email", event.target.value)
+                          }
+                        />
+                      </label>
+
+                      <div className="auth-tier-picker">
+                        <div className="auth-tier-picker-head">
+                          <span>Choose tier</span>
+                          <p>Select, Premium, or Executive.</p>
+                        </div>
+                        <div className="auth-tier-grid">
+                          {TIER_OPTIONS.map((tier) => {
+                            const isSelected = signupForm.tier === tier.value;
+                            return (
+                              <button
+                                key={tier.value}
+                                type="button"
+                                className={`auth-tier-card auth-tier-card--${tier.accent}${isSelected ? " is-selected" : ""
+                                  }`}
+                                aria-pressed={isSelected}
+                                onClick={() => updateSignupField("tier", tier.value)}
+                              >
+                                <span className="auth-tier-crown" aria-hidden="true">
+                                  <svg viewBox="0 0 24 24">
+                                    <path d="M3 18h18l-2-9-5 4-2-7-2 7-5-4-2 9Z" />
+                                  </svg>
+                                </span>
+                                <span className="auth-tier-label">{tier.label}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
 
                     <div className="field-stack">
                       <label className="field">
@@ -1068,6 +1211,19 @@ export default function AuthPage() {
                           value={signupForm.promoCode}
                           onChange={(event) =>
                             updateSignupField("promoCode", event.target.value)
+                          }
+                        />
+                      </label>
+
+                      <label className="field">
+                        <span>Date of Birth</span>
+                        <input
+                          type="date"
+                          required
+                          max={todayIso}
+                          value={signupForm.dateOfBirth}
+                          onChange={(event) =>
+                            updateSignupField("dateOfBirth", event.target.value)
                           }
                         />
                       </label>
@@ -1228,10 +1384,60 @@ export default function AuthPage() {
                       </div>
                     </div>
 
+                    <div className="auth-section-toolbar">
+                      <label className="auth-section-search">
+                        <input
+                          type="search"
+                          placeholder="Search sportsbooks"
+                          value={sportsbookSearch}
+                          onChange={(event) => {
+                            setSportsbookSearch(event.target.value);
+                            setShowAllSportsbooks(true);
+                          }}
+                        />
+                      </label>
+                      <div className="auth-section-actions">
+                        <button
+                          type="button"
+                          className="auth-section-action"
+                          onClick={() =>
+                            setSelectedSportsbooks((current) =>
+                              allFilteredSportsbooksSelected
+                                ? current.filter(
+                                    (sportsbook) =>
+                                      !filteredSportsbookOptions.includes(sportsbook)
+                                  )
+                                : uniqueValues([
+                                    ...current,
+                                    ...filteredSportsbookOptions
+                                  ])
+                            )
+                          }
+                        >
+                          {allFilteredSportsbooksSelected
+                            ? "Deselect all"
+                            : "Select all"}
+                        </button>
+                        {filteredSportsbookOptions.length > INITIAL_VISIBLE_SPORTSBOOKS &&
+                        !sportsbookSearch.trim() ? (
+                          <button
+                            type="button"
+                            className="auth-section-action"
+                            onClick={() =>
+                              setShowAllSportsbooks((current) => !current)
+                            }
+                          >
+                            {showAllSportsbooks ? "Less" : "More"}
+                          </button>
+                        ) : null}
+                      </div>
+                    </div>
+
                     <div className="auth-chip-grid">
-                      {sportsbookOptions.map((sportsbook) => {
+                      {visibleSportsbookOptions.map((sportsbook) => {
                         const isSelected = selectedSportsbooks.includes(sportsbook);
                         const isLegal = legalSportsbooks.includes(sportsbook);
+                        const sportsbookMeta = getSportsbookMeta(sportsbook);
                         return (
                           <button
                             key={sportsbook}
@@ -1239,14 +1445,32 @@ export default function AuthPage() {
                             className={`auth-chip ${isSelected ? "selected" : ""} ${isLegal ? "legal" : ""}`}
                             onClick={() => toggleSportsbook(sportsbook)}
                           >
-                            <span>{sportsbook}</span>
-                            {isLegal ? (
-                              <span className="auth-chip-note">Legal</span>
-                            ) : null}
+                            <span className="auth-chip-main">
+                              <SportsbookLogo sportsbook={sportsbook} size={32} />
+                              <span className="auth-chip-copy">
+                                <span>{sportsbook}</span>
+                                <span className="auth-chip-domain">
+                                  {new URL(sportsbookMeta.siteHref).hostname.replace(/^www\./, "")}
+                                </span>
+                              </span>
+                            </span>
+                            <span className="auth-chip-meta">
+                              {isLegal ? (
+                                <span className="auth-chip-note">Legal</span>
+                              ) : null}
+                              {isSelected ? (
+                                <span className="auth-chip-selected">Selected</span>
+                              ) : null}
+                            </span>
                           </button>
                         );
                       })}
                     </div>
+                    {visibleSportsbookOptions.length === 0 ? (
+                      <div className="field-hint">
+                        No sportsbooks match that search.
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="auth-grid">
