@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 
 export const ARBEV_BOOK_OPTIONS = [
@@ -160,11 +161,14 @@ export function SportsbookLogo({
       aria-hidden="true"
     >
       {activeSource ? (
-        <img
+        <Image
           src={activeSource}
           alt=""
-          loading="lazy"
+          fill
+          sizes={`${size}px`}
+          unoptimized
           referrerPolicy="no-referrer"
+          style={{ objectFit: "cover" }}
           onError={() => {
             setSourceIndex((current) => {
               if (current + 1 < sources.length) {

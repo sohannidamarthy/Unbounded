@@ -4,50 +4,50 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
+const HERO_IMAGES = [
+  { src: "/blurred.jpg", label: "Arbitrage betting" },
+  { src: "/blurred2.jpg", label: "EV betting" }
+];
+const SECONDARY_IMAGES = [
+  { src: "/blurred3.jpg", label: "Track bets" },
+  { src: "/blurred3.jpg", label: "Calculate bets" },
+  { src: "/blurred3.jpg", label: "Live arbitrage feed" },
+  { src: "/blurred3.jpg", label: "EV betting analysis" }
+];
+const TESTIMONIALS = [
+  {
+    quote:
+      "We cut our scan-to-bet time in half. The live alerts feel tailored instead of noisy.",
+    name: "Anonymous",
+    role: "Operations lead, Midwest betting group"
+  },
+  {
+    quote:
+      "The recap trail keeps our team aligned on why we passed or pressed. That alone is huge.",
+    name: "Anonymous",
+    role: "Trading manager, private syndicate"
+  },
+  {
+    quote:
+      "I finally have one place for alerts, staking, and withdrawals. No more spreadsheet sprawl.",
+    name: "Anonymous",
+    role: "Independent bettor"
+  },
+  {
+    quote:
+      "We added two operators without adding chaos. The audit trail makes reviews painless.",
+    name: "Anonymous",
+    role: "Partner, multi-state group"
+  },
+  {
+    quote:
+      "Live windows used to be frantic. Now the alert stack and notes keep us consistent.",
+    name: "Anonymous",
+    role: "Lead analyst, small team"
+  }
+];
 
 export default function Home() {
-  const heroImages = [
-    { src: "/blurred.jpg", label: "Arbitrage betting" },
-    { src: "/blurred2.jpg", label: "EV betting" }
-  ];
-  const secondaryImages = [
-    { src: "/blurred3.jpg", label: "Track bets" },
-    { src: "/blurred3.jpg", label: "Calculate bets" },
-    { src: "/blurred3.jpg", label: "Live arbitrage feed" },
-    { src: "/blurred3.jpg", label: "EV betting analysis" }
-  ];
-  const testimonials = [
-    {
-      quote:
-        "We cut our scan-to-bet time in half. The live alerts feel tailored instead of noisy.",
-      name: "Anonymous",
-      role: "Operations lead, Midwest betting group"
-    },
-    {
-      quote:
-        "The recap trail keeps our team aligned on why we passed or pressed. That alone is huge.",
-      name: "Anonymous",
-      role: "Trading manager, private syndicate"
-    },
-    {
-      quote:
-        "I finally have one place for alerts, staking, and withdrawals. No more spreadsheet sprawl.",
-      name: "Anonymous",
-      role: "Independent bettor"
-    },
-    {
-      quote:
-        "We added two operators without adding chaos. The audit trail makes reviews painless.",
-      name: "Anonymous",
-      role: "Partner, multi-state group"
-    },
-    {
-      quote:
-        "Live windows used to be frantic. Now the alert stack and notes keep us consistent.",
-      name: "Anonymous",
-      role: "Lead analyst, small team"
-    }
-  ];
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const [activeSecondaryIndex, setActiveSecondaryIndex] = useState(0);
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
@@ -55,9 +55,9 @@ export default function Home() {
   const [pricingNotified, setPricingNotified] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const heroImage = heroImages[activeHeroIndex];
-  const secondaryImage = secondaryImages[activeSecondaryIndex];
-  const activeTestimonial = testimonials[activeTestimonialIndex];
+  const heroImage = HERO_IMAGES[activeHeroIndex];
+  const secondaryImage = SECONDARY_IMAGES[activeSecondaryIndex];
+  const activeTestimonial = TESTIMONIALS[activeTestimonialIndex];
 
   useEffect(() => {
     setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
@@ -82,7 +82,7 @@ export default function Home() {
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
-      setActiveHeroIndex((current) => (current + 1) % heroImages.length);
+      setActiveHeroIndex((current) => (current + 1) % HERO_IMAGES.length);
     }, 5000);
 
     return () => {
@@ -93,7 +93,7 @@ export default function Home() {
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       setActiveSecondaryIndex(
-        (current) => (current + 1) % secondaryImages.length
+        (current) => (current + 1) % SECONDARY_IMAGES.length
       );
     }, 3000);
 
@@ -105,7 +105,7 @@ export default function Home() {
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       setActiveTestimonialIndex(
-        (current) => (current + 1) % testimonials.length
+        (current) => (current + 1) % TESTIMONIALS.length
       );
     }, 7000);
 
@@ -232,7 +232,7 @@ export default function Home() {
                 role="tablist"
                 aria-label="Betting view"
               >
-                {heroImages.map((image, index) => (
+                {HERO_IMAGES.map((image, index) => (
                   <button
                     key={image.label}
                     type="button"
@@ -283,7 +283,7 @@ export default function Home() {
                 role="tablist"
                 aria-label="Betting workflow"
               >
-                {secondaryImages.map((image, index) => (
+                {SECONDARY_IMAGES.map((image, index) => (
                   <button
                     key={image.label}
                     type="button"
@@ -441,7 +441,7 @@ export default function Home() {
                 onClick={() =>
                   setActiveTestimonialIndex(
                     (current) =>
-                      (current - 1 + testimonials.length) % testimonials.length
+                      (current - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
                   )
                 }
                 aria-label="Previous testimonial"
@@ -453,7 +453,7 @@ export default function Home() {
                 className="primary"
                 onClick={() =>
                   setActiveTestimonialIndex(
-                    (current) => (current + 1) % testimonials.length
+                    (current) => (current + 1) % TESTIMONIALS.length
                   )
                 }
                 aria-label="Next testimonial"
@@ -476,7 +476,7 @@ export default function Home() {
               </div>
             </div>
             <div className="testimonial-dots" role="tablist">
-              {testimonials.map((testimonial, index) => (
+              {TESTIMONIALS.map((testimonial, index) => (
                 <button
                   key={testimonial.quote}
                   type="button"
