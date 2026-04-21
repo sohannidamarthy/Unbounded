@@ -12,24 +12,8 @@ type DashboardHeaderProps = {
 
 export function DashboardHeader({ onOpenBetCalculator }: DashboardHeaderProps) {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAuthReady, setIsAuthReady] = useState(false);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const homeHref = isAuthenticated ? "/dashboard" : "/";
-
-  useEffect(() => {
-    setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
-    setIsAuthReady(true);
-
-    const handleStorage = () => {
-      setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
-    };
-
-    window.addEventListener("storage", handleStorage);
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-    };
-  }, []);
+  const homeHref = "/dashboard";
 
   useEffect(() => {
     let lastScrollY = window.scrollY;
@@ -60,7 +44,6 @@ export function DashboardHeader({ onOpenBetCalculator }: DashboardHeaderProps) {
 
   const handleLogoutClick = () => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
-    setIsAuthenticated(false);
     router.push("/");
   };
 
@@ -105,56 +88,46 @@ export function DashboardHeader({ onOpenBetCalculator }: DashboardHeaderProps) {
           </a>
         </nav>
         <div className="header-actions header-actions--split">
-          {isAuthReady ? (
-            isAuthenticated ? (
-              <div className="account-menu">
-                <button
-                  className="primary header-primary pulse-on-hover"
-                  type="button"
-                  aria-haspopup="menu"
-                >
-                  Account
-                </button>
-                <div className="account-dropdown" role="menu">
-                  <button className="account-dropdown-item" type="button" role="menuitem">
-                    Settings
-                  </button>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
-                    Billing and User payment
-                  </button>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
-                    Daily Bets
-                  </button>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
-                    Live ROI
-                  </button>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
-                    Group Chats
-                  </button>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
-                    Withdrawals
-                  </button>
-                  <a className="account-dropdown-item" role="menuitem" href="/tutorials">
-                    Tutorials
-                  </a>
-                  <button
-                    className="account-dropdown-item"
-                    type="button"
-                    role="menuitem"
-                    onClick={handleLogoutClick}
-                  >
-                    Log out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <a className="primary header-primary pulse-on-hover" href="/dashboard">
-                Dashboard
+          <div className="account-menu">
+            <button
+              className="primary header-primary pulse-on-hover"
+              type="button"
+              aria-haspopup="menu"
+            >
+              Account
+            </button>
+            <div className="account-dropdown" role="menu">
+              <button className="account-dropdown-item" type="button" role="menuitem">
+                Settings
+              </button>
+              <button className="account-dropdown-item" type="button" role="menuitem">
+                Billing and User payment
+              </button>
+              <button className="account-dropdown-item" type="button" role="menuitem">
+                Daily Bets
+              </button>
+              <button className="account-dropdown-item" type="button" role="menuitem">
+                Live ROI
+              </button>
+              <button className="account-dropdown-item" type="button" role="menuitem">
+                Group Chats
+              </button>
+              <button className="account-dropdown-item" type="button" role="menuitem">
+                Withdrawals
+              </button>
+              <a className="account-dropdown-item" role="menuitem" href="/tutorials">
+                Tutorials
               </a>
-            )
-          ) : (
-            <div className="header-actions-placeholder" aria-hidden="true" />
-          )}
+              <button
+                className="account-dropdown-item"
+                type="button"
+                role="menuitem"
+                onClick={handleLogoutClick}
+              >
+                Log out
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </header>
