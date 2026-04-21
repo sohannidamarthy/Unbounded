@@ -5,30 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 
 import type { SeoPageDefinition } from "./seoData";
 
-const TOKEN_STORAGE_KEY = "unbounded.access_token";
-
 type SeoPageClientProps = {
   page: SeoPageDefinition;
 };
 
 export function SeoPageClient({ page }: SeoPageClientProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAuthReady, setIsAuthReady] = useState(false);
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
   const [isPricingSubmitting, setIsPricingSubmitting] = useState(false);
   const [pricingNotified, setPricingNotified] = useState(false);
-
-  useEffect(() => {
-    setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
-    setIsAuthReady(true);
-    const handleStorage = () => {
-      setIsAuthenticated(Boolean(localStorage.getItem(TOKEN_STORAGE_KEY)));
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-    };
-  }, []);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -43,12 +27,8 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
   }, [page.testimonials.length]);
 
   const activeTestimonial = page.testimonials[activeTestimonialIndex];
-  const primaryHref =
-    isAuthReady && isAuthenticated ? page.ctaTarget : "/auth";
-  const primaryLabel =
-    isAuthReady && isAuthenticated
-      ? page.ctaLoggedInLabel
-      : page.ctaLoggedOutLabel;
+  const primaryHref = page.ctaTarget;
+  const primaryLabel = page.ctaLoggedInLabel;
   const apiBase = useMemo(() => {
     return (
       process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||

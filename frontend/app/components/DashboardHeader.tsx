@@ -148,8 +148,8 @@ export function DashboardHeader({ onOpenBetCalculator }: DashboardHeaderProps) {
                 </div>
               </div>
             ) : (
-              <a className="primary header-primary pulse-on-hover" href="/auth">
-                Log in / Sign up
+              <a className="primary header-primary pulse-on-hover" href="/dashboard">
+                Dashboard
               </a>
             )
           ) : (
