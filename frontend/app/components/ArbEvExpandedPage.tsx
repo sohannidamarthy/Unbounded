@@ -970,7 +970,9 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                       <span className="dashboard-arb-cell dashboard-arb-cell--time">
                         {row.start}
                       </span>
-                      <span className="dashboard-arb-cell">{row.sport}</span>
+                      <span className="dashboard-arb-cell dashboard-arb-cell--sport">
+                        {row.sport}
+                      </span>
                       <span className="dashboard-arb-cell dashboard-arb-cell--league">
                         {row.league}
                       </span>

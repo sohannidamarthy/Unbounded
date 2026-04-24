@@ -443,7 +443,7 @@ export default function ProfitTrackerPage() {
               <div className="profit-chart-wrap">
                 <svg
                   viewBox="0 0 100 26"
-                  preserveAspectRatio="none"
+                  preserveAspectRatio="xMidYMid meet"
                   role="img"
                   aria-label="Net profit over time"
                   style={{ fontFamily: "inherit" }}
@@ -607,25 +607,27 @@ export default function ProfitTrackerPage() {
             {!isTableMinimized ? (
               <div className="profit-table">
                 <div className="profit-row profit-row--header">
-                  <span>Settled</span>
-                  <span>Type</span>
-                  <span>Bet</span>
-                  <span>Odds / Net</span>
+                  <span className="profit-row-settled">Settled</span>
+                  <span className="profit-row-type">Type</span>
+                  <span className="profit-row-bet">Bet</span>
+                  <span className="profit-row-result">Odds / Net</span>
                 </div>
                 {inScope
                   .slice()
                   .reverse()
                   .map((entry) => (
                     <div key={entry.id} className="profit-row">
-                      <span>{new Date(entry.settledAt).toLocaleDateString()}</span>
-                      <span>
+                      <span className="profit-row-settled">
+                        {new Date(entry.settledAt).toLocaleDateString()}
+                      </span>
+                      <span className="profit-row-type">
                         {entry.categories.join(" / ").toUpperCase()}
                         <em className="profit-row-bet-type">
                           {BET_TYPE_LABELS[entry.betType]}
                         </em>
                       </span>
-                      <span>{entry.matchup}</span>
-                      <span>
+                      <span className="profit-row-bet">{entry.matchup}</span>
+                      <span className="profit-row-result">
                         {entry.odds} Net: {entry.net >= 0 ? "+" : "-"}$
                         {Math.abs(entry.net).toFixed(2)}
                       </span>

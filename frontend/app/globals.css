@@ -4594,7 +4594,10 @@ a {
   position: sticky;
   top: 14px;
   z-index: 80;
-  grid-template-columns: max-content minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "brand actions"
+    "nav nav";
   gap: 24px;
   padding: 16px 18px;
   border-radius: 30px;
@@ -4617,10 +4620,9 @@ a {
 }
 
 .dashboard-header-group {
+  grid-area: nav;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  column-gap: 20px;
   min-width: 0;
   padding: 8px 16px 8px 18px;
   border-radius: 999px;
@@ -4660,6 +4662,7 @@ a {
 }
 
 .dashboard-page .brand {
+  grid-area: brand;
   grid-template-columns: 56px auto;
   grid-template-rows: auto;
   column-gap: 16px;
@@ -4791,10 +4794,15 @@ a {
 }
 
 .dashboard-page-header .header-actions {
+  grid-area: actions;
   margin-left: auto;
   justify-content: flex-end;
   align-items: center;
   gap: 0;
+  width: auto;
+  min-width: 0;
+  justify-self: end;
+  align-self: center;
 }
 
 .dashboard-page-header .header-actions.header-actions--split {
@@ -4866,6 +4874,12 @@ a {
 
 .account-menu:hover .account-dropdown,
 .account-menu:focus-within .account-dropdown {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.account-menu.is-open .account-dropdown {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
@@ -5920,17 +5934,19 @@ a {
   }
 
   .dashboard-page .dashboard-page-header {
-    grid-template-columns: 1fr;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "nav nav";
+    align-items: center;
     gap: 14px;
     padding: 14px;
     border-radius: 24px;
   }
 
   .dashboard-page-header .dashboard-header-group {
-    display: flex;
+    display: grid;
     width: 100%;
-    flex-wrap: wrap;
     gap: 8px;
     border-radius: 22px;
     padding: 10px;
@@ -5938,7 +5954,6 @@ a {
 
   .dashboard-page-header .nav-links {
     width: 100%;
-    order: 1;
     justify-content: flex-start;
     flex-wrap: nowrap;
     white-space: nowrap;
@@ -5947,9 +5962,8 @@ a {
   }
 
   .dashboard-page-header .header-actions {
-    width: 100%;
-    order: 2;
-    justify-content: space-between;
+    width: auto;
+    justify-content: flex-end;
     flex-wrap: nowrap;
     margin-left: 0;
   }
@@ -7052,26 +7066,26 @@ a {
   }
 
   .dashboard-page .dashboard-page-header {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "nav nav";
     gap: 14px;
   }
 
   .dashboard-page .dashboard-header-group {
-    display: flex;
+    display: grid;
     width: 100%;
-    flex-wrap: wrap;
     border-radius: 24px;
   }
 
   .dashboard-page .dashboard-page-header .nav-links {
     width: 100%;
-    order: 1;
   }
 
   .dashboard-page .dashboard-page-header .header-actions {
-    width: 100%;
-    order: 2;
-    justify-content: space-between;
+    width: auto;
+    justify-content: flex-end;
   }
 }
 
@@ -7124,6 +7138,8 @@ a {
 }
 
 .profit-tracker-shell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
   display: grid;
   gap: 18px;
   border-radius: 24px;
@@ -7193,11 +7209,14 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
+  align-items: flex-start;
 }
 
 .profit-tracker-control-group {
   display: grid;
   gap: 8px;
+  min-width: min(260px, 100%);
+  flex: 1 1 240px;
 }
 
 .profit-tracker-control-group > span {
@@ -7312,7 +7331,8 @@ a {
 .profit-chart-wrap {
   margin-top: 14px;
   height: auto;
-  aspect-ratio: 4 / 1.45;
+  aspect-ratio: 16 / 7;
+  min-height: 280px;
   border-radius: 14px;
   border: 1px solid rgba(215, 170, 66, 0.28);
   background:
@@ -7325,6 +7345,7 @@ a {
 .profit-chart-wrap svg {
   width: 100%;
   height: 100%;
+  display: block;
 }
 
 .profit-grid-line {
@@ -7611,6 +7632,184 @@ a {
   font-size: 14px;
 }
 
+@media (max-width: 900px) {
+  .profit-tracker-shell {
+    gap: 16px;
+  }
+
+  .profit-tracker-hero {
+    flex-direction: column;
+  }
+
+  .profit-tracker-metrics {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profit-tracker-chart-head,
+  .profit-tracker-table-head {
+    align-items: flex-start;
+  }
+
+  .profit-chart-wrap {
+    aspect-ratio: 16 / 9;
+    min-height: 240px;
+    padding: 12px 8px 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .profit-tracker-main {
+    width: 100%;
+    padding-inline: 0;
+  }
+
+  .profit-tracker-shell,
+  .profit-tracker-hero,
+  .profit-tracker-controls,
+  .profit-tracker-chart-card,
+  .profit-tracker-table-card {
+    padding: 16px 14px;
+  }
+
+  .profit-tracker-shell {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+  }
+
+  .profit-tracker-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .profit-tracker-control-group {
+    min-width: 0;
+    flex-basis: 100%;
+  }
+
+  .profit-tracker-pill-group {
+    gap: 6px;
+  }
+
+  .profit-pill {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .profit-tracker-chart-head,
+  .profit-tracker-table-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profit-section-toggle {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .profit-chart-wrap {
+    aspect-ratio: 1.2 / 1;
+    min-height: 220px;
+    padding: 10px 12px 8px 8px;
+  }
+
+  .profit-axis-label {
+    font-size: 1.2px;
+  }
+
+  .profit-axis-title {
+    font-size: 1.6px;
+  }
+
+  .profit-table {
+    border: none;
+    background: transparent;
+    display: grid;
+    gap: 12px;
+    overflow: visible;
+  }
+
+  .profit-row--header {
+    display: none;
+  }
+
+  .profit-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "settled result"
+      "type type"
+      "bet bet";
+    gap: 10px 12px;
+    min-width: 0;
+    border-radius: 14px;
+    border: 1px solid rgba(215, 170, 66, 0.24);
+    background: rgba(9, 25, 39, 0.72);
+    padding: 14px;
+  }
+
+  .profit-row-settled {
+    grid-area: settled;
+  }
+
+  .profit-row-type {
+    grid-area: type;
+  }
+
+  .profit-row-bet {
+    grid-area: bet;
+    font-weight: 600;
+    color: #f7f1e8;
+  }
+
+  .profit-row-result {
+    grid-area: result;
+    text-align: right;
+    font-weight: 700;
+    color: #f2d384;
+  }
+
+  .profit-row-settled::before,
+  .profit-row-type::before,
+  .profit-row-bet::before,
+  .profit-row-result::before {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(247, 241, 232, 0.58);
+  }
+
+  .profit-row-settled::before {
+    content: "Settled";
+  }
+
+  .profit-row-type::before {
+    content: "Type";
+  }
+
+  .profit-row-bet::before {
+    content: "Bet";
+  }
+
+  .profit-row-result::before {
+    content: "Odds / Net";
+  }
+
+  .profit-table-minimized {
+    grid-template-columns: 1fr;
+  }
+
+  .profit-dot-modal {
+    width: min(100%, calc(100vw - 20px));
+    padding: 14px;
+  }
+
+  .profit-dot-modal-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Sitewide layout stabilization */
 .site {
   overflow-x: hidden;
@@ -7683,6 +7882,21 @@ a {
 
   .nav-links {
     width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .profit-tracker-page .profit-tracker-main {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding-inline: 12px;
+  }
+
+  .profit-tracker-page .profit-tracker-shell {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
   }
 }
 
@@ -7960,5 +8174,661 @@ a {
 
   .seo-pricing-panel {
     padding: 22px 18px;
+  }
+}
+
+@media (max-width: 900px) {
+  .site {
+    padding: 24px 24px 32px;
+    gap: 32px;
+  }
+
+  .site main {
+    gap: 40px;
+  }
+
+  .dashboard-page-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "nav nav";
+    align-items: center;
+    gap: 14px;
+    top: 10px;
+    padding: 14px;
+    border-radius: 26px;
+  }
+
+  .dashboard-page .dashboard-page-header .brand {
+    width: max-content;
+    justify-content: flex-start;
+  }
+
+  .dashboard-page .dashboard-page-header .brand-home-link {
+    justify-self: start;
+  }
+
+  .dashboard-page .dashboard-header-group {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .dashboard-page-header .nav-links {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .dashboard-page-header .header-actions {
+    margin-left: 0;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .dashboard-page-header .account-menu {
+    margin-left: 0;
+  }
+
+  .dashboard-page-header .account-dropdown {
+    width: min(240px, calc(100vw - 32px));
+  }
+
+  .hero-section {
+    gap: 24px;
+  }
+
+  .hero-banner,
+  .hero-banner-secondary {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .hero-banner-primary {
+    margin-top: 8px;
+  }
+
+  .hero-banner-secondary {
+    margin-top: 36px;
+  }
+
+  .hero-banner-label,
+  .hero-banner-secondary .hero-banner-media {
+    grid-column: auto;
+  }
+
+  .hero-banner-label {
+    gap: 12px;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+  }
+
+  .hero-banner-media,
+  .hero-banner-cta {
+    max-width: none;
+    justify-self: stretch;
+  }
+
+  .hero-image-toggle {
+    max-width: calc(100% - 24px);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .hero-image-toggle::-webkit-scrollbar {
+    display: none;
+  }
+
+  .toggle-btn {
+    flex: 0 0 auto;
+  }
+
+  .waitlist-shell {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .waitlist-card {
+    padding: 32px;
+    transform: none;
+    box-shadow: 12px 12px 0 var(--bull-navy);
+  }
+
+  .logo-frame {
+    padding: 18px;
+    box-shadow: 12px 12px 0 var(--bull-navy);
+  }
+
+  .profit-tracker-hero {
+    flex-direction: column;
+  }
+
+  .profit-tracker-metrics {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profit-chart-wrap {
+    aspect-ratio: 2.2 / 1.6;
+  }
+
+  .profit-table {
+    overflow-x: auto;
+  }
+
+  .profit-row {
+    min-width: 720px;
+  }
+
+  .profit-dot-modal-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-live-board {
+    overflow-x: auto;
+  }
+
+  .dashboard-live-board-header,
+  .dashboard-live-board-row {
+    min-width: 560px;
+  }
+
+  .dashboard-live-filters,
+  .dashboard-withdrawal-header,
+  .dashboard-tools-header,
+  .dashboard-chat-header,
+  .dashboard-chat-filters {
+    align-items: stretch;
+  }
+
+  .dashboard-withdrawal-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .dashboard-tools-list,
+  .dashboard-chat-placeholder-grid,
+  .dashboard-chat-recommended-grid {
+    gap: 16px;
+  }
+
+  .dashboard-tools-list {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-withdrawal-preference,
+  .dashboard-tools-decay-stat {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .seo-page-main {
+    width: min(1320px, calc(100vw - 32px));
+    padding-bottom: 56px;
+  }
+
+  .seo-hero-frame,
+  .seo-pricing-panel {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .site {
+    padding: 16px 14px 24px;
+    gap: 24px;
+  }
+
+  .site main {
+    gap: 32px;
+  }
+
+  .site-header {
+    gap: 12px;
+  }
+
+  .brand {
+    grid-template-columns: 48px auto;
+    column-gap: 10px;
+  }
+
+  .brand img {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+
+  .brand-text {
+    font-size: 18px;
+    padding-top: 0;
+  }
+
+  .dashboard-page-header {
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .dashboard-page .dashboard-page-header .brand {
+    grid-template-columns: 48px auto;
+    width: max-content;
+    justify-content: flex-start;
+  }
+
+  .dashboard-page .dashboard-page-header .brand-text {
+    white-space: nowrap;
+  }
+
+  .dashboard-page .dashboard-header-group {
+    padding: 10px;
+    gap: 10px;
+    border-radius: 18px;
+  }
+
+  .dashboard-page-header .nav-links {
+    gap: 8px;
+  }
+
+  .dashboard-page-header .nav-links a {
+    padding: 8px 10px;
+    font-size: 11px;
+  }
+
+  .dashboard-page-header .header-actions {
+    justify-content: flex-end;
+  }
+
+  .dashboard-page-header .header-primary {
+    min-height: 40px;
+    padding: 10px 14px;
+  }
+
+  .dashboard-page-header .account-dropdown {
+    width: min(220px, calc(100vw - 28px));
+  }
+
+  .hero-banner-label::before,
+  .hero-banner-label::after {
+    display: none;
+  }
+
+  .hero-image-toggle {
+    top: 12px;
+    left: 12px;
+    max-width: calc(100% - 24px);
+  }
+
+  .hero-banner-primary .toggle-btn,
+  .hero-banner-secondary .toggle-btn {
+    padding: 8px 10px;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .pricing-grid,
+  .dashboard-live-grid,
+  .dashboard-live-extra,
+  .dashboard-leaderboard-mini-grid,
+  .profit-table-minimized,
+  .dashboard-withdrawal-grid,
+  .dashboard-tools-list,
+  .dashboard-chat-placeholder-grid,
+  .dashboard-chat-recommended-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profit-tracker-shell,
+  .profit-tracker-hero,
+  .profit-tracker-controls,
+  .profit-tracker-chart-card,
+  .profit-tracker-table-card,
+  .dashboard-leaderboard,
+  .dashboard-withdrawal,
+  .dashboard-tools,
+  .seo-hero-frame,
+  .seo-pricing-panel,
+  .waitlist-card {
+    padding: 18px 16px;
+  }
+
+  .profit-tracker-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .profit-tracker-table-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profit-chart-wrap {
+    aspect-ratio: 1.35 / 1;
+    padding: 10px 6px 6px;
+  }
+
+  .dashboard-live-board-header,
+  .dashboard-live-board-row {
+    min-width: 520px;
+  }
+
+  .profit-tracker-page .profit-tracker-main {
+    padding-inline: 14px;
+  }
+
+  .profit-tracker-page .profit-tracker-shell {
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+  }
+
+  .profit-tracker-page .profit-row {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .seo-page-main {
+    width: min(1320px, calc(100vw - 20px));
+  }
+
+  .waitlist-page {
+    padding: 20px 12px;
+  }
+}
+
+@media (max-width: 760px) {
+  .arb-ev-page-main {
+    width: 100%;
+    max-width: 100%;
+    padding: 24px 14px 36px;
+  }
+
+  .arb-ev-page-shell {
+    width: 100%;
+    max-width: 100%;
+    gap: 20px;
+  }
+
+  .dashboard-arb,
+  .dashboard-ev,
+  .arb-ev-specialization,
+  .arb-ev-tutorial-lab {
+    padding: 18px 16px;
+  }
+
+  .dashboard-arb-header,
+  .dashboard-ev-header {
+    gap: 16px;
+  }
+
+  .dashboard-arb-controls,
+  .dashboard-ev-controls {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .dashboard-page-filter-field,
+  .dashboard-top-filter--page,
+  .dashboard-top-filters--page {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .dashboard-top-filters--page {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .dashboard-panel-tracker-toggle--corner {
+    position: static !important;
+    top: auto !important;
+    right: auto !important;
+    width: 100%;
+    justify-content: space-between;
+    padding-inline: 2px;
+    pointer-events: auto;
+  }
+
+  .dashboard-panel-tracker-toggle--corner span {
+    pointer-events: auto;
+    white-space: normal;
+  }
+
+  .dashboard-arb-table.is-expanded {
+    margin-top: 0;
+  }
+
+  .dashboard-event-popout-league-row,
+  .dashboard-event-popout-market-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-event-popout-net-profit {
+    text-align: left;
+  }
+
+  .dashboard-event-popout-market-row input {
+    width: 100%;
+    text-align: left;
+  }
+
+  .dashboard-arb-limit,
+  .dashboard-arb-metric,
+  .dashboard-arb-preference,
+  .dashboard-ev-limit,
+  .dashboard-ev-metric,
+  .dashboard-ev-preference {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-arb-toggle-group,
+  .dashboard-arb-ways,
+  .dashboard-arb-actions,
+  .dashboard-ev-toggle-group,
+  .dashboard-ev-ways {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-page-header,
+  .dashboard-header-group {
+    overflow: visible;
+  }
+
+  .dashboard-page-header .header-actions,
+  .dashboard-page-header .header-actions.header-actions--split {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .dashboard-page-header .account-menu {
+    width: auto;
+    display: inline-flex;
+  }
+
+  .dashboard-page-header .account-menu > button {
+    width: auto;
+    justify-content: center;
+  }
+
+  .dashboard-page-header .account-dropdown {
+    display: grid;
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    width: min(240px, calc(100vw - 28px));
+    min-width: 180px;
+    max-width: calc(100vw - 28px);
+    margin-top: 0;
+    transform: translateY(-8px);
+    z-index: 30;
+  }
+
+  .arb-ev-page .arb-ev-specialization-copy h1 {
+    max-width: none;
+  }
+
+  .arb-ev-page .dashboard-filter-menu {
+    width: min(100%, calc(100vw - 40px));
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    gap: 12px;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded .dashboard-arb-row--header {
+    display: none;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded .dashboard-arb-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas:
+      "time sport"
+      "league league"
+      "match match";
+    gap: 10px 12px;
+    padding: 14px;
+    border: 1px solid rgba(215, 170, 66, 0.24);
+    border-radius: 16px;
+    background: rgba(9, 25, 39, 0.74);
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded .dashboard-arb-row:not(.dashboard-arb-row--header):hover,
+  .arb-ev-page .dashboard-arb-row.is-selected {
+    transform: none;
+  }
+
+  .arb-ev-page .dashboard-arb-cell--time {
+    grid-area: time;
+  }
+
+  .arb-ev-page .dashboard-arb-cell--sport {
+    grid-area: sport;
+    text-align: right;
+  }
+
+  .arb-ev-page .dashboard-arb-cell--league {
+    grid-area: league;
+  }
+
+  .arb-ev-page .dashboard-arb-cell--match {
+    grid-area: match;
+    min-width: 0;
+  }
+
+  .arb-ev-page .dashboard-arb-cell--match > span:first-child {
+    overflow-wrap: anywhere;
+  }
+
+  .arb-ev-page .dashboard-event-popout-grid,
+  .arb-ev-page .dashboard-event-popout-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .dashboard-page .dashboard-page-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "nav nav";
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .dashboard-page .dashboard-page-header .brand {
+    grid-area: brand;
+    width: auto;
+    min-width: 0;
+    grid-template-columns: 44px minmax(0, auto);
+    column-gap: 10px;
+    align-items: center;
+  }
+
+  .dashboard-page .dashboard-page-header .brand img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .dashboard-page .dashboard-page-header .brand-text {
+    min-width: 0;
+    font-size: 16px;
+    line-height: 1;
+    padding-top: 0;
+  }
+
+  .dashboard-page .dashboard-page-header .brand-home-link {
+    max-width: 100%;
+  }
+
+  .dashboard-page .dashboard-page-header .header-actions,
+  .dashboard-page .dashboard-page-header .header-actions.header-actions--split {
+    grid-area: actions;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    justify-self: end;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .dashboard-page .dashboard-page-header .account-menu {
+    display: inline-flex;
+    width: auto;
+  }
+
+  .dashboard-page .dashboard-page-header .header-primary {
+    min-height: 40px;
+    padding: 10px 14px;
+    font-size: 12px;
+  }
+
+  .dashboard-page .dashboard-header-group {
+    grid-area: nav;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 20px;
+  }
+
+  .dashboard-page .dashboard-page-header .nav-links {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .dashboard-page .dashboard-page-header .nav-links a {
+    flex: 0 0 auto;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 0;
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .dashboard-page .dashboard-page-header .nav-links::-webkit-scrollbar {
+    display: none;
+  }
+
+  .dashboard-page .dashboard-page-header .account-dropdown {
+    right: 0;
+    top: calc(100% + 8px);
+    width: min(220px, calc(100vw - 28px));
+    max-width: calc(100vw - 28px);
   }
 }
