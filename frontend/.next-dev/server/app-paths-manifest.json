@@ -1,7 +1,0 @@
-{
-  "/api/site-chat/route": "app/api/site-chat/route.js",
-  "/arbitrage-bets/page": "app/arbitrage-bets/page.js",
-  "/profit-tracker/page": "app/profit-tracker/page.js",
-  "/[slug]/page": "app/[slug]/page.js",
-  "/page": "app/page.js"
-}

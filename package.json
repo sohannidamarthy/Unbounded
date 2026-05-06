@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "",
+  "engines": {
+    "node": ">=20.19.0 <21"
+  },
   "scripts": {
     "dev": "poetry run uvicorn app.main:app --reload",
     "start": "poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000",
@@ -12,4 +15,3 @@
     "docker:reset": "docker compose down -v"
   }
 }
-

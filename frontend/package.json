@@ -2,6 +2,9 @@
   "name": "unbounded-frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.19.0 <21"
+  },
   "scripts": {
     "clean": "rm -rf .next .next-dev node_modules/.cache",
     "clean:build": "rm -rf .next",
