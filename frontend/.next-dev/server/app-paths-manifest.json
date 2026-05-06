@@ -1,6 +1,7 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
+  "/api/site-chat/route": "app/api/site-chat/route.js",
+  "/arbitrage-bets/page": "app/arbitrage-bets/page.js",
   "/profit-tracker/page": "app/profit-tracker/page.js",
-  "/leaderboard/page": "app/leaderboard/page.js",
-  "/ev-bets/page": "app/ev-bets/page.js"
+  "/[slug]/page": "app/[slug]/page.js",
+  "/page": "app/page.js"
 }
