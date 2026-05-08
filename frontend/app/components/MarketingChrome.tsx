@@ -75,9 +75,9 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
                   <button className="account-dropdown-item" type="button" role="menuitem">
                     Settings
                   </button>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
+                  <a className="account-dropdown-item" role="menuitem" href="/billing">
                     Billing and User payment
-                  </button>
+                  </a>
                   <button className="account-dropdown-item" type="button" role="menuitem">
                     Tutorials
                   </button>

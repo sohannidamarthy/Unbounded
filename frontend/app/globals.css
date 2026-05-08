@@ -5433,6 +5433,10 @@ a {
   box-shadow: 16px 16px 0 rgba(0, 0, 0, 0.4);
 }
 
+.tier-pricing-card {
+  align-content: start;
+}
+
 .pricing-head {
   display: flex;
   align-items: center;
@@ -5456,8 +5460,179 @@ a {
   color: #ffffff;
 }
 
+.tier-price-stack {
+  display: grid;
+  gap: 2px;
+}
+
+.tier-price-stack .pricing-price {
+  margin: 0;
+}
+
+.tier-price-stack span {
+  color: rgba(247, 243, 234, 0.72);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.annual-price-callout {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(98, 215, 137, 0.55);
+  background: linear-gradient(135deg, rgba(98, 215, 137, 0.17), rgba(181, 136, 33, 0.12));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.annual-price-callout strong,
+.annual-price-callout p {
+  color: #f7f3ea;
+}
+
+.annual-price-callout div {
+  display: grid;
+  gap: 4px;
+}
+
+.annual-price-callout span {
+  display: block;
+  color: rgba(247, 243, 234, 0.72);
+  font-size: 12px;
+}
+
+.annual-price-callout p {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
+}
+
+.tier-feature-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted);
+}
+
+.tier-feature-list li {
+  display: grid;
+  grid-template-columns: 10px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.tier-feature-list li::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-top: 7px;
+  border-radius: 999px;
+  background: #62d789;
+  box-shadow: 0 0 10px rgba(98, 215, 137, 0.65);
+}
+
 .pricing-note {
   color: var(--muted);
+}
+
+.billing-page-main {
+  display: grid;
+  gap: 28px;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+  padding: 12px 0 72px;
+}
+
+.billing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.36fr);
+  gap: 24px;
+  align-items: stretch;
+  padding: 28px;
+  border-radius: 24px;
+  border: 1px solid rgba(181, 136, 33, 0.45);
+  background: linear-gradient(145deg, rgba(9, 32, 55, 0.92), rgba(4, 18, 32, 0.94));
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.36);
+}
+
+.billing-eyebrow {
+  display: inline-flex;
+  margin-bottom: 12px;
+  color: #f2c969;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.billing-hero h1 {
+  max-width: 720px;
+  color: #f7f3ea;
+  font-size: clamp(2rem, 1.65rem + 1vw, 3rem);
+  line-height: 1.05;
+}
+
+.billing-hero p {
+  max-width: 680px;
+  margin-top: 14px;
+  color: rgba(247, 243, 234, 0.74);
+  line-height: 1.55;
+}
+
+.billing-annual-banner {
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(98, 215, 137, 0.55);
+  background: rgba(98, 215, 137, 0.13);
+}
+
+.billing-annual-banner span,
+.billing-cadence-option span {
+  color: #62d789;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.billing-annual-banner strong {
+  color: #f7f3ea;
+  font-size: 24px;
+}
+
+.billing-cadence-panel {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.billing-cadence-option {
+  display: grid;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(181, 136, 33, 0.28);
+  background: rgba(7, 19, 31, 0.68);
+}
+
+.billing-cadence-option.is-recommended {
+  border-color: rgba(98, 215, 137, 0.62);
+  background: linear-gradient(135deg, rgba(98, 215, 137, 0.15), rgba(181, 136, 33, 0.12));
+}
+
+.billing-cadence-option strong {
+  color: #f7f3ea;
+  font-size: 18px;
+}
+
+.billing-cadence-option p {
+  color: rgba(247, 243, 234, 0.72);
 }
 
 .pricing-waitlist {
@@ -8654,6 +8829,28 @@ a {
   .dashboard-chat-placeholder-grid,
   .dashboard-chat-recommended-grid {
     grid-template-columns: 1fr;
+  }
+
+  .annual-price-callout {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .annual-price-callout p {
+    text-align: left;
+  }
+
+  .billing-page-main {
+    padding: 0 0 56px;
+  }
+
+  .billing-hero,
+  .billing-cadence-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .billing-hero {
+    padding: 22px 18px;
   }
 
   .profit-tracker-shell,

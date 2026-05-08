@@ -122,14 +122,14 @@ export function DashboardHeader({ onOpenBetCalculator }: DashboardHeaderProps) {
             >
               Settings
             </button>
-            <button
+            <a
               className="account-dropdown-item"
-              type="button"
               role="menuitem"
+              href="/billing"
               onClick={() => setIsAccountMenuOpen(false)}
             >
               Billing and User payment
-            </button>
+            </a>
             <button
               className="account-dropdown-item"
               type="button"

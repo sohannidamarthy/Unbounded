@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { PricingTierCards } from "./components/PricingTierCards";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 const HERO_IMAGES = [
@@ -196,9 +197,9 @@ export default function Home() {
                   <button className="account-dropdown-item" type="button" role="menuitem">
                     Settings
                   </button>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
+                  <a className="account-dropdown-item" role="menuitem" href="/billing">
                     Billing and User payment
-                  </button>
+                  </a>
                   <a className="account-dropdown-item" role="menuitem" href="/tutorials">
                     Tutorials
                   </a>
@@ -309,43 +310,12 @@ export default function Home() {
         <section id="pricing" className="section pricing-section">
           <div className="section-header">
             <h2>Pricing plans</h2>
-            <p>Choose the workspace that fits your betting pace.</p>
+            <p>
+              Choose Select, Premium, or Executive. Annual payment is highlighted
+              because it saves 10% across the year.
+            </p>
           </div>
-          <div className="pricing-grid">
-            <article className="pricing-card">
-              <div className="pricing-head">
-                <h3>Starter</h3>
-                <span className="pricing-tag">Free</span>
-              </div>
-              <p className="pricing-price">$0</p>
-              <p className="pricing-note">7-day trial, limited markets.</p>
-              <a className="primary is-disabled" href="#">
-                Current plan
-              </a>
-            </article>
-            <article className="pricing-card featured">
-              <div className="pricing-head">
-                <h3>Pro</h3>
-                <span className="pricing-tag">Most popular</span>
-              </div>
-              <p className="pricing-price">$19</p>
-              <p className="pricing-note">Full market access + live alerts.</p>
-              <a className="primary pulse-on-hover" href="/waitlist">
-                Go Pro
-              </a>
-            </article>
-            <article className="pricing-card">
-              <div className="pricing-head">
-                <h3>Premium</h3>
-                <span className="pricing-tag">Best Value</span>
-              </div>
-              <p className="pricing-price">$39</p>
-              <p className="pricing-note">Highest priority updates on lines.</p>
-              <a className="primary pulse-on-hover" href="/waitlist">
-                Go premium
-              </a>
-            </article>
-          </div>
+          <PricingTierCards />
           <div className="pricing-waitlist">
             <div>
               <h3>Still deciding?</h3>

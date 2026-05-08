@@ -20,7 +20,7 @@ const SITE_DESTINATIONS: SiteDestination[] = [
     title: "Home",
     href: "/",
     description: "Marketing overview, pricing, and product intro.",
-    keywords: ["home", "start", "main", "pricing", "landing"]
+    keywords: ["home", "start", "main", "landing"]
   },
   {
     title: "Dashboard",
@@ -81,6 +81,21 @@ const SITE_DESTINATIONS: SiteDestination[] = [
     href: "/auth",
     description: "Sign in and account access.",
     keywords: ["login", "sign in", "auth", "register", "signup"]
+  },
+  {
+    title: "Billing",
+    href: "/billing",
+    description: "Subscription tiers, annual savings, and user payment options.",
+    keywords: [
+      "billing",
+      "payment",
+      "subscription",
+      "pricing",
+      "select",
+      "premium",
+      "executive",
+      "annual"
+    ]
   },
   {
     title: "Waitlist",
