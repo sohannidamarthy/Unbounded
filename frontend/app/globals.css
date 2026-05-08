@@ -5651,11 +5651,13 @@ a {
 
 .tier-feature-list {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
   color: var(--muted);
+  font-size: 14px;
+  line-height: 1.35;
 }
 
 .tier-feature-list li {
@@ -5671,6 +5673,13 @@ a {
   height: 7px;
   margin-top: 7px;
   border-radius: 999px;
+}
+
+.tier-sportsbook-note {
+  margin: 0;
+  padding-top: 4px;
+  color: rgba(247, 243, 234, 0.64);
+  font-size: 12px;
 }
 
 .pricing-note {

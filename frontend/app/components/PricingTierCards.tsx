@@ -41,6 +41,9 @@ export function PricingTierCards({ context = "marketing" }: PricingTierCardsProp
               <li key={feature}>{feature}</li>
             ))}
           </ul>
+          <p className="tier-sportsbook-note">
+            Supports workflows across 100+ sportsbooks.
+          </p>
           <a className="primary pulse-on-hover" href="/billing">
             Choose {plan.name}
           </a>

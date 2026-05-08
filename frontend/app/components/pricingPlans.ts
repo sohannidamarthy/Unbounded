@@ -15,11 +15,18 @@ export const PRICING_PLANS: PricingPlan[] = [
     annualPrice: "21.49",
     annualMonthlyEquivalent: "1.79",
     tag: "Tier one",
-    description: "Core access for testing the workflow and getting started.",
+    description:
+      "Core access to precision-driven arbitrage and AI-powered insights.",
     features: [
-      "Limited market views",
-      "Basic tutorials and guides",
-      "Starter tracking workflow"
+      "Limited arbitrage access for moneyline only",
+      "Limited +EV opportunities and live odds coverage",
+      "Profit calculator",
+      "Public leaderboard and top bets feed",
+      "Validator and manual entry tool",
+      "Sports and league selector",
+      "Light ads and minimal pop-ups",
+      "Newsletter-only mode included",
+      "7-day free trial"
     ]
   },
   {
@@ -28,11 +35,22 @@ export const PRICING_PLANS: PricingPlan[] = [
     annualPrice: "151.09",
     annualMonthlyEquivalent: "12.59",
     tag: "Most popular",
-    description: "Full access for active bettors who want faster signals.",
+    description:
+      "Full access for active bettors who want sharper boards, signals, and recommendations.",
     features: [
-      "Live arbitrage and EV boards",
-      "Profit tracker access",
-      "AI-assisted signal filters"
+      "All arbitrage opportunities and +EV bets",
+      "Live odds",
+      "Profit calculator",
+      "Public leaderboard with leaders' bets",
+      "Validator and manual entry",
+      "Fastest withdrawal methods",
+      "Sports and league selector",
+      "Friction score",
+      "Community-enabled bet flagging and trust scoring",
+      "No ads or pop-ups",
+      "Daily top bets and recommendations",
+      "Top earners recommendations",
+      "Reduced first-month price"
     ]
   },
   {
@@ -41,11 +59,17 @@ export const PRICING_PLANS: PricingPlan[] = [
     annualPrice: "280.69",
     annualMonthlyEquivalent: "23.39",
     tag: "Best annual value",
-    description: "Priority workflow access for heavier operators and teams.",
+    description:
+      "Priority workflow access for heavier operators who want the highest-signal tools.",
     features: [
-      "Priority line updates",
-      "Advanced recap highlights",
-      "Team-ready workflow support"
+      "Everything in Premium",
+      "AI bet recommendations and AI smart parlay builder",
+      "Time-to-decay meter",
+      "Historical odds",
+      "Predictive line movement signals",
+      "AI confidence score per bet",
+      "Private Executive leaderboard",
+      "Executive-only opportunities and more"
     ]
   }
 ];
