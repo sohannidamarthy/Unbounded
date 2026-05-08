@@ -5434,7 +5434,107 @@ a {
 }
 
 .tier-pricing-card {
+  position: relative;
+  overflow: hidden;
   align-content: start;
+  background:
+    linear-gradient(145deg, rgba(6, 24, 42, 0.92), rgba(3, 14, 25, 0.94));
+}
+
+.tier-pricing-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.14;
+}
+
+.tier-pricing-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.tier-pricing-card--select {
+  border-color: rgba(165, 31, 45, 0.72);
+}
+
+.tier-pricing-card--select::before {
+  background: radial-gradient(circle at 70% 8%, rgba(165, 31, 45, 0.9), transparent 38%);
+}
+
+.tier-pricing-card--premium {
+  border-color: rgba(156, 166, 174, 0.78);
+}
+
+.tier-pricing-card--premium::before {
+  background: radial-gradient(circle at 70% 8%, rgba(156, 166, 174, 0.85), transparent 38%);
+}
+
+.tier-pricing-card--executive {
+  border-color: rgba(181, 136, 33, 0.92);
+  box-shadow: 18px 18px 0 rgba(0, 0, 0, 0.42), 0 0 30px rgba(181, 136, 33, 0.12);
+}
+
+.tier-pricing-card--executive::before {
+  background: radial-gradient(circle at 70% 8%, rgba(242, 201, 105, 0.95), transparent 42%);
+}
+
+.tier-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tier-icon span {
+  width: 24px;
+  height: 16px;
+  display: block;
+  clip-path: polygon(0 100%, 12% 38%, 28% 72%, 44% 24%, 58% 68%, 74% 34%, 100% 100%);
+}
+
+.tier-pricing-card--select .tier-icon {
+  background: rgba(165, 31, 45, 0.14);
+}
+
+.tier-pricing-card--select .tier-icon span,
+.tier-pricing-card--select .tier-feature-list li::before {
+  background: #d63b4a;
+  box-shadow: 0 0 12px rgba(214, 59, 74, 0.55);
+}
+
+.tier-pricing-card--premium .tier-icon {
+  background: rgba(156, 166, 174, 0.14);
+}
+
+.tier-pricing-card--premium .tier-icon span,
+.tier-pricing-card--premium .tier-feature-list li::before {
+  background: #9ca6ae;
+  box-shadow: 0 0 12px rgba(156, 166, 174, 0.42);
+}
+
+.tier-pricing-card--executive .tier-icon {
+  background: rgba(242, 201, 105, 0.16);
+}
+
+.tier-pricing-card--executive .tier-icon span,
+.tier-pricing-card--executive .tier-feature-list li::before {
+  background: #f2c969;
+  box-shadow: 0 0 14px rgba(242, 201, 105, 0.62);
+}
+
+.tier-pricing-card--select .pricing-head h3 {
+  color: #ff6875;
+}
+
+.tier-pricing-card--premium .pricing-head h3 {
+  color: #d8dde2;
+}
+
+.tier-pricing-card--executive .pricing-head h3 {
+  color: #f2c969;
 }
 
 .pricing-head {
@@ -5447,11 +5547,26 @@ a {
 .pricing-tag {
   padding: 6px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(181, 136, 33, 0.6);
+  border: 1px solid currentColor;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #b58821;
+}
+
+.tier-pricing-card--select .pricing-tag {
+  color: #ff6875;
+  background: rgba(165, 31, 45, 0.12);
+}
+
+.tier-pricing-card--premium .pricing-tag {
+  color: #d8dde2;
+  background: rgba(156, 166, 174, 0.12);
+}
+
+.tier-pricing-card--executive .pricing-tag {
+  color: #f2c969;
+  background: rgba(242, 201, 105, 0.14);
 }
 
 .pricing-price {
@@ -5481,11 +5596,15 @@ a {
   justify-content: space-between;
   gap: 16px;
   align-items: center;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(98, 215, 137, 0.55);
-  background: linear-gradient(135deg, rgba(98, 215, 137, 0.17), rgba(181, 136, 33, 0.12));
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(242, 201, 105, 0.88);
+  background:
+    linear-gradient(135deg, rgba(242, 201, 105, 0.28), rgba(181, 136, 33, 0.2)),
+    rgba(7, 19, 31, 0.72);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
+    0 12px 24px rgba(181, 136, 33, 0.18);
 }
 
 .annual-price-callout strong,
@@ -5498,6 +5617,25 @@ a {
   gap: 4px;
 }
 
+.annual-price-callout strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+
+.annual-price-callout strong::before {
+  content: "Best value";
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: #071626;
+  background: #f2c969;
+  font-size: 10px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .annual-price-callout span {
   display: block;
   color: rgba(247, 243, 234, 0.72);
@@ -5508,6 +5646,7 @@ a {
   margin: 0;
   text-align: right;
   font-weight: 700;
+  font-size: 18px;
 }
 
 .tier-feature-list {
@@ -5532,8 +5671,6 @@ a {
   height: 7px;
   margin-top: 7px;
   border-radius: 999px;
-  background: #62d789;
-  box-shadow: 0 0 10px rgba(98, 215, 137, 0.65);
 }
 
 .pricing-note {
@@ -5589,13 +5726,16 @@ a {
   gap: 8px;
   padding: 20px;
   border-radius: 18px;
-  border: 1px solid rgba(98, 215, 137, 0.55);
-  background: rgba(98, 215, 137, 0.13);
+  border: 1px solid rgba(242, 201, 105, 0.86);
+  background:
+    linear-gradient(145deg, rgba(242, 201, 105, 0.26), rgba(181, 136, 33, 0.16)),
+    rgba(7, 19, 31, 0.7);
+  box-shadow: 0 18px 34px rgba(181, 136, 33, 0.18);
 }
 
 .billing-annual-banner span,
 .billing-cadence-option span {
-  color: #62d789;
+  color: #f2c969;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -5622,8 +5762,9 @@ a {
 }
 
 .billing-cadence-option.is-recommended {
-  border-color: rgba(98, 215, 137, 0.62);
-  background: linear-gradient(135deg, rgba(98, 215, 137, 0.15), rgba(181, 136, 33, 0.12));
+  border-color: rgba(242, 201, 105, 0.72);
+  background: linear-gradient(135deg, rgba(242, 201, 105, 0.2), rgba(181, 136, 33, 0.12));
+  box-shadow: 0 14px 26px rgba(181, 136, 33, 0.14);
 }
 
 .billing-cadence-option strong {

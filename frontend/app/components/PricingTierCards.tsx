@@ -9,11 +9,14 @@ export function PricingTierCards({ context = "marketing" }: PricingTierCardsProp
     <div className={`pricing-grid pricing-grid--${context}`}>
       {PRICING_PLANS.map((plan) => (
         <article
-          className={`pricing-card tier-pricing-card${
+          className={`pricing-card tier-pricing-card tier-pricing-card--${plan.name.toLowerCase()}${
             plan.name === "Premium" ? " featured" : ""
           }`}
           key={plan.name}
         >
+          <div className="tier-icon" aria-hidden="true">
+            <span />
+          </div>
           <div className="pricing-head">
             <h3>{plan.name}</h3>
             <span className="pricing-tag">{plan.tag}</span>
