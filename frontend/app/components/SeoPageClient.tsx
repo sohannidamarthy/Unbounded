@@ -13,6 +13,7 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
   const [isPricingSubmitting, setIsPricingSubmitting] = useState(false);
   const [pricingNotified, setPricingNotified] = useState(false);
+  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
@@ -63,6 +64,7 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
 
       event.currentTarget.reset();
       setPricingNotified(true);
+      setIsNewsletterOpen(false);
     } catch {
       setPricingNotified(true);
     } finally {
@@ -82,9 +84,13 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
               <a className="primary header-primary pulse-on-hover" href={primaryHref}>
                 {primaryLabel}
               </a>
-              <a className="ghost pulse-on-hover" href="/waitlist">
+              <button
+                className="ghost pulse-on-hover"
+                type="button"
+                onClick={() => setIsNewsletterOpen(true)}
+              >
                 Join newsletter
-              </a>
+              </button>
             </div>
           </div>
           <div className="seo-hero-preview">
@@ -128,7 +134,7 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
           <div className="testimonial-controls">
             <button
               type="button"
-              className="ghost"
+              className="testimonial-arrow"
               onClick={() =>
                 setActiveTestimonialIndex(
                   (current) =>
@@ -137,11 +143,11 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
               }
               aria-label="Previous testimonial"
             >
-              Prev
+              ‹
             </button>
             <button
               type="button"
-              className="primary"
+              className="testimonial-arrow"
               onClick={() =>
                 setActiveTestimonialIndex(
                   (current) => (current + 1) % page.testimonials.length
@@ -149,7 +155,7 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
               }
               aria-label="Next testimonial"
             >
-              Next
+              ›
             </button>
           </div>
         </div>
@@ -190,11 +196,45 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
             <a className="primary pulse-on-hover" href={primaryHref}>
               {primaryLabel}
             </a>
-            <form className="pricing-form" onSubmit={handlePricingSubmit}>
+            <button
+              className="primary pulse-on-hover"
+              type="button"
+              onClick={() => setIsNewsletterOpen(true)}
+            >
+              Newsletter updates
+            </button>
+          </div>
+        </div>
+      </section>
+      {isNewsletterOpen ? (
+        <div
+          className="newsletter-modal-backdrop"
+          role="presentation"
+          onClick={() => setIsNewsletterOpen(false)}
+        >
+          <section
+            className="newsletter-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="seo-newsletter-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="newsletter-modal-close"
+              type="button"
+              aria-label="Close newsletter form"
+              onClick={() => setIsNewsletterOpen(false)}
+            >
+              ×
+            </button>
+            <span className="billing-eyebrow">Newsletter</span>
+            <h2 id="seo-newsletter-title">Get Unbounded updates</h2>
+            <p>Product updates, tier announcements, and betting workflow notes.</p>
+            <form className="pricing-form newsletter-modal-form" onSubmit={handlePricingSubmit}>
               <input
                 name="email"
                 type="email"
-                placeholder="you@company.com"
+                placeholder="Email address"
                 autoComplete="email"
                 required
               />
@@ -202,13 +242,13 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
                 {isPricingSubmitting
                   ? "Sending..."
                   : pricingNotified
-                    ? "Notified!"
-                    : "Join waitlist"}
+                    ? "Subscribed"
+                    : "Subscribe"}
               </button>
             </form>
-          </div>
+          </section>
         </div>
-      </section>
+      ) : null}
     </main>
   );
 }

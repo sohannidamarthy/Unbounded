@@ -92,8 +92,8 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
                 </div>
               </div>
             ) : (
-              <a className="primary header-primary pulse-on-hover" href="/dashboard">
-                Go to Dashboard
+              <a className="primary header-primary pulse-on-hover" href="/auth">
+                Log in
               </a>
             )
           ) : (
@@ -103,14 +103,16 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
       </header>
       {children}
       <footer className="site-footer">
-        <div>
+        <div className="footer-brand">
           <strong>Unbounded</strong>
+          <span>Precision betting workflows, education, and account tools.</span>
         </div>
         <div className="footer-links">
           <a href="/arbitrage">Arbitrage</a>
           <a href="/positive-ev">Positive EV</a>
           <a href="/tools">Tools</a>
           <a href="/tutorials">Tutorials</a>
+          <a href="/billing">Billing</a>
         </div>
       </footer>
     </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 
-export default function WaitlistPage() {
+export default function NewsletterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [notified, setNotified] = useState(false);
 
@@ -58,9 +58,9 @@ export default function WaitlistPage() {
         </section>
         <section className="waitlist-card">
           <p className="eyebrow">Unbounded</p>
-          <h1>Join the waitlist</h1>
+          <h1>Newsletter updates</h1>
           <p className="lede">
-            Be first to hear about launches, updates, and early access.
+            Get product updates, tier announcements, and practical betting workflow notes.
           </p>
           <form className="waitlist-form" onSubmit={handleSubmit}>
             <label className="field">
@@ -68,13 +68,13 @@ export default function WaitlistPage() {
               <input
                 name="email"
                 type="email"
-                placeholder="you@company.com"
+                placeholder="Email address"
                 autoComplete="email"
                 required
               />
             </label>
             <button className="primary" type="submit">
-              {isSubmitting ? "Sending..." : notified ? "Notified!" : "Notify me"}
+              {isSubmitting ? "Sending..." : notified ? "Subscribed" : "Subscribe"}
             </button>
           </form>
         </section>

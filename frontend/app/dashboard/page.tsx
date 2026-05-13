@@ -1754,14 +1754,16 @@ export default function DashboardPage() {
       />
 
       <footer className="site-footer">
-        <div>
+        <div className="footer-brand">
           <strong>Unbounded</strong>
+          <span>Dashboard tools for live betting decisions and review.</span>
         </div>
         <div className="footer-links">
-          <a href="#">Contact</a>
-          <a href="#">Terms and services</a>
-          <a href="#">Blog</a>
-          <a href="#">About</a>
+          <a href="/arbitrage-bets">Arbitrage</a>
+          <a href="/ev-bets">Positive EV</a>
+          <a href="/profit-tracker">Profit Tracker</a>
+          <a href="/leaderboard">Leaderboard</a>
+          <a href="/billing">Billing</a>
         </div>
       </footer>
     </div>

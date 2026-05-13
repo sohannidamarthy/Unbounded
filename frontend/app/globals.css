@@ -5806,6 +5806,10 @@ a {
   color: var(--muted);
 }
 
+.pricing-waitlist > .primary {
+  flex: 0 0 auto;
+}
+
 .pricing-form {
   display: flex;
   gap: 12px;
@@ -5825,6 +5829,60 @@ a {
 
 .pricing-form input::placeholder {
   color: rgba(255, 255, 255, 0.6);
+}
+
+.newsletter-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(2, 8, 14, 0.68);
+  backdrop-filter: blur(10px);
+}
+
+.newsletter-modal {
+  position: relative;
+  width: min(520px, 100%);
+  display: grid;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 22px;
+  border: 1px solid rgba(181, 136, 33, 0.58);
+  background: linear-gradient(145deg, rgba(9, 32, 55, 0.98), rgba(4, 18, 32, 0.98));
+  box-shadow: 0 26px 60px rgba(0, 0, 0, 0.48);
+}
+
+.newsletter-modal h2 {
+  color: #f7f3ea;
+  font-size: 28px;
+  line-height: 1.12;
+}
+
+.newsletter-modal p {
+  color: rgba(247, 243, 234, 0.72);
+  line-height: 1.5;
+}
+
+.newsletter-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(181, 136, 33, 0.42);
+  background: rgba(255, 255, 255, 0.06);
+  color: #f7f3ea;
+  cursor: pointer;
+}
+
+.newsletter-modal-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
 }
 
 .pulse-on-hover {
@@ -6101,6 +6159,27 @@ a {
   gap: 10px;
 }
 
+.testimonial-arrow {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(181, 136, 33, 0.5);
+  background: rgba(7, 19, 31, 0.68);
+  color: #f7f3ea;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.testimonial-arrow:hover {
+  transform: translateY(-2px);
+  border-color: rgba(242, 201, 105, 0.85);
+  background: rgba(181, 136, 33, 0.18);
+}
+
 .testimonial-card {
   margin-top: 18px;
   background: linear-gradient(140deg, rgba(9, 32, 55, 0.95), rgba(0, 16, 30, 0.95));
@@ -6171,6 +6250,16 @@ a {
   box-shadow: 0 0 12px rgba(242, 200, 105, 0.7);
 }
 
+.testimonial-dots .dot.active::after {
+  content: "";
+  display: block;
+  width: 24px;
+  height: 2px;
+  margin: 13px 0 0 -7px;
+  border-radius: 999px;
+  background: rgba(242, 201, 105, 0.8);
+}
+
 @keyframes testimonialFade {
   from {
     opacity: 0;
@@ -6225,14 +6314,14 @@ a {
 }
 
 .site-footer {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   justify-content: space-between;
   gap: 24px;
-  flex-wrap: wrap;
-  padding-top: 16px;
+  padding: 22px 0 4px;
   border-top: 1px solid rgba(181, 136, 33, 0.2);
-  color: var(--bull-gold);
+  color: rgba(247, 243, 234, 0.72);
   font-size: 14px;
 }
 
@@ -6242,10 +6331,30 @@ a {
   font-size: 16px;
 }
 
+.footer-brand {
+  display: grid;
+  gap: 6px;
+}
+
+.footer-brand span {
+  max-width: 420px;
+  color: rgba(247, 243, 234, 0.62);
+  line-height: 1.4;
+}
+
 .footer-links {
   display: flex;
   gap: 18px;
   flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.footer-links a {
+  color: rgba(247, 243, 234, 0.78);
+}
+
+.footer-links a:hover {
+  color: var(--bull-gold);
 }
 
 @keyframes float-in {
@@ -8891,6 +9000,11 @@ a {
 
   .site-header {
     gap: 12px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(181, 136, 33, 0.22);
+    background: rgba(7, 19, 31, 0.58);
   }
 
   .brand {
@@ -8980,6 +9094,37 @@ a {
   .dashboard-chat-placeholder-grid,
   .dashboard-chat-recommended-grid {
     grid-template-columns: 1fr;
+  }
+
+  .pricing-waitlist {
+    gap: 16px;
+  }
+
+  .pricing-waitlist > .primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .newsletter-modal {
+    padding: 24px 18px;
+  }
+
+  .newsletter-modal-form {
+    grid-template-columns: 1fr;
+  }
+
+  .newsletter-modal-form button {
+    width: 100%;
+  }
+
+  .site-footer {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .footer-links {
+    justify-content: flex-start;
+    gap: 12px 16px;
   }
 
   .annual-price-callout {

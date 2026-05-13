@@ -54,6 +54,7 @@ export default function Home() {
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
   const [isPricingSubmitting, setIsPricingSubmitting] = useState(false);
   const [pricingNotified, setPricingNotified] = useState(false);
+  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const heroImage = HERO_IMAGES[activeHeroIndex];
@@ -145,6 +146,7 @@ export default function Home() {
 
       event.currentTarget.reset();
       setPricingNotified(true);
+      setIsNewsletterOpen(false);
     } catch (error) {
       // Keep optimistic "Notified!" even if the request errors.
     } finally {
@@ -214,8 +216,8 @@ export default function Home() {
                 </div>
               </div>
             ) : (
-              <a className="primary header-primary pulse-on-hover" href="/dashboard">
-                Go to Dashboard
+              <a className="primary header-primary pulse-on-hover" href="/auth">
+                Log in
               </a>
             )
           ) : (
@@ -264,9 +266,9 @@ export default function Home() {
               <div className="hero-banner-actions">
                 <a
                   className="primary header-primary pulse-on-hover"
-                  href="/waitlist"
+                  href="/auth"
                 >
-                  Sign up
+                  Create account
                 </a>
                 <a className="ghost pulse-on-hover" href="#">
                   Enter promo code
@@ -318,25 +320,16 @@ export default function Home() {
           <PricingTierCards />
           <div className="pricing-waitlist">
             <div>
-              <h3>Still deciding?</h3>
-              <p>Drop your email for early access updates.</p>
+              <h3>Stay updated</h3>
+              <p>Receive product updates, tier announcements, and betting workflow notes.</p>
             </div>
-            <form className="pricing-form" onSubmit={handlePricingSubmit}>
-              <input
-                name="email"
-                type="email"
-                placeholder="you@company.com"
-                autoComplete="email"
-                required
-              />
-              <button className="primary pulse-on-hover" type="submit">
-                {isPricingSubmitting
-                  ? "Sending..."
-                  : pricingNotified
-                    ? "Notified!"
-                    : "Join waitlist"}
-              </button>
-            </form>
+            <button
+              className="primary pulse-on-hover"
+              type="button"
+              onClick={() => setIsNewsletterOpen(true)}
+            >
+              Join newsletter
+            </button>
           </div>
         </section>
         <section id="workflow" className="section workflow">
@@ -407,7 +400,7 @@ export default function Home() {
             <div className="testimonial-controls">
               <button
                 type="button"
-                className="ghost"
+                className="testimonial-arrow"
                 onClick={() =>
                   setActiveTestimonialIndex(
                     (current) =>
@@ -416,11 +409,11 @@ export default function Home() {
                 }
                 aria-label="Previous testimonial"
               >
-                Prev
+                ‹
               </button>
               <button
                 type="button"
-                className="primary"
+                className="testimonial-arrow"
                 onClick={() =>
                   setActiveTestimonialIndex(
                     (current) => (current + 1) % TESTIMONIALS.length
@@ -428,7 +421,7 @@ export default function Home() {
                 }
                 aria-label="Next testimonial"
               >
-                Next
+                ›
               </button>
             </div>
           </div>
@@ -469,16 +462,64 @@ export default function Home() {
       </main>
 
       <footer className="site-footer">
-        <div>
+        <div className="footer-brand">
           <strong>Unbounded</strong>
+          <span>Precision betting workflows, education, and account tools.</span>
         </div>
         <div className="footer-links">
           <a href="/arbitrage">Arbitrage</a>
           <a href="/positive-ev">Positive EV</a>
           <a href="/tools">Tools</a>
           <a href="/tutorials">Tutorials</a>
+          <a href="/billing">Billing</a>
         </div>
       </footer>
+      {isNewsletterOpen ? (
+        <div
+          className="newsletter-modal-backdrop"
+          role="presentation"
+          onClick={() => setIsNewsletterOpen(false)}
+        >
+          <section
+            className="newsletter-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="newsletter-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="newsletter-modal-close"
+              type="button"
+              aria-label="Close newsletter form"
+              onClick={() => setIsNewsletterOpen(false)}
+            >
+              ×
+            </button>
+            <span className="billing-eyebrow">Newsletter</span>
+            <h2 id="newsletter-title">Get Unbounded updates</h2>
+            <p>
+              Product updates, tier announcements, and practical betting
+              workflow notes.
+            </p>
+            <form className="pricing-form newsletter-modal-form" onSubmit={handlePricingSubmit}>
+              <input
+                name="email"
+                type="email"
+                placeholder="Email address"
+                autoComplete="email"
+                required
+              />
+              <button className="primary pulse-on-hover" type="submit">
+                {isPricingSubmitting
+                  ? "Sending..."
+                  : pricingNotified
+                    ? "Subscribed"
+                    : "Subscribe"}
+              </button>
+            </form>
+          </section>
+        </div>
+      ) : null}
     </div>
   );
 }

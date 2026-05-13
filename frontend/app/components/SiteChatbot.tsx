@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -25,6 +25,7 @@ const SUGGESTIONS = ["Arbitrage bets", "Positive EV", "Profit tracker"];
 
 export function SiteChatbot() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>(STARTER_MESSAGES);
@@ -36,6 +37,10 @@ export function SiteChatbot() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const visibleMessages = useMemo(() => messages.slice(-6), [messages]);
+
+  if (pathname !== "/dashboard") {
+    return null;
+  }
 
   const submitMessage = async (messageText: string) => {
     const trimmed = messageText.trim();

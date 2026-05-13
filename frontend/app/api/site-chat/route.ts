@@ -98,10 +98,10 @@ const SITE_DESTINATIONS: SiteDestination[] = [
     ]
   },
   {
-    title: "Waitlist",
-    href: "/waitlist",
-    description: "Join the waitlist.",
-    keywords: ["waitlist", "join", "early access"]
+    title: "Newsletter",
+    href: "/",
+    description: "Newsletter signup is available from the homepage pricing section.",
+    keywords: ["newsletter", "updates", "email"]
   }
 ];
 
