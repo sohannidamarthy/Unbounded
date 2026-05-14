@@ -15,7 +15,10 @@ class Settings(BaseSettings):
     # Database & Cache
     # -------------------------
     database_url: str = Field(..., description="PostgreSQL connection URL")
-    redis_url: str = Field(..., description="Redis connection URL")
+    redis_url: str = Field(
+        "redis://localhost:6379/0",
+        description="Redis connection URL",
+    )
 
     # -------------------------
     # Security
