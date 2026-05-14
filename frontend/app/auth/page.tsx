@@ -555,6 +555,12 @@ export default function AuthPage() {
     process.env.NEXT_PUBLIC_AUTH_LOGIN_URL || `${apiBase}/auth/login`;
   const signupEndpoint =
     process.env.NEXT_PUBLIC_AUTH_SIGNUP_URL || `${apiBase}/auth/signup`;
+  const isLoginApiConfigured = Boolean(
+    apiBase || process.env.NEXT_PUBLIC_AUTH_LOGIN_URL
+  );
+  const isSignupApiConfigured = Boolean(
+    apiBase || process.env.NEXT_PUBLIC_AUTH_SIGNUP_URL
+  );
 
   const regionOptions = useMemo(
     () => REGION_OPTIONS[signupForm.country] || [],
@@ -653,6 +659,9 @@ export default function AuthPage() {
         }
       } else {
         const text = await response.text();
+        if (contentType.includes("text/html") || text.trim().startsWith("<")) {
+          return "The auth API is not configured correctly. Check NEXT_PUBLIC_API_URL on the frontend deployment.";
+        }
         if (text) {
           return text.slice(0, 240);
         }
@@ -787,6 +796,14 @@ export default function AuthPage() {
         return;
       }
 
+      if (!isSignupApiConfigured) {
+        setMessageTone("error");
+        setMessage(
+          "The signup API is not configured. Add NEXT_PUBLIC_API_URL to the frontend deployment and redeploy."
+        );
+        return;
+      }
+
       const response = await fetch(signupEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -914,6 +931,14 @@ export default function AuthPage() {
       localStorage.setItem(SAVED_EMAIL_KEY, emailValue);
     } else {
       localStorage.removeItem(SAVED_EMAIL_KEY);
+    }
+
+    if (!isLoginApiConfigured) {
+      setMessageTone("error");
+      setMessage(
+        "The login API is not configured. Add NEXT_PUBLIC_API_URL to the frontend deployment and redeploy."
+      );
+      return;
     }
 
     setIsSubmitting(true);
