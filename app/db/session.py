@@ -14,6 +14,7 @@ def _database_engine_config(database_url: str) -> tuple[str, dict]:
     if url.drivername in {"postgres", "postgresql", "postgresql+psycopg"}:
         query = dict(url.query)
         sslmode = query.pop("sslmode", None)
+        query.pop("channel_binding", None)
         url = url.set(drivername="postgresql+pg8000", query=query)
         if sslmode and sslmode != "disable":
             connect_args["ssl_context"] = True
