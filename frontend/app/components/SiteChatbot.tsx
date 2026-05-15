@@ -22,6 +22,7 @@ const STARTER_MESSAGES: ChatMessage[] = [
 ];
 
 const SUGGESTIONS = ["Arbitrage bets", "Positive EV", "Profit tracker"];
+const BET_TYPES = ["Moneyline", "Spread", "Total", "Player prop", "Alt line"];
 
 export function SiteChatbot() {
   const router = useRouter();
@@ -33,6 +34,8 @@ export function SiteChatbot() {
     href: string;
     label: string;
   } | null>(null);
+  const [betType, setBetType] = useState(BET_TYPES[0]);
+  const [stake, setStake] = useState("100");
   const [isSending, setIsSending] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -116,6 +119,12 @@ export function SiteChatbot() {
     setPendingRoute(null);
   };
 
+  const handleBetRequest = () => {
+    void submitMessage(
+      `Find ${betType.toLowerCase()} opportunities for about $${stake || "100"} total stake.`
+    );
+  };
+
   return (
     <div className={`site-chatbot${isOpen ? " is-open" : ""}`}>
       {isOpen ? (
@@ -160,17 +169,46 @@ export function SiteChatbot() {
               Go to {pendingRoute.label}
             </button>
           ) : (
-            <div className="site-chatbot-suggestions">
-              {SUGGESTIONS.map((suggestion) => (
-                <button
-                  key={suggestion}
-                  type="button"
-                  onClick={() => void submitMessage(suggestion)}
-                  disabled={isSending}
-                >
-                  {suggestion}
+            <div className="site-chatbot-action-stack">
+              <div className="site-chatbot-bet-builder">
+                <label>
+                  <span>Bet type</span>
+                  <select
+                    value={betType}
+                    onChange={(event) => setBetType(event.target.value)}
+                  >
+                    {BET_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  <span>Total stake</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={stake}
+                    onChange={(event) => setStake(event.target.value)}
+                  />
+                </label>
+                <button type="button" onClick={handleBetRequest} disabled={isSending}>
+                  Find plays
                 </button>
-              ))}
+              </div>
+              <div className="site-chatbot-suggestions">
+                {SUGGESTIONS.map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => void submitMessage(suggestion)}
+                    disabled={isSending}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

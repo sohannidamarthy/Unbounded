@@ -183,6 +183,7 @@ export function DashboardHeader({ onOpenBetCalculator }: DashboardHeaderProps) {
       </div>
       <div className="dashboard-header-group">
         <nav className="nav-links">
+          <a href="/dashboard">Home</a>
           <a href="/arbitrage-bets">Arbitrage</a>
           <a href="/ev-bets">Positive EV</a>
           <a href="/profit-tracker">Profit Tracker</a>

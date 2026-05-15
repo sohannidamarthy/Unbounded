@@ -42,6 +42,7 @@ const arbTableRows = [
     league: "NBA",
     match: "Pacers (+110) vs. Lakers (-110)",
     betType: "moneyline" as BetType,
+    netProfit: "+$42",
   },
   {
     start: "1:30 AM CT",
@@ -49,6 +50,7 @@ const arbTableRows = [
     league: "NBA",
     match: "Heat (+145) vs. Celtics (-160)",
     betType: "player-prop" as BetType,
+    netProfit: "+$31",
   },
   {
     start: "3:15 PM CT",
@@ -56,6 +58,7 @@ const arbTableRows = [
     league: "NFL",
     match: "Wolves (+120) vs. Reapers (-130)",
     betType: "spread" as BetType,
+    netProfit: "+$27",
   },
   {
     start: "6:10 PM CT",
@@ -63,6 +66,7 @@ const arbTableRows = [
     league: "MLB",
     match: "Dodgers (-105) vs. Mets (+102)",
     betType: "total" as BetType,
+    netProfit: "+$18",
   },
   {
     start: "7:45 PM CT",
@@ -70,6 +74,7 @@ const arbTableRows = [
     league: "MLS",
     match: "Harbor FC (+180) vs. Northbridge (-190)",
     betType: "alt-line" as BetType,
+    netProfit: "+$22",
   },
 ] as const;
 
@@ -939,6 +944,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                 <span role="columnheader">Sport</span>
                 <span role="columnheader">League</span>
                 <span role="columnheader">Match</span>
+                <span role="columnheader">Net profit</span>
               </div>
               {filteredRows.length === 0 ? (
                 <div className="dashboard-bet-type-empty" role="row">
@@ -981,6 +987,9 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                         <span className="dashboard-bet-type-badge">
                           {BET_TYPE_LABELS[row.betType]}
                         </span>
+                      </span>
+                      <span className="dashboard-arb-cell dashboard-arb-cell--net">
+                        {row.netProfit}
                       </span>
                     </div>
                     {renderEventDropdown(rowId)}

@@ -182,10 +182,52 @@ const GOAL_OPTIONS = [
   "Learn EV and arbitrage"
 ];
 const INITIAL_VISIBLE_SPORTSBOOKS = 8;
-const TIER_OPTIONS: { value: Exclude<TierOption, "">; label: string; accent: string }[] = [
-  { value: "select", label: "Select", accent: "red" },
-  { value: "premium", label: "Premium", accent: "silver" },
-  { value: "executive", label: "Executive", accent: "gold" }
+const TIER_OPTIONS: {
+  value: Exclude<TierOption, "">;
+  label: string;
+  accent: string;
+  description: string;
+  features: string[];
+}[] = [
+  {
+    value: "select",
+    label: "Select",
+    accent: "red",
+    description: "Entry access for testing the core arbitrage workflow.",
+    features: [
+      "Moneyline arbitrage access",
+      "Limited +EV and live odds coverage",
+      "Profit calculator",
+      "Public leaderboard and top bets feed",
+      "7-day free trial"
+    ]
+  },
+  {
+    value: "premium",
+    label: "Premium",
+    accent: "silver",
+    description: "Full board access for active bettors who want sharper filters.",
+    features: [
+      "All arbitrage and +EV bets",
+      "Live odds and fastest withdrawal methods",
+      "Friction score and trust scoring",
+      "No ads or pop-ups",
+      "Daily top bets and recommendations"
+    ]
+  },
+  {
+    value: "executive",
+    label: "Executive",
+    accent: "gold",
+    description: "Highest-signal tier for operators who want priority tools.",
+    features: [
+      "Everything in Premium",
+      "AI bet recommendations and smart parlay builder",
+      "Time-to-decay meter and historical odds",
+      "Predictive line movement signals",
+      "Private Executive leaderboard"
+    ]
+  }
 ];
 
 const MAX_PASSWORD_LENGTH = 100;
@@ -1032,10 +1074,11 @@ export default function AuthPage() {
           </a>
         </div>
         <nav className="nav-links">
-          <a href="/">Arbitrage</a>
-          <a href="/">Value Bets</a>
-          <a href="/">Pricing</a>
-          <a href="/">Tutorials</a>
+          <a href="/">Home</a>
+          <a href="/arbitrage">Arbitrage</a>
+          <a href="/positive-ev">Value Bets</a>
+          <a href="/billing">Pricing</a>
+          <a href="/tutorials">Tutorials</a>
         </nav>
       </header>
       <main>
@@ -1210,6 +1253,14 @@ export default function AuthPage() {
                                   </svg>
                                 </span>
                                 <span className="auth-tier-label">{tier.label}</span>
+                                <span className="auth-tier-description">
+                                  {tier.description}
+                                </span>
+                                <span className="auth-tier-features">
+                                  {tier.features.map((feature) => (
+                                    <span key={feature}>{feature}</span>
+                                  ))}
+                                </span>
                               </button>
                             );
                           })}

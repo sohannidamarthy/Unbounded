@@ -52,6 +52,7 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
           </a>
         </div>
         <nav className="nav-links">
+          <a href="/">Home</a>
           <a href="/arbitrage">Arbitrage</a>
           <a href="/positive-ev">Positive EV</a>
           <a href="/tools">Tools</a>
@@ -108,6 +109,7 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
           <span>Precision betting workflows, education, and account tools.</span>
         </div>
         <div className="footer-links">
+          <a href="/">Home</a>
           <a href="/arbitrage">Arbitrage</a>
           <a href="/positive-ev">Positive EV</a>
           <a href="/tools">Tools</a>

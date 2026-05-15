@@ -115,13 +115,6 @@ const events: ProfitEvent[] = [
   },
 ];
 
-const periodMs: Record<Period, number> = {
-  day: 24 * 60 * 60 * 1000,
-  week: 7 * 24 * 60 * 60 * 1000,
-  month: 31 * 24 * 60 * 60 * 1000,
-  year: 365 * 24 * 60 * 60 * 1000,
-};
-
 const periodLabels: Record<Period, string> = {
   day: "Day",
   week: "Week",
@@ -140,8 +133,66 @@ const sourcePriority: Source[] = ["arb", "ev", "live"];
 const getPrimarySource = (event: ProfitEvent): Source =>
   sourcePriority.find((source) => event.categories.includes(source)) ?? "live";
 
+const toDateInputValue = (date: Date) => date.toISOString().slice(0, 10);
+
+const toMonthInputValue = (date: Date) => date.toISOString().slice(0, 7);
+
+const toWeekInputValue = (date: Date) => {
+  const target = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const dayNumber = target.getUTCDay() || 7;
+  target.setUTCDate(target.getUTCDate() + 4 - dayNumber);
+  const yearStart = new Date(Date.UTC(target.getUTCFullYear(), 0, 1));
+  const weekNumber = Math.ceil((((target.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return `${target.getUTCFullYear()}-W${String(weekNumber).padStart(2, "0")}`;
+};
+
+const getWeekRange = (weekValue: string) => {
+  const [yearValue, weekPart] = weekValue.split("-W");
+  const year = Number(yearValue);
+  const week = Number(weekPart);
+  const firstThursday = new Date(Date.UTC(year, 0, 4));
+  const firstThursdayDay = firstThursday.getUTCDay() || 7;
+  const monday = new Date(firstThursday);
+  monday.setUTCDate(firstThursday.getUTCDate() - firstThursdayDay + 1 + (week - 1) * 7);
+  const end = new Date(monday);
+  end.setUTCDate(monday.getUTCDate() + 7);
+  return { start: monday, end };
+};
+
+const getDateRange = (period: Period, value: string) => {
+  if (period === "day") {
+    const start = new Date(`${value}T00:00:00.000Z`);
+    const end = new Date(start);
+    end.setUTCDate(start.getUTCDate() + 1);
+    return { start, end };
+  }
+
+  if (period === "week") {
+    return getWeekRange(value);
+  }
+
+  if (period === "month") {
+    const [year, month] = value.split("-").map(Number);
+    const start = new Date(Date.UTC(year, month - 1, 1));
+    const end = new Date(Date.UTC(year, month, 1));
+    return { start, end };
+  }
+
+  const year = Number(value);
+  return {
+    start: new Date(Date.UTC(year, 0, 1)),
+    end: new Date(Date.UTC(year + 1, 0, 1)),
+  };
+};
+
 export default function ProfitTrackerPage() {
   const [period, setPeriod] = useState<Period>("month");
+  const [periodValues, setPeriodValues] = useState<Record<Period, string>>({
+    day: toDateInputValue(now),
+    week: toWeekInputValue(now),
+    month: toMonthInputValue(now),
+    year: String(now.getUTCFullYear()),
+  });
   const [selectedSources, setSelectedSources] = useState<Source[]>([
     "live",
     "arb",
@@ -159,9 +210,9 @@ export default function ProfitTrackerPage() {
   const [betCalculatorOddsA, setBetCalculatorOddsA] = useState("");
   const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
 
-  const rangeStart = useMemo(
-    () => new Date(now.getTime() - periodMs[period]),
-    [period]
+  const selectedRange = useMemo(
+    () => getDateRange(period, periodValues[period]),
+    [period, periodValues]
   );
 
   const inScope = useMemo(
@@ -169,7 +220,7 @@ export default function ProfitTrackerPage() {
       events
         .filter((entry) => {
           const settled = new Date(entry.settledAt);
-          return settled >= rangeStart && settled <= now;
+          return settled >= selectedRange.start && settled < selectedRange.end;
         })
         .filter((entry) =>
           entry.categories.some((category) => selectedSources.includes(category))
@@ -179,7 +230,7 @@ export default function ProfitTrackerPage() {
           (a, b) =>
             new Date(a.settledAt).getTime() - new Date(b.settledAt).getTime()
         ),
-    [rangeStart, selectedBetTypes, selectedSources]
+    [selectedRange, selectedBetTypes, selectedSources]
   );
 
   const totalNet = useMemo(
@@ -323,6 +374,30 @@ export default function ProfitTrackerPage() {
     });
   };
   const allBetTypesSelected = selectedBetTypes.length === ALL_BET_TYPES.length;
+  const selectedWindowLabel = (() => {
+    if (period === "day") {
+      return new Date(`${periodValues.day}T00:00:00.000Z`).toLocaleDateString(undefined, {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+    if (period === "week") {
+      return `Week of ${selectedRange.start.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })}`;
+    }
+    if (period === "month") {
+      const [year, month] = periodValues.month.split("-").map(Number);
+      return new Date(Date.UTC(year, month - 1, 1)).toLocaleDateString(undefined, {
+        month: "long",
+        year: "numeric",
+      });
+    }
+    return periodValues.year;
+  })();
   useEffect(() => {
     if (window.location.hash === "#bet-calculator") {
       setIsBetCalculatorOpen(true);
@@ -370,6 +445,62 @@ export default function ProfitTrackerPage() {
                     {periodLabels[item]}
                   </button>
                 ))}
+              </div>
+              <div className="profit-window-picker">
+                {period === "day" ? (
+                  <input
+                    type="date"
+                    value={periodValues.day}
+                    onChange={(event) =>
+                      setPeriodValues((current) => ({
+                        ...current,
+                        day: event.target.value,
+                      }))
+                    }
+                  />
+                ) : null}
+                {period === "week" ? (
+                  <input
+                    type="week"
+                    value={periodValues.week}
+                    onChange={(event) =>
+                      setPeriodValues((current) => ({
+                        ...current,
+                        week: event.target.value,
+                      }))
+                    }
+                  />
+                ) : null}
+                {period === "month" ? (
+                  <input
+                    type="month"
+                    value={periodValues.month}
+                    onChange={(event) =>
+                      setPeriodValues((current) => ({
+                        ...current,
+                        month: event.target.value,
+                      }))
+                    }
+                  />
+                ) : null}
+                {period === "year" ? (
+                  <select
+                    value={periodValues.year}
+                    onChange={(event) =>
+                      setPeriodValues((current) => ({
+                        ...current,
+                        year: event.target.value,
+                      }))
+                    }
+                  >
+                    {[2024, 2025, 2026, 2027].map((year) => (
+                      <option key={year} value={String(year)}>
+                        {year}
+                      </option>
+                    ))}
+                  </select>
+                ) : null}
+                <strong>{selectedWindowLabel}</strong>
               </div>
             </div>
 

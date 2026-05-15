@@ -158,6 +158,7 @@ export default function DashboardPage() {
       league: "NBA",
       match: "Pacers (+110) vs. Lakers (-110)",
       betType: "moneyline" as BetType,
+      netProfit: "+$42",
     },
     {
       start: "1:30 AM CT",
@@ -165,6 +166,7 @@ export default function DashboardPage() {
       league: "NBA",
       match: "Heat (+145) vs. Celtics (-160)",
       betType: "player-prop" as BetType,
+      netProfit: "+$31",
     },
     {
       start: "3:15 PM CT",
@@ -172,6 +174,7 @@ export default function DashboardPage() {
       league: "NFL",
       match: "Wolves (+120) vs. Reapers (-130)",
       betType: "spread" as BetType,
+      netProfit: "+$27",
     },
     {
       start: "6:10 PM CT",
@@ -179,6 +182,7 @@ export default function DashboardPage() {
       league: "MLB",
       match: "Dodgers (-105) vs. Mets (+102)",
       betType: "total" as BetType,
+      netProfit: "+$18",
     },
     {
       start: "7:45 PM CT",
@@ -186,6 +190,7 @@ export default function DashboardPage() {
       league: "MLS",
       match: "Harbor FC (+180) vs. Northbridge (-190)",
       betType: "alt-line" as BetType,
+      netProfit: "+$22",
     },
   ];
   const leaderboardPreviewBoards = [
@@ -233,6 +238,7 @@ export default function DashboardPage() {
     betType: BetType;
     odds: string;
     edge: string;
+    netProfit: string;
     payoutBoost: number;
     tags: LiveFilter[];
   }[] = [
@@ -244,6 +250,7 @@ export default function DashboardPage() {
       betType: "moneyline",
       odds: "-115",
       edge: "+4.8%",
+      netProfit: "+$36",
       payoutBoost: 0.12,
       tags: ["Trending", "Live now"],
     },
@@ -255,6 +262,7 @@ export default function DashboardPage() {
       betType: "spread",
       odds: "+145",
       edge: "+3.6%",
+      netProfit: "+$28",
       payoutBoost: 0.3,
       tags: ["Trending"],
     },
@@ -266,6 +274,7 @@ export default function DashboardPage() {
       betType: "player-prop",
       odds: "+105",
       edge: "+4.9%",
+      netProfit: "+$24",
       payoutBoost: 0.18,
       tags: ["Trending", "High payout"],
     },
@@ -277,6 +286,7 @@ export default function DashboardPage() {
       betType: "total",
       odds: "+118",
       edge: "+4.7%",
+      netProfit: "+$19",
       payoutBoost: 0.22,
       tags: ["Trending"],
     },
@@ -288,6 +298,7 @@ export default function DashboardPage() {
       betType: "alt-line",
       odds: "+136",
       edge: "+5.3%",
+      netProfit: "+$44",
       payoutBoost: 0.4,
       tags: ["High payout", "Live now"],
     },
@@ -299,6 +310,7 @@ export default function DashboardPage() {
       betType: "spread",
       odds: "-108",
       edge: "+4.0%",
+      netProfit: "+$21",
       payoutBoost: 0.1,
       tags: ["Live now"],
     },
@@ -887,14 +899,21 @@ export default function DashboardPage() {
                         }
                       >
                         <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                          {row.start}
+                          {row.tags.includes("Live now") ? (
+                            <span className="dashboard-live-time-badge">Live</span>
+                          ) : (
+                            row.start
+                          )}
                         </span>
                         <span className="dashboard-arb-cell dashboard-arb-cell--details">
-                          <span className="dashboard-arb-league">{row.league}</span>
-                          <span className="dashboard-arb-match">{row.match}</span>
-                          <span className="dashboard-arb-sport">{row.sport}</span>
-                          <span className="dashboard-bet-type-badge dashboard-bet-type-badge--inline">
-                            {BET_TYPE_LABELS[row.betType]}
+                    <span className="dashboard-arb-league">{row.league}</span>
+                    <span className="dashboard-arb-match">{row.match}</span>
+                    <span className="dashboard-arb-sport">{row.sport}</span>
+                    <span className="dashboard-net-profit-badge">
+                      Net {row.netProfit}
+                    </span>
+                    <span className="dashboard-bet-type-badge dashboard-bet-type-badge--inline">
+                      {BET_TYPE_LABELS[row.betType]}
                           </span>
                         </span>
                         </div>
@@ -976,9 +995,10 @@ export default function DashboardPage() {
                         role="row"
                       >
                         <span role="columnheader">Match starts</span>
-                        <span role="columnheader">Sport</span>
-                        <span role="columnheader">League</span>
-                        <span role="columnheader">Match</span>
+                <span role="columnheader">Sport</span>
+                <span role="columnheader">League</span>
+                <span role="columnheader">Match</span>
+                <span role="columnheader">Net profit</span>
                       </div>
                       {filteredLiveRows.length === 0 ? (
                         <div className="dashboard-bet-type-empty" role="row">
@@ -1010,18 +1030,25 @@ export default function DashboardPage() {
                           }
                         >
                           <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                            {row.start}
+                            {row.tags.includes("Live now") ? (
+                              <span className="dashboard-live-time-badge">Live</span>
+                            ) : (
+                              row.start
+                            )}
                           </span>
                           <span className="dashboard-arb-cell">{row.sport}</span>
                           <span className="dashboard-arb-cell dashboard-arb-cell--league">
                             {row.league}
                           </span>
-                          <span className="dashboard-arb-cell dashboard-arb-cell--match">
-                            <span>{row.match}</span>
-                            <span className="dashboard-bet-type-badge">
-                              {BET_TYPE_LABELS[row.betType]}
-                            </span>
-                          </span>
+                      <span className="dashboard-arb-cell dashboard-arb-cell--match">
+                        <span>{row.match}</span>
+                        <span className="dashboard-bet-type-badge">
+                          {BET_TYPE_LABELS[row.betType]}
+                        </span>
+                      </span>
+                      <span className="dashboard-arb-cell dashboard-arb-cell--net">
+                        {row.netProfit}
+                      </span>
                           </div>
                           {renderEventDropdown(`live-${row.start}-${row.match}`)}
                         </Fragment>
@@ -1753,19 +1780,6 @@ export default function DashboardPage() {
         onOddsBChange={setBetCalculatorOddsB}
       />
 
-      <footer className="site-footer">
-        <div className="footer-brand">
-          <strong>Unbounded</strong>
-          <span>Dashboard tools for live betting decisions and review.</span>
-        </div>
-        <div className="footer-links">
-          <a href="/arbitrage-bets">Arbitrage</a>
-          <a href="/ev-bets">Positive EV</a>
-          <a href="/profit-tracker">Profit Tracker</a>
-          <a href="/leaderboard">Leaderboard</a>
-          <a href="/billing">Billing</a>
-        </div>
-      </footer>
     </div>
   );
 }
