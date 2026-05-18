@@ -35,48 +35,31 @@ type EventPopout = {
   oddsB: string;
 };
 
-const arbTableRows = [
-  {
-    start: "12:00 AM CT",
-    sport: "Basketball",
-    league: "NBA",
-    match: "Pacers (+110) vs. Lakers (-110)",
-    betType: "moneyline" as BetType,
-    netProfit: "+$42",
-  },
-  {
-    start: "1:30 AM CT",
-    sport: "Basketball",
-    league: "NBA",
-    match: "Heat (+145) vs. Celtics (-160)",
-    betType: "player-prop" as BetType,
-    netProfit: "+$31",
-  },
-  {
-    start: "3:15 PM CT",
-    sport: "Football",
-    league: "NFL",
-    match: "Wolves (+120) vs. Reapers (-130)",
-    betType: "spread" as BetType,
-    netProfit: "+$27",
-  },
-  {
-    start: "6:10 PM CT",
-    sport: "Baseball",
-    league: "MLB",
-    match: "Dodgers (-105) vs. Mets (+102)",
-    betType: "total" as BetType,
-    netProfit: "+$18",
-  },
-  {
-    start: "7:45 PM CT",
-    sport: "Soccer",
-    league: "MLS",
-    match: "Harbor FC (+180) vs. Northbridge (-190)",
-    betType: "alt-line" as BetType,
-    netProfit: "+$22",
-  },
-] as const;
+type ArbEvTableRow = {
+  start: string;
+  sport: Sport;
+  league: string;
+  match: string;
+  betType: BetType;
+  netProfit: string;
+  book?: string;
+};
+
+type LiveEvPayload = {
+  ev_id?: string;
+  sport?: string;
+  league?: string;
+  event_name?: string;
+  start_time_ms?: number;
+  market_key?: string;
+  selection?: string;
+  book?: string;
+  odds_american?: number;
+  edge?: number;
+  expected_value?: number;
+};
+
+const arbTableRows: ArbEvTableRow[] = [];
 
 const sportOptions: Sport[] = ["Basketball", "Football", "Baseball", "Soccer"];
 const bookOptions: Book[] = [...ARBEV_BOOK_OPTIONS];
@@ -146,18 +129,18 @@ const pageConfigs = {
     stats: [
       {
         label: "Candidate +EV bets",
-        value: "213",
-        detail: "Current board opportunities after your saved filters.",
+        value: "0",
+        detail: "Waiting for live or seeded EV opportunities.",
       },
       {
         label: "Best edge cluster",
-        value: "Alt lines",
-        detail: "Most stable value concentration this session.",
+        value: "Waiting",
+        detail: "Updates when EV rows are loaded.",
       },
       {
         label: "Model confidence",
-        value: "71%",
-        detail: "Across your preferred books and lines mix.",
+        value: "Waiting",
+        detail: "Populates from live candidate rows.",
       },
     ],
     cards: [
@@ -206,6 +189,72 @@ function getSelectionLabel(
   return selections[0];
 }
 
+function mapSportLabel(sport?: string): Sport {
+  const normalized = (sport ?? "").toLowerCase();
+  if (["nba", "ncaab", "basketball"].includes(normalized)) {
+    return "Basketball";
+  }
+  if (["nfl", "ncaaf", "football"].includes(normalized)) {
+    return "Football";
+  }
+  if (["mlb", "baseball"].includes(normalized)) {
+    return "Baseball";
+  }
+  return "Soccer";
+}
+
+function mapMarketToBetType(marketKey?: string): BetType {
+  const normalized = (marketKey ?? "").toLowerCase();
+  if (normalized.includes("prop")) {
+    return "player-prop";
+  }
+  if (normalized.includes("spread")) {
+    return "spread";
+  }
+  if (normalized.includes("total")) {
+    return normalized.includes("alt") ? "alt-line" : "total";
+  }
+  if (normalized.includes("alt")) {
+    return "alt-line";
+  }
+  return "moneyline";
+}
+
+function formatStartTime(timestamp?: number) {
+  if (!timestamp) {
+    return "TBD";
+  }
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  }).format(new Date(timestamp));
+}
+
+function formatAmericanOdds(odds?: number) {
+  if (odds === undefined || odds === null) {
+    return "";
+  }
+  return odds > 0 ? `+${odds}` : `${odds}`;
+}
+
+function mapEvPayloadToRow(ev: LiveEvPayload): ArbEvTableRow {
+  const oddsLabel = formatAmericanOdds(ev.odds_american);
+  const selection = ev.selection ?? "EV selection";
+  const bookLabel = ev.book ? ` @ ${ev.book}` : "";
+  const edge = ev.edge ?? ev.expected_value ?? 0;
+
+  return {
+    start: formatStartTime(ev.start_time_ms),
+    sport: mapSportLabel(ev.sport),
+    league: ev.league ?? (ev.sport ?? "EV").toUpperCase(),
+    match: `${ev.event_name ?? "Event"} - ${selection}${oddsLabel ? ` (${oddsLabel})` : ""}${bookLabel}`,
+    betType: mapMarketToBetType(ev.market_key),
+    netProfit: `+${(edge * 100).toFixed(1)}% EV`,
+    book: ev.book,
+  };
+}
+
 export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const pageConfig = pageConfigs[initialView];
   const [arbEvView, setArbEvView] = useState<ArbEvView>(initialView);
@@ -225,6 +274,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const [betCalculatorStake, setBetCalculatorStake] = useState("100");
   const [betCalculatorOddsA, setBetCalculatorOddsA] = useState("");
   const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
+  const [liveEvRows, setLiveEvRows] = useState<ArbEvTableRow[]>([]);
   const [selectedSports, setSelectedSports] = useState<Sport[]>([...sportOptions]);
   const [selectedBooks, setSelectedBooks] = useState<Book[]>([...bookOptions]);
   const [selectedBetTypes, setSelectedBetTypes] = useState<BetType[]>([...ALL_BET_TYPES]);
@@ -255,6 +305,36 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     if (window.location.hash === "#bet-calculator") {
       setIsBetCalculatorOpen(true);
     }
+  }, []);
+
+  useEffect(() => {
+    let isCancelled = false;
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+    async function loadEvRows() {
+      try {
+        const response = await fetch(`${apiBase}/v1/evs?sport=all&limit=100`, {
+          cache: "no-store",
+        });
+        if (!response.ok) {
+          throw new Error(`EV API returned ${response.status}`);
+        }
+        const payload = (await response.json()) as { evs?: LiveEvPayload[] };
+        if (!isCancelled) {
+          setLiveEvRows((payload.evs ?? []).map(mapEvPayloadToRow));
+        }
+      } catch {
+        if (!isCancelled) {
+          setLiveEvRows([]);
+        }
+      }
+    }
+
+    loadEvRows();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -544,10 +624,12 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     "All bets",
     "Pick bets"
   );
-  const filteredRows = arbTableRows.filter(
+  const activeBoardRows = arbEvView === "ev" ? liveEvRows : arbTableRows;
+  const filteredRows = activeBoardRows.filter(
     (row) =>
       selectedSports.includes(row.sport) &&
-      selectedBetTypes.includes(row.betType)
+      selectedBetTypes.includes(row.betType) &&
+      (!row.book || selectedBooks.includes(row.book as Book))
   );
 
   const toggleDraftSport = (sport: Sport) => {
