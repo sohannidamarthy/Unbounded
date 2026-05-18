@@ -33,33 +33,63 @@ type EventPopout = {
   teamB: string;
   oddsA: string;
   oddsB: string;
+  betType?: BetType;
+  legs?: LiveBetLeg[];
+};
+
+type LiveBetLeg = {
+  outcome_key: string;
+  book: string;
+  odds_decimal: number;
+  odds_american?: number | string;
+  line?: number | string | null;
+  bet_url?: string;
+};
+
+type LiveArbPayload = {
+  arb_id?: string;
+  sport?: string;
+  league?: string;
+  event_id?: string;
+  event_name?: string;
+  start_time_ms?: number;
+  market_key?: string;
+  line?: number | string | null;
+  roi?: number;
+  roi_raw?: number;
+  legs?: LiveBetLeg[];
 };
 
 type ArbEvTableRow = {
+  id: string;
   start: string;
   sport: Sport;
   league: string;
   match: string;
   betType: BetType;
   netProfit: string;
-  book?: string;
+  roi: number;
+  legs: LiveBetLeg[];
+  books: string[];
 };
 
 type LiveEvPayload = {
   ev_id?: string;
   sport?: string;
   league?: string;
+  event_id?: string;
   event_name?: string;
   start_time_ms?: number;
   market_key?: string;
   selection?: string;
   book?: string;
+  odds_decimal?: number;
   odds_american?: number;
+  line?: number | string | null;
+  bet_url?: string;
   edge?: number;
   expected_value?: number;
 };
-
-const arbTableRows: ArbEvTableRow[] = [];
 
 const sportOptions: Sport[] = ["Basketball", "Football", "Baseball", "Soccer"];
 const bookOptions: Book[] = [...ARBEV_BOOK_OPTIONS];
@@ -191,13 +221,13 @@ function getSelectionLabel(
 
 function mapSportLabel(sport?: string): Sport {
   const normalized = (sport ?? "").toLowerCase();
-  if (["nba", "ncaab", "basketball"].includes(normalized)) {
+  if (normalized.includes("nba") || normalized.includes("ncaab") || normalized.includes("basketball")) {
     return "Basketball";
   }
-  if (["nfl", "ncaaf", "football"].includes(normalized)) {
+  if (normalized.includes("nfl") || normalized.includes("ncaaf") || normalized.includes("football")) {
     return "Football";
   }
-  if (["mlb", "baseball"].includes(normalized)) {
+  if (normalized.includes("mlb") || normalized.includes("baseball")) {
     return "Baseball";
   }
   return "Soccer";
@@ -220,6 +250,16 @@ function mapMarketToBetType(marketKey?: string): BetType {
   return "moneyline";
 }
 
+function decimalToAmerican(decimal: number) {
+  if (!Number.isFinite(decimal) || decimal <= 1) {
+    return "--";
+  }
+  if (decimal >= 2) {
+    return `+${Math.round((decimal - 1) * 100)}`;
+  }
+  return `${Math.round(-100 / (decimal - 1))}`;
+}
+
 function formatStartTime(timestamp?: number) {
   if (!timestamp) {
     return "TBD";
@@ -231,27 +271,54 @@ function formatStartTime(timestamp?: number) {
   }).format(new Date(timestamp));
 }
 
-function formatAmericanOdds(odds?: number) {
-  if (odds === undefined || odds === null) {
-    return "";
-  }
-  return odds > 0 ? `+${odds}` : `${odds}`;
-}
-
 function mapEvPayloadToRow(ev: LiveEvPayload): ArbEvTableRow {
-  const oddsLabel = formatAmericanOdds(ev.odds_american);
   const selection = ev.selection ?? "EV selection";
-  const bookLabel = ev.book ? ` @ ${ev.book}` : "";
   const edge = ev.edge ?? ev.expected_value ?? 0;
+  const oddsDecimal = Number(ev.odds_decimal || 0);
+  const leg: LiveBetLeg = {
+    outcome_key: selection,
+    book: ev.book ?? "Sportsbook",
+    odds_decimal: oddsDecimal || 1,
+    odds_american: ev.odds_american,
+    line: ev.line,
+    bet_url: ev.bet_url,
+  };
 
   return {
+    id: ev.ev_id ?? `${ev.event_id ?? "ev"}-${selection}`,
     start: formatStartTime(ev.start_time_ms),
     sport: mapSportLabel(ev.sport),
     league: ev.league ?? (ev.sport ?? "EV").toUpperCase(),
-    match: `${ev.event_name ?? "Event"} - ${selection}${oddsLabel ? ` (${oddsLabel})` : ""}${bookLabel}`,
+    match: `${ev.event_name ?? "Event"} - ${selection}`,
     betType: mapMarketToBetType(ev.market_key),
     netProfit: `+${(edge * 100).toFixed(1)}% EV`,
-    book: ev.book,
+    roi: edge,
+    legs: [leg],
+    books: [leg.book],
+  };
+}
+
+function mapArbPayloadToRow(arb: LiveArbPayload): ArbEvTableRow {
+  const roi = Number(arb.roi ?? arb.roi_raw ?? 0);
+  const legs = Array.isArray(arb.legs) ? arb.legs : [];
+  const eventName = arb.event_name || arb.event_id || "Live event";
+  const legSummary = legs
+    .slice(0, 2)
+    .map((leg) => `${leg.outcome_key} (${decimalToAmerican(Number(leg.odds_decimal))})`)
+    .join(" vs. ");
+  const marketSuffix = arb.line != null ? ` ${arb.line}` : "";
+
+  return {
+    id: arb.arb_id ?? `${arb.event_id ?? "arb"}-${arb.market_key ?? "market"}`,
+    start: formatStartTime(arb.start_time_ms),
+    sport: mapSportLabel(arb.sport),
+    league: arb.league ?? (arb.sport ?? "Arb").toUpperCase(),
+    match: legSummary || `${eventName}${marketSuffix}`,
+    betType: mapMarketToBetType(arb.market_key),
+    netProfit: `+${(roi * 100).toFixed(2)}%`,
+    roi,
+    legs,
+    books: legs.map((leg) => leg.book),
   };
 }
 
@@ -274,6 +341,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const [betCalculatorStake, setBetCalculatorStake] = useState("100");
   const [betCalculatorOddsA, setBetCalculatorOddsA] = useState("");
   const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
+  const [liveArbRows, setLiveArbRows] = useState<ArbEvTableRow[]>([]);
   const [liveEvRows, setLiveEvRows] = useState<ArbEvTableRow[]>([]);
   const [selectedSports, setSelectedSports] = useState<Sport[]>([...sportOptions]);
   const [selectedBooks, setSelectedBooks] = useState<Book[]>([...bookOptions]);
@@ -311,26 +379,30 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     let isCancelled = false;
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-    async function loadEvRows() {
+    async function loadRows() {
       try {
-        const response = await fetch(`${apiBase}/v1/evs?sport=all&limit=100`, {
-          cache: "no-store",
-        });
-        if (!response.ok) {
-          throw new Error(`EV API returned ${response.status}`);
+        const [arbResponse, evResponse] = await Promise.all([
+          fetch(`${apiBase}/v1/arbs?sport=all&limit=100`, { cache: "no-store" }),
+          fetch(`${apiBase}/v1/evs?sport=all&limit=100`, { cache: "no-store" }),
+        ]);
+        if (!arbResponse.ok || !evResponse.ok) {
+          throw new Error("Board API request failed");
         }
-        const payload = (await response.json()) as { evs?: LiveEvPayload[] };
+        const arbPayload = (await arbResponse.json()) as { arbs?: LiveArbPayload[] };
+        const evPayload = (await evResponse.json()) as { evs?: LiveEvPayload[] };
         if (!isCancelled) {
-          setLiveEvRows((payload.evs ?? []).map(mapEvPayloadToRow));
+          setLiveArbRows((arbPayload.arbs ?? []).map(mapArbPayloadToRow));
+          setLiveEvRows((evPayload.evs ?? []).map(mapEvPayloadToRow));
         }
       } catch {
         if (!isCancelled) {
+          setLiveArbRows([]);
           setLiveEvRows([]);
         }
       }
     }
 
-    loadEvRows();
+    loadRows();
 
     return () => {
       isCancelled = true;
@@ -410,6 +482,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     sport,
     league,
     match,
+    betType,
+    legs,
   }: {
     id: string;
     board: "Arbitrage" | "EV";
@@ -417,8 +491,12 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     sport: string;
     league: string;
     match: string;
+    betType?: BetType;
+    legs?: LiveBetLeg[];
   }): EventPopout => {
     const parsed = parseMatchup(match);
+    const firstLeg = legs?.[0];
+    const secondLeg = legs?.[1];
     return {
       id,
       board,
@@ -426,10 +504,12 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
       sport,
       league,
       match,
-      teamA: parsed.teamA,
-      teamB: parsed.teamB,
-      oddsA: parsed.oddsA,
-      oddsB: parsed.oddsB,
+      teamA: firstLeg?.outcome_key ?? parsed.teamA,
+      teamB: secondLeg?.outcome_key ?? parsed.teamB,
+      oddsA: firstLeg ? decimalToAmerican(Number(firstLeg.odds_decimal)) : parsed.oddsA,
+      oddsB: secondLeg ? decimalToAmerican(Number(secondLeg.odds_decimal)) : parsed.oddsB,
+      betType,
+      legs,
     };
   };
 
@@ -481,6 +561,14 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
       return null;
     }
 
+    const openBetLeg = (leg: LiveBetLeg) => {
+      const fallbackHref = getSportsbookMeta(leg.book).siteHref;
+      const href = leg.bet_url || fallbackHref;
+      if (href && href !== "#") {
+        window.open(href, "_blank", "noopener,noreferrer");
+      }
+    };
+
     return (
       <div className="dashboard-event-dropdown-row">
         <aside className="dashboard-event-popout" aria-label="Selected event">
@@ -509,7 +597,12 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
           </div>
           <div className="dashboard-event-popout-market">
             <div className="dashboard-event-popout-market-row">
-              <span>{eventPopout.teamA}</span>
+              <span>
+                {eventPopout.legs?.[0] ? (
+                  <SportsbookLogo sportsbook={eventPopout.legs[0].book} size={22} />
+                ) : null}
+                {eventPopout.teamA}
+              </span>
               {manualEntryMode ? (
                 <input
                   value={manualOddsA}
@@ -521,7 +614,12 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
               )}
             </div>
             <div className="dashboard-event-popout-market-row">
-              <span>{eventPopout.teamB}</span>
+              <span>
+                {eventPopout.legs?.[1] ? (
+                  <SportsbookLogo sportsbook={eventPopout.legs[1].book} size={22} />
+                ) : null}
+                {eventPopout.teamB}
+              </span>
               {manualEntryMode ? (
                 <input
                   value={manualOddsB}
@@ -533,6 +631,20 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
               )}
             </div>
           </div>
+          {eventPopout.legs?.length ? (
+            <div className="dashboard-event-popout-actions">
+              {eventPopout.legs.map((leg) => (
+                <button
+                  type="button"
+                  className="dashboard-event-popout-btn"
+                  key={`${eventPopout.id}-${leg.book}-${leg.outcome_key}`}
+                  onClick={() => openBetLeg(leg)}
+                >
+                  Bet {leg.outcome_key} at {leg.book}
+                </button>
+              ))}
+            </div>
+          ) : null}
           <div className="dashboard-event-popout-grid">
             <div>
               <span>Start</span>
@@ -567,6 +679,46 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const isCurrentTabTracked =
     arbEvView === "arb" ? arbTabProfitTracker : evTabProfitTracker;
   const activePageConfig = pageConfigs[arbEvView];
+  const activeStats =
+    arbEvView === "arb"
+      ? [
+          {
+            label: "Live arbs tracked",
+            value: String(liveArbRows.length),
+            detail: "Synced from the same backend feed as the dashboard.",
+          },
+          {
+            label: "Best edge",
+            value: liveArbRows.length
+              ? `${(Math.max(...liveArbRows.map((row) => row.roi)) * 100).toFixed(2)}%`
+              : "Waiting",
+            detail: "Highest visible arb edge with current filters.",
+          },
+          {
+            label: "Top sport",
+            value: liveArbRows[0]?.sport ?? "Waiting",
+            detail: "Sport with the strongest visible opportunity.",
+          },
+        ]
+      : [
+          {
+            label: "Candidate +EV bets",
+            value: String(liveEvRows.length),
+            detail: "Synced from the same backend feed as the dashboard.",
+          },
+          {
+            label: "Best edge",
+            value: liveEvRows.length
+              ? `${(Math.max(...liveEvRows.map((row) => row.roi)) * 100).toFixed(1)}% EV`
+              : "Waiting",
+            detail: "Highest visible EV edge with current filters.",
+          },
+          {
+            label: "Top sport",
+            value: liveEvRows[0]?.sport ?? "Waiting",
+            detail: "Sport with the strongest visible EV candidate.",
+          },
+        ];
   const tutorialCards = activePageConfig.tutorials
     .map((item) => {
       const seoPage = SEO_PAGES[item.path];
@@ -602,6 +754,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     visibleTutorialCards[0] ??
     tutorialCards[0];
   const allSportsSelected = selectedSports.length === sportOptions.length;
+  const allBooksSelected = selectedBooks.length === bookOptions.length;
   const allBetTypesSelected = selectedBetTypes.length === ALL_BET_TYPES.length;
   const sportFilterLabel = getSelectionLabel(
     selectedSports,
@@ -624,12 +777,14 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     "All bets",
     "Pick bets"
   );
-  const activeBoardRows = arbEvView === "ev" ? liveEvRows : arbTableRows;
+  const activeBoardRows = arbEvView === "ev" ? liveEvRows : liveArbRows;
   const filteredRows = activeBoardRows.filter(
     (row) =>
       selectedSports.includes(row.sport) &&
       selectedBetTypes.includes(row.betType) &&
-      (!row.book || selectedBooks.includes(row.book as Book))
+      (allBooksSelected ||
+        !row.books.length ||
+        row.books.some((book) => selectedBooks.includes(book as Book)))
   );
 
   const toggleDraftSport = (sport: Sport) => {
@@ -719,7 +874,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
               </div>
             </div>
             <div className="arb-ev-specialization-stats">
-              {activePageConfig.stats.map((stat) => (
+              {activeStats.map((stat) => (
                 <article
                   className="arb-ev-specialization-stat"
                   key={`${arbEvView}-${stat.label}`}
@@ -1034,7 +1189,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                 </div>
               ) : null}
               {filteredRows.map((row) => {
-                const rowId = `${arbEvView}-${row.start}-${row.match}`;
+                const rowId = `${arbEvView}-${row.id}`;
                 return (
                   <Fragment key={rowId}>
                     <div
@@ -1051,6 +1206,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                             sport: row.sport,
                             league: row.league,
                             match: row.match,
+                            betType: row.betType,
+                            legs: row.legs,
                           })
                         )
                       }

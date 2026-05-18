@@ -38,6 +38,24 @@ type LiveArbPayload = {
   legs?: LiveArbLeg[];
 };
 
+type LiveEvPayload = {
+  ev_id: string;
+  sport?: string;
+  league?: string;
+  event_id?: string;
+  event_name?: string;
+  start_time_ms?: number;
+  market_key?: string;
+  selection?: string;
+  line?: number | string | null;
+  book?: string;
+  odds_decimal?: number;
+  odds_american?: number;
+  edge?: number;
+  expected_value?: number;
+  bet_url?: string;
+};
+
 type DashboardArbRow = {
   id: string;
   start: string;
@@ -130,6 +148,42 @@ function mapArbPayloadToRow(arb: LiveArbPayload): DashboardArbRow {
   };
 }
 
+function mapEvPayloadToRow(ev: LiveEvPayload): DashboardArbRow {
+  const edge = Number(ev.edge ?? ev.expected_value ?? 0);
+  const book = ev.book || "Sportsbook";
+  const selection = ev.selection || "EV selection";
+  const oddsDecimal = Number(ev.odds_decimal || 0);
+  const oddsAmerican =
+    ev.odds_american !== undefined
+      ? ev.odds_american
+      : oddsDecimal
+        ? decimalToAmerican(oddsDecimal)
+        : undefined;
+  const legs: LiveArbLeg[] = [
+    {
+      outcome_key: selection,
+      book,
+      odds_decimal: oddsDecimal || 1,
+      odds_american: oddsAmerican,
+      line: ev.line,
+      bet_url: ev.bet_url,
+    },
+  ];
+
+  return {
+    id: ev.ev_id,
+    start: formatStartTime(ev.start_time_ms),
+    sport: sportLabel(ev.sport),
+    league: ev.league || String(ev.sport || "").toUpperCase() || "EV",
+    match: `${ev.event_name || ev.event_id || "EV event"} - ${selection}`,
+    betType: mapMarketToBetType(ev.market_key),
+    netProfit: `+${(edge * 100).toFixed(1)}% EV`,
+    roi: edge,
+    legs,
+    isLiveData: true,
+  };
+}
+
 function formatDisplayName(value: string | null) {
   if (!value) {
     return "You";
@@ -215,7 +269,9 @@ export default function DashboardPage() {
   const [includeSelfInLeaderboard, setIncludeSelfInLeaderboard] = useState(false);
   const [currentUserName, setCurrentUserName] = useState("You");
   const [liveArbRows, setLiveArbRows] = useState<DashboardArbRow[]>([]);
+  const [liveEvRows, setLiveEvRows] = useState<DashboardArbRow[]>([]);
   const [arbFeedStatus, setArbFeedStatus] = useState<"connecting" | "live" | "empty" | "offline">("connecting");
+  const [evFeedStatus, setEvFeedStatus] = useState<"connecting" | "live" | "empty" | "offline">("connecting");
   const [savedBetStatus, setSavedBetStatus] = useState("");
   const isLiveExpanded = expandedPanel === "live";
   const isWithdrawalExpanded = expandedPanel === "withdrawal";
@@ -272,7 +328,6 @@ export default function DashboardPage() {
       ? recommendedGuides
       : recommendedGuides.filter((item) => item.type === chatFilter);
 
-  const previewArbTableRows: DashboardArbRow[] = [];
   const leaderboardPreviewBoards = [
     {
       label: "24h cash",
@@ -346,6 +401,40 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const token = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+    let isMounted = true;
+
+    fetch(`${apiBase}/v1/evs?sport=all&limit=50`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      cache: "no-store",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`EV feed request failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((payload: { evs?: LiveEvPayload[] }) => {
+        if (!isMounted) {
+          return;
+        }
+        const rows = (payload.evs ?? []).map(mapEvPayloadToRow);
+        setLiveEvRows(rows);
+        setEvFeedStatus(rows.length ? "live" : "empty");
+      })
+      .catch(() => {
+        if (isMounted) {
+          setEvFeedStatus("offline");
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
     const wsUrl = apiBase.replace(/^http/i, "ws").replace(/\/$/, "") + "/ws/arbs";
     const socket = new WebSocket(wsUrl);
 
@@ -395,7 +484,7 @@ export default function DashboardPage() {
     .filter((row) => selectedLiveBetTypes.includes(row.betType))
     .slice(0, 3);
   const activeArbBetTypes = arbEvView === "arb" ? selectedArbBetTypes : selectedEvBetTypes;
-  const arbTableRows = arbEvView === "arb" ? liveArbRows : previewArbTableRows;
+  const arbTableRows = arbEvView === "arb" ? liveArbRows : liveEvRows;
   const filteredArbRows = arbTableRows.filter((row) =>
     activeArbBetTypes.includes(row.betType)
   );
@@ -404,6 +493,10 @@ export default function DashboardPage() {
     ? `${(Math.max(...liveArbRows.map((row) => row.roi)) * 100).toFixed(2)}%`
     : "Waiting";
   const topArbSport = liveArbRows[0]?.sport ?? "Waiting";
+  const bestEvEdge = liveEvRows.length
+    ? `${(Math.max(...liveEvRows.map((row) => row.roi)) * 100).toFixed(1)}% EV`
+    : "Waiting";
+  const topEvSport = liveEvRows[0]?.sport ?? "Waiting";
   const allLiveBetTypesSelected = selectedLiveBetTypes.length === ALL_BET_TYPES.length;
   const allArbBetTypesSelected = activeArbBetTypes.length === ALL_BET_TYPES.length;
 
@@ -1104,21 +1197,23 @@ export default function DashboardPage() {
                       ? arbFeedStatus === "live"
                         ? "Live arb board synced from backend feed."
                         : "Current arb board will switch to live opportunities when the feed publishes."
-                      : "Positive EV opportunities will appear here when the feed publishes."}
+                      : evFeedStatus === "live"
+                        ? "Positive EV board synced from backend feed."
+                        : "Positive EV opportunities will appear here when the feed publishes."}
                   </p>
                 </div>
                 <div className="dashboard-compact-stats">
                   <div className="dashboard-compact-stat">
                     <span>{arbEvView === "arb" ? "Live arbs" : "Live +EV"}</span>
-                    <strong>{arbEvView === "arb" ? liveArbRows.length : 0}</strong>
+                    <strong>{arbEvView === "arb" ? liveArbRows.length : liveEvRows.length}</strong>
                   </div>
                   <div className="dashboard-compact-stat">
                     <span>Top sport</span>
-                    <strong>{arbEvView === "arb" ? topArbSport : "Waiting"}</strong>
+                    <strong>{arbEvView === "arb" ? topArbSport : topEvSport}</strong>
                   </div>
                   <div className="dashboard-compact-stat">
                     <span>Best edge</span>
-                    <strong>{arbEvView === "arb" ? bestArbEdge : "Waiting"}</strong>
+                    <strong>{arbEvView === "arb" ? bestArbEdge : bestEvEdge}</strong>
                   </div>
                 </div>
               </div>
