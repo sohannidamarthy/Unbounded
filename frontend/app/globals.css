@@ -8180,6 +8180,11 @@ a {
   cursor: pointer;
 }
 
+.profit-section-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .profit-chart-wrap {
   margin-top: 14px;
   height: auto;
@@ -8323,6 +8328,14 @@ a {
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.profit-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .profit-table {

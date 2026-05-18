@@ -328,6 +328,11 @@ export default function ProfitTrackerPage() {
       return [...current, betType];
     });
   };
+  const clearSavedBets = () => {
+    window.localStorage.removeItem(SAVED_BETS_STORAGE_KEY);
+    setSavedEvents([]);
+    setSelectedDotEvent(null);
+  };
   const allBetTypesSelected = selectedBetTypes.length === ALL_BET_TYPES.length;
   const selectedWindowLabel = (() => {
     if (period === "day") {
@@ -681,14 +686,24 @@ export default function ProfitTrackerPage() {
           <section className="profit-tracker-table-card">
             <div className="profit-tracker-table-head">
               <h2>Tracked Bets</h2>
-              <button
-                type="button"
-                className="profit-section-toggle"
-                onClick={() => setIsTableMinimized((prev) => !prev)}
-                aria-expanded={!isTableMinimized}
-              >
-                {isTableMinimized ? "Expand bets" : "Minimize bets"}
-              </button>
+              <div className="profit-table-actions">
+                <button
+                  type="button"
+                  className="profit-section-toggle"
+                  onClick={clearSavedBets}
+                  disabled={savedEvents.length === 0}
+                >
+                  Clear all
+                </button>
+                <button
+                  type="button"
+                  className="profit-section-toggle"
+                  onClick={() => setIsTableMinimized((prev) => !prev)}
+                  aria-expanded={!isTableMinimized}
+                >
+                  {isTableMinimized ? "Expand bets" : "Minimize bets"}
+                </button>
+              </div>
             </div>
             {!isTableMinimized ? (
               <div className="profit-table">

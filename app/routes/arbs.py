@@ -1,30 +1,41 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from typing import Any
 
 from fastapi import APIRouter, Query
-from sqlalchemy import text
+from sqlalchemy import bindparam, text
 
 from app.db.session import SessionLocal
 from app.redis_client import get_redis
 
 router = APIRouter(prefix="/v1", tags=["arbs"])
+logger = logging.getLogger(__name__)
 
 ARB_DETAIL_KEY = "arb:detail:{arb_id}"
 ARB_FEED_KEY = "arbs:feed:{sport}"
 
 
 async def _load_arbs_from_redis(sport: str, limit: int) -> list[dict[str, Any]]:
-    r = await get_redis()
-    feed_key = ARB_FEED_KEY.format(sport=sport)
-    ids = await r.zrevrange(feed_key, 0, max(0, limit - 1))
+    try:
+        r = await get_redis()
+        feed_key = ARB_FEED_KEY.format(sport=sport)
+        ids = await r.zrevrange(feed_key, 0, max(0, limit - 1))
+    except Exception:
+        logger.exception("Failed to load arb feed from Redis for sport=%s", sport)
+        return []
+
     if not ids:
         return []
 
     keys = [ARB_DETAIL_KEY.format(arb_id=arb_id) for arb_id in ids]
-    payloads = await r.mget(keys)
+    try:
+        payloads = await r.mget(keys)
+    except Exception:
+        logger.exception("Failed to load arb details from Redis for sport=%s", sport)
+        return []
     arbs: list[dict[str, Any]] = []
     for arb_id, raw in zip(ids, payloads):
         if not raw:
@@ -69,11 +80,11 @@ def _load_arbs_from_db(*, sports: list[str] | None, limit: int) -> list[dict[str
             SELECT arb_id, sport, league, event_id, event_name, start_time_ms,
                    market_key, market_instance_id, line, roi_raw, payload_json
             FROM arb_latest
-            WHERE sport = ANY(:sports)
+            WHERE sport IN :sports
             ORDER BY roi_raw DESC NULLS LAST, updated_at DESC
             LIMIT :limit
             """
-        )
+        ).bindparams(bindparam("sports", expanding=True))
         params = {"sports": sports, "limit": limit}
     else:
         query = text(
