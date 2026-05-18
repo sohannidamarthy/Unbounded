@@ -311,6 +311,10 @@ def main() -> None:
                 }
 
                 write_arb(r, arb)
+                try:
+                    upsert_arb_latest(arb_id=arb_id, arb_payload=arb)
+                except Exception as e:
+                    print(f"[audit] failed to upsert arb_latest {arb_id}: {e}")
                 published += 1
 
             if errors:

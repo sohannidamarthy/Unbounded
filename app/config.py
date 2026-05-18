@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     # External APIs
     # -------------------------
     odds_api_key: Optional[SecretStr] = None
+    oddsjam_api_key: Optional[SecretStr] = None
 
     # -------------------------
     # Pydantic Settings Config
