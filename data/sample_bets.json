@@ -1,0 +1,328 @@
+{
+  "generated_at": "2026-05-18T17:15:00.000Z",
+  "description": "Seed arbitrage opportunities for dashboard/profit-tracker testing. These are synthetic examples, not live betting advice.",
+  "arbs": [
+    {
+      "schema_version": 1,
+      "arb_id": "seed_nba_moneyline_lal_bos",
+      "sport": "nba",
+      "league": "NBA",
+      "event_id": "seed_evt_nba_lal_bos_20260518",
+      "event_name": "Los Angeles Lakers vs Boston Celtics",
+      "start_time_ms": 1779145200000,
+      "market_key": "moneyline",
+      "market_instance_id": "main",
+      "line": null,
+      "player_id": null,
+      "S": 0.963131,
+      "roi": 0.038281,
+      "ts_updated_ms": 1779124500000,
+      "ts_min_leg_ingested_ms": 1779124495000,
+      "legs": [
+        {
+          "outcome_key": "Lakers",
+          "book": "DraftKings",
+          "odds_decimal": 2.12,
+          "odds_american": 112,
+          "bet_url": "https://sportsbook.draftkings.com",
+          "ts_ingested_ms": 1779124495000,
+          "line": null,
+          "market_instance_id": "main"
+        },
+        {
+          "outcome_key": "Celtics",
+          "book": "FanDuel",
+          "odds_decimal": 2.03,
+          "odds_american": 103,
+          "bet_url": "https://www.fanduel.com",
+          "ts_ingested_ms": 1779124498000,
+          "line": null,
+          "market_instance_id": "main"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "arb_id": "seed_nba_spread_nyk_mia",
+      "sport": "nba",
+      "league": "NBA",
+      "event_id": "seed_evt_nba_nyk_mia_20260518",
+      "event_name": "New York Knicks vs Miami Heat",
+      "start_time_ms": 1779152400000,
+      "market_key": "spread",
+      "market_instance_id": "spread:4.5",
+      "line": 4.5,
+      "player_id": null,
+      "S": 0.978495,
+      "roi": 0.021978,
+      "ts_updated_ms": 1779124500000,
+      "ts_min_leg_ingested_ms": 1779124482000,
+      "legs": [
+        {
+          "outcome_key": "Knicks +4.5",
+          "book": "BetMGM",
+          "odds_decimal": 1.96,
+          "odds_american": -104,
+          "bet_url": "https://sports.betmgm.com",
+          "ts_ingested_ms": 1779124482000,
+          "line": 4.5,
+          "market_instance_id": "spread:4.5"
+        },
+        {
+          "outcome_key": "Heat -4.5",
+          "book": "Caesars",
+          "odds_decimal": 2.14,
+          "odds_american": 114,
+          "bet_url": "https://www.caesars.com/sportsbook-and-casino",
+          "ts_ingested_ms": 1779124490000,
+          "line": 4.5,
+          "market_instance_id": "spread:4.5"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "arb_id": "seed_nfl_moneyline_dal_phi",
+      "sport": "nfl",
+      "league": "NFL",
+      "event_id": "seed_evt_nfl_dal_phi_20260519",
+      "event_name": "Dallas Cowboys vs Philadelphia Eagles",
+      "start_time_ms": 1779220800000,
+      "market_key": "moneyline",
+      "market_instance_id": "main",
+      "line": null,
+      "player_id": null,
+      "S": 0.968329,
+      "roi": 0.032706,
+      "ts_updated_ms": 1779124500000,
+      "ts_min_leg_ingested_ms": 1779124470000,
+      "legs": [
+        {
+          "outcome_key": "Cowboys",
+          "book": "Fanatics",
+          "odds_decimal": 2.23,
+          "odds_american": 123,
+          "bet_url": "https://sportsbook.fanatics.com",
+          "ts_ingested_ms": 1779124470000,
+          "line": null,
+          "market_instance_id": "main"
+        },
+        {
+          "outcome_key": "Eagles",
+          "book": "ESPN BET",
+          "odds_decimal": 1.92,
+          "odds_american": -109,
+          "bet_url": "https://espnbet.com",
+          "ts_ingested_ms": 1779124491000,
+          "line": null,
+          "market_instance_id": "main"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "arb_id": "seed_nfl_total_kc_buf",
+      "sport": "nfl",
+      "league": "NFL",
+      "event_id": "seed_evt_nfl_kc_buf_20260519",
+      "event_name": "Kansas City Chiefs vs Buffalo Bills",
+      "start_time_ms": 1779228000000,
+      "market_key": "total",
+      "market_instance_id": "total:47.5",
+      "line": 47.5,
+      "player_id": null,
+      "S": 0.982684,
+      "roi": 0.017621,
+      "ts_updated_ms": 1779124500000,
+      "ts_min_leg_ingested_ms": 1779124462000,
+      "legs": [
+        {
+          "outcome_key": "Over 47.5",
+          "book": "DraftKings",
+          "odds_decimal": 2.06,
+          "odds_american": 106,
+          "bet_url": "https://sportsbook.draftkings.com",
+          "ts_ingested_ms": 1779124462000,
+          "line": 47.5,
+          "market_instance_id": "total:47.5"
+        },
+        {
+          "outcome_key": "Under 47.5",
+          "book": "BetRivers",
+          "odds_decimal": 2.01,
+          "odds_american": 101,
+          "bet_url": "https://www.betrivers.com",
+          "ts_ingested_ms": 1779124489000,
+          "line": 47.5,
+          "market_instance_id": "total:47.5"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "arb_id": "seed_mlb_moneyline_nyy_lad",
+      "sport": "mlb",
+      "league": "MLB",
+      "event_id": "seed_evt_mlb_nyy_lad_20260518",
+      "event_name": "New York Yankees vs Los Angeles Dodgers",
+      "start_time_ms": 1779161400000,
+      "market_key": "moneyline",
+      "market_instance_id": "main",
+      "line": null,
+      "player_id": null,
+      "S": 0.971247,
+      "roi": 0.029604,
+      "ts_updated_ms": 1779124500000,
+      "ts_min_leg_ingested_ms": 1779124447000,
+      "legs": [
+        {
+          "outcome_key": "Yankees",
+          "book": "FanDuel",
+          "odds_decimal": 2.18,
+          "odds_american": 118,
+          "bet_url": "https://www.fanduel.com",
+          "ts_ingested_ms": 1779124447000,
+          "line": null,
+          "market_instance_id": "main"
+        },
+        {
+          "outcome_key": "Dodgers",
+          "book": "Bet365",
+          "odds_decimal": 1.95,
+          "odds_american": -105,
+          "bet_url": "https://www.bet365.com",
+          "ts_ingested_ms": 1779124480000,
+          "line": null,
+          "market_instance_id": "main"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "arb_id": "seed_mlb_total_chc_stl",
+      "sport": "mlb",
+      "league": "MLB",
+      "event_id": "seed_evt_mlb_chc_stl_20260519",
+      "event_name": "Chicago Cubs vs St. Louis Cardinals",
+      "start_time_ms": 1779214500000,
+      "market_key": "total",
+      "market_instance_id": "total:8.5",
+      "line": 8.5,
+      "player_id": null,
+      "S": 0.984495,
+      "roi": 0.015749,
+      "ts_updated_ms": 1779124500000,
+      "ts_min_leg_ingested_ms": 1779124435000,
+      "legs": [
+        {
+          "outcome_key": "Over 8.5",
+          "book": "PointsBet",
+          "odds_decimal": 2.08,
+          "odds_american": 108,
+          "bet_url": "https://pointsbet.com",
+          "ts_ingested_ms": 1779124435000,
+          "line": 8.5,
+          "market_instance_id": "total:8.5"
+        },
+        {
+          "outcome_key": "Under 8.5",
+          "book": "Caesars",
+          "odds_decimal": 1.985,
+          "odds_american": -102,
+          "bet_url": "https://www.caesars.com/sportsbook-and-casino",
+          "ts_ingested_ms": 1779124472000,
+          "line": 8.5,
+          "market_instance_id": "total:8.5"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "arb_id": "seed_mls_moneyline_mia_atl",
+      "sport": "mls",
+      "league": "MLS",
+      "event_id": "seed_evt_mls_mia_atl_20260518",
+      "event_name": "Inter Miami vs Atlanta United",
+      "start_time_ms": 1779166800000,
+      "market_key": "moneyline",
+      "market_instance_id": "main",
+      "line": null,
+      "player_id": null,
+      "S": 0.989171,
+      "roi": 0.010948,
+      "ts_updated_ms": 1779124500000,
+      "ts_min_leg_ingested_ms": 1779124420000,
+      "legs": [
+        {
+          "outcome_key": "Inter Miami",
+          "book": "BetMGM",
+          "odds_decimal": 2.42,
+          "odds_american": 142,
+          "bet_url": "https://sports.betmgm.com",
+          "ts_ingested_ms": 1779124420000,
+          "line": null,
+          "market_instance_id": "main"
+        },
+        {
+          "outcome_key": "Atlanta United",
+          "book": "DraftKings",
+          "odds_decimal": 3.15,
+          "odds_american": 215,
+          "bet_url": "https://sportsbook.draftkings.com",
+          "ts_ingested_ms": 1779124450000,
+          "line": null,
+          "market_instance_id": "main"
+        },
+        {
+          "outcome_key": "Draw",
+          "book": "FanDuel",
+          "odds_decimal": 3.85,
+          "odds_american": 285,
+          "bet_url": "https://www.fanduel.com",
+          "ts_ingested_ms": 1779124460000,
+          "line": null,
+          "market_instance_id": "main"
+        }
+      ]
+    },
+    {
+      "schema_version": 1,
+      "arb_id": "seed_epl_total_ars_tot",
+      "sport": "epl",
+      "league": "EPL",
+      "event_id": "seed_evt_epl_ars_tot_20260519",
+      "event_name": "Arsenal vs Tottenham",
+      "start_time_ms": 1779206400000,
+      "market_key": "total",
+      "market_instance_id": "total:2.5",
+      "line": 2.5,
+      "player_id": null,
+      "S": 0.974261,
+      "roi": 0.026419,
+      "ts_updated_ms": 1779124500000,
+      "ts_min_leg_ingested_ms": 1779124411000,
+      "legs": [
+        {
+          "outcome_key": "Over 2.5",
+          "book": "Bet365",
+          "odds_decimal": 2.07,
+          "odds_american": 107,
+          "bet_url": "https://www.bet365.com",
+          "ts_ingested_ms": 1779124411000,
+          "line": 2.5,
+          "market_instance_id": "total:2.5"
+        },
+        {
+          "outcome_key": "Under 2.5",
+          "book": "FanDuel",
+          "odds_decimal": 2.035,
+          "odds_american": 104,
+          "bet_url": "https://www.fanduel.com",
+          "ts_ingested_ms": 1779124441000,
+          "line": 2.5,
+          "market_instance_id": "total:2.5"
+        }
+      ]
+    }
+  ]
+}

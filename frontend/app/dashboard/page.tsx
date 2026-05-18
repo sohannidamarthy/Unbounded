@@ -272,74 +272,7 @@ export default function DashboardPage() {
       ? recommendedGuides
       : recommendedGuides.filter((item) => item.type === chatFilter);
 
-  const payoutMultiplier: Record<Sport, number> = {
-    Basketball: 1.92,
-    Football: 2.28,
-    Baseball: 2.05,
-    Soccer: 2.4,
-  };
-  const previewArbTableRows: DashboardArbRow[] = [
-    {
-      id: "preview-pacers-lakers",
-      start: "12:00 AM CT",
-      sport: "Basketball",
-      league: "NBA",
-      match: "Pacers (+110) vs. Lakers (-110)",
-      betType: "moneyline" as BetType,
-      netProfit: "+$42",
-      roi: 0,
-      legs: [],
-      isLiveData: false,
-    },
-    {
-      id: "preview-heat-celtics",
-      start: "1:30 AM CT",
-      sport: "Basketball",
-      league: "NBA",
-      match: "Heat (+145) vs. Celtics (-160)",
-      betType: "player-prop" as BetType,
-      netProfit: "+$31",
-      roi: 0,
-      legs: [],
-      isLiveData: false,
-    },
-    {
-      id: "preview-wolves-reapers",
-      start: "3:15 PM CT",
-      sport: "Football",
-      league: "NFL",
-      match: "Wolves (+120) vs. Reapers (-130)",
-      betType: "spread" as BetType,
-      netProfit: "+$27",
-      roi: 0,
-      legs: [],
-      isLiveData: false,
-    },
-    {
-      id: "preview-dodgers-mets",
-      start: "6:10 PM CT",
-      sport: "Baseball",
-      league: "MLB",
-      match: "Dodgers (-105) vs. Mets (+102)",
-      betType: "total" as BetType,
-      netProfit: "+$18",
-      roi: 0,
-      legs: [],
-      isLiveData: false,
-    },
-    {
-      id: "preview-harbor-northbridge",
-      start: "7:45 PM CT",
-      sport: "Soccer",
-      league: "MLS",
-      match: "Harbor FC (+180) vs. Northbridge (-190)",
-      betType: "alt-line" as BetType,
-      netProfit: "+$22",
-      roi: 0,
-      legs: [],
-      isLiveData: false,
-    },
-  ];
+  const previewArbTableRows: DashboardArbRow[] = [];
   const leaderboardPreviewBoards = [
     {
       label: "24h cash",
@@ -451,80 +384,7 @@ export default function DashboardPage() {
     netProfit: string;
     payoutBoost: number;
     tags: LiveFilter[];
-  }[] = [
-    {
-      start: "12:10 PM CT",
-      sport: "Basketball",
-      league: "NBA",
-      match: "Warriors vs Suns",
-      betType: "moneyline",
-      odds: "-115",
-      edge: "+4.8%",
-      netProfit: "+$36",
-      payoutBoost: 0.12,
-      tags: ["Trending", "Live now"],
-    },
-    {
-      start: "12:45 PM CT",
-      sport: "Football",
-      league: "NFL",
-      match: "Chiefs vs Bills",
-      betType: "spread",
-      odds: "+145",
-      edge: "+3.6%",
-      netProfit: "+$28",
-      payoutBoost: 0.3,
-      tags: ["Trending"],
-    },
-    {
-      start: "01:20 PM CT",
-      sport: "Baseball",
-      league: "MLB",
-      match: "Dodgers vs Mets",
-      betType: "player-prop",
-      odds: "+105",
-      edge: "+4.9%",
-      netProfit: "+$24",
-      payoutBoost: 0.18,
-      tags: ["Trending", "High payout"],
-    },
-    {
-      start: "02:05 PM CT",
-      sport: "Soccer",
-      league: "MLS",
-      match: "Northbridge FC vs Harbor",
-      betType: "total",
-      odds: "+118",
-      edge: "+4.7%",
-      netProfit: "+$19",
-      payoutBoost: 0.22,
-      tags: ["Trending"],
-    },
-    {
-      start: "02:40 PM CT",
-      sport: "Basketball",
-      league: "NBA",
-      match: "Kings vs Storm",
-      betType: "alt-line",
-      odds: "+136",
-      edge: "+5.3%",
-      netProfit: "+$44",
-      payoutBoost: 0.4,
-      tags: ["High payout", "Live now"],
-    },
-    {
-      start: "03:10 PM CT",
-      sport: "Football",
-      league: "NFL",
-      match: "Wolves vs Reapers",
-      betType: "spread",
-      odds: "-108",
-      edge: "+4.0%",
-      netProfit: "+$21",
-      payoutBoost: 0.1,
-      tags: ["Live now"],
-    },
-  ];
+  }[] = [];
   const filteredLiveRows = liveTableRows.filter(
     (row) =>
       (activeSport === "All" || row.sport === activeSport) &&
@@ -535,7 +395,7 @@ export default function DashboardPage() {
     .filter((row) => selectedLiveBetTypes.includes(row.betType))
     .slice(0, 3);
   const activeArbBetTypes = arbEvView === "arb" ? selectedArbBetTypes : selectedEvBetTypes;
-  const arbTableRows = arbEvView === "arb" && liveArbRows.length > 0 ? liveArbRows : previewArbTableRows;
+  const arbTableRows = arbEvView === "arb" ? liveArbRows : previewArbTableRows;
   const filteredArbRows = arbTableRows.filter((row) =>
     activeArbBetTypes.includes(row.betType)
   );
@@ -544,228 +404,8 @@ export default function DashboardPage() {
     ? `${(Math.max(...liveArbRows.map((row) => row.roi)) * 100).toFixed(2)}%`
     : "Waiting";
   const topArbSport = liveArbRows[0]?.sport ?? "Waiting";
-  const liveDataSport: Sport =
-    activeSport === "All" ? "Basketball" : activeSport;
   const allLiveBetTypesSelected = selectedLiveBetTypes.length === ALL_BET_TYPES.length;
   const allArbBetTypesSelected = activeArbBetTypes.length === ALL_BET_TYPES.length;
-
-  const liveData: Record<
-    Sport,
-    {
-      hero: string;
-      board: {
-        matchup: string;
-        odds: string;
-        edge: string;
-        payoutBoost: number;
-        tags: LiveFilter[];
-      }[];
-      cards: {
-        title: string;
-        meta: string;
-        odds: string;
-        payoutBoost: number;
-        tags: LiveFilter[];
-      }[];
-    }
-  > = {
-    Basketball: {
-      hero: "Skyline Kings vs Harbor Jets",
-      board: [
-        {
-          matchup: "Skyline Kings -3.5",
-          odds: "-112",
-          edge: "+4.8%",
-          payoutBoost: 0.12,
-          tags: ["Trending", "Live now"],
-        },
-        {
-          matchup: "Harbor Jets ML",
-          odds: "+142",
-          edge: "+3.1%",
-          payoutBoost: -0.05,
-          tags: ["Trending"],
-        },
-        {
-          matchup: "Total O 218.5",
-          odds: "+105",
-          edge: "+5.4%",
-          payoutBoost: 0.22,
-          tags: ["High payout", "Live now"],
-        },
-      ],
-      cards: [
-        {
-          title: "Fourth-quarter surge",
-          meta: "3 picks • live",
-          odds: "+285",
-          payoutBoost: 0.65,
-          tags: ["High payout", "Live now"],
-        },
-        {
-          title: "Sharpside sweep",
-          meta: "2 picks • pregame",
-          odds: "+150",
-          payoutBoost: 0.28,
-          tags: ["Trending"],
-        },
-        {
-          title: "Rim protectors",
-          meta: "4 picks • props",
-          odds: "+320",
-          payoutBoost: 0.85,
-          tags: ["High payout"],
-        },
-      ],
-    },
-    Football: {
-      hero: "Iron City Wolves vs Gulf Coast Reapers",
-      board: [
-        {
-          matchup: "Wolves -2.5",
-          odds: "-108",
-          edge: "+4.0%",
-          payoutBoost: 0.1,
-          tags: ["Trending", "Live now"],
-        },
-        {
-          matchup: "Reapers ML",
-          odds: "+125",
-          edge: "+3.6%",
-          payoutBoost: 0.08,
-          tags: ["Trending"],
-        },
-        {
-          matchup: "Total U 45.0",
-          odds: "+110",
-          edge: "+5.9%",
-          payoutBoost: 0.35,
-          tags: ["High payout"],
-        },
-      ],
-      cards: [
-        {
-          title: "Redzone rally",
-          meta: "3 picks • live",
-          odds: "+310",
-          payoutBoost: 0.7,
-          tags: ["High payout", "Live now"],
-        },
-        {
-          title: "Prime-time lock",
-          meta: "2 picks • pregame",
-          odds: "+135",
-          payoutBoost: 0.22,
-          tags: ["Trending"],
-        },
-        {
-          title: "Defensive grind",
-          meta: "4 picks • totals",
-          odds: "+295",
-          payoutBoost: 0.78,
-          tags: ["High payout"],
-        },
-      ],
-    },
-    Baseball: {
-      hero: "Coastal Comets vs Prairie Owls",
-      board: [
-        {
-          matchup: "Comets -1.5",
-          odds: "+128",
-          edge: "+4.5%",
-          payoutBoost: 0.2,
-          tags: ["High payout"],
-        },
-        {
-          matchup: "Owls ML",
-          odds: "+112",
-          edge: "+3.2%",
-          payoutBoost: 0.05,
-          tags: ["Trending", "Live now"],
-        },
-        {
-          matchup: "Total O 8.0",
-          odds: "-104",
-          edge: "+4.9%",
-          payoutBoost: 0.18,
-          tags: ["Trending"],
-        },
-      ],
-      cards: [
-        {
-          title: "Bullpen breaker",
-          meta: "2 picks • live",
-          odds: "+165",
-          payoutBoost: 0.3,
-          tags: ["Live now"],
-        },
-        {
-          title: "Slugger stack",
-          meta: "3 picks • props",
-          odds: "+240",
-          payoutBoost: 0.55,
-          tags: ["High payout"],
-        },
-        {
-          title: "Late innings edge",
-          meta: "4 picks • totals",
-          odds: "+275",
-          payoutBoost: 0.68,
-          tags: ["Trending"],
-        },
-      ],
-    },
-    Soccer: {
-      hero: "Northbridge FC vs Valencia Harbor",
-      board: [
-        {
-          matchup: "Northbridge -0.5",
-          odds: "+118",
-          edge: "+4.7%",
-          payoutBoost: 0.22,
-          tags: ["Trending"],
-        },
-        {
-          matchup: "Draw",
-          odds: "+210",
-          edge: "+5.3%",
-          payoutBoost: 0.5,
-          tags: ["High payout"],
-        },
-        {
-          matchup: "BTTS Yes",
-          odds: "-102",
-          edge: "+3.8%",
-          payoutBoost: 0.1,
-          tags: ["Live now"],
-        },
-      ],
-      cards: [
-        {
-          title: "Second-half surge",
-          meta: "2 picks • live",
-          odds: "+175",
-          payoutBoost: 0.32,
-          tags: ["Live now"],
-        },
-        {
-          title: "Corner chaos",
-          meta: "3 picks • props",
-          odds: "+255",
-          payoutBoost: 0.6,
-          tags: ["High payout"],
-        },
-        {
-          title: "Clean sheet blend",
-          meta: "4 picks • props",
-          odds: "+290",
-          payoutBoost: 0.74,
-          tags: ["Trending"],
-        },
-      ],
-    },
-  };
 
   const toDecimalOdds = (americanOdds: string) => {
     const value = Number(americanOdds);
@@ -1208,16 +848,6 @@ export default function DashboardPage() {
                     className="dashboard-live-expanded"
                     onClick={(event) => event.stopPropagation()}
                   >
-                    {(() => {
-                      const sportData = liveData[liveDataSport];
-                      const activeBoard = sportData.board.filter((row) =>
-                        row.tags.includes(activeFilter)
-                      );
-                      const activeCards = sportData.cards.filter((card) =>
-                        card.tags.includes(activeFilter)
-                      );
-                      return (
-                        <>
                     <div className="dashboard-live-filters">
                       <div className="dashboard-live-tabs">
                         {liveSportTabs.map((sport) => (
@@ -1246,24 +876,6 @@ export default function DashboardPage() {
                             {filter}
                           </button>
                         ))}
-                      </div>
-                    </div>
-                    <div className="dashboard-live-hero">
-                      <div>
-                        <div className="dashboard-live-hero-title">
-                          {activeSport} live spotlight
-                        </div>
-                        <p>
-                          {sportData.hero} headline with real-time edges, in-play
-                          volatility, and payout previews.
-                        </p>
-                      </div>
-                      <div className="dashboard-live-hero-stat">
-                        <span>Est. payout boost</span>
-                        <strong>
-                          $
-                          {(liveBetValue * payoutMultiplier[liveDataSport]).toFixed(2)}
-                        </strong>
                       </div>
                     </div>
 
@@ -1337,9 +949,6 @@ export default function DashboardPage() {
                         </Fragment>
                       ))}
                     </div>
-                        </>
-                      );
-                    })()}
                   </div>
                 )}
               </div>
@@ -1495,21 +1104,21 @@ export default function DashboardPage() {
                       ? arbFeedStatus === "live"
                         ? "Live arb board synced from backend feed."
                         : "Current arb board will switch to live opportunities when the feed publishes."
-                      : "Three quick positive EV looks from the current board."}
+                      : "Positive EV opportunities will appear here when the feed publishes."}
                   </p>
                 </div>
                 <div className="dashboard-compact-stats">
                   <div className="dashboard-compact-stat">
                     <span>{arbEvView === "arb" ? "Live arbs" : "Live +EV"}</span>
-                    <strong>{arbEvView === "arb" ? liveArbRows.length : "27"}</strong>
+                    <strong>{arbEvView === "arb" ? liveArbRows.length : 0}</strong>
                   </div>
                   <div className="dashboard-compact-stat">
                     <span>Top sport</span>
-                    <strong>{arbEvView === "arb" ? topArbSport : "Basketball"}</strong>
+                    <strong>{arbEvView === "arb" ? topArbSport : "Waiting"}</strong>
                   </div>
                   <div className="dashboard-compact-stat">
                     <span>Best edge</span>
-                    <strong>{arbEvView === "arb" ? bestArbEdge : "+6.2%"}</strong>
+                    <strong>{arbEvView === "arb" ? bestArbEdge : "Waiting"}</strong>
                   </div>
                 </div>
               </div>
