@@ -28,6 +28,8 @@ frontend_origins = [o.strip() for o in origins_env.split(",") if o.strip()]
 allow_origin_regex = None
 if os.getenv("ENV", "development") == "development":
     allow_origin_regex = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
+elif os.getenv("ALLOW_VERCEL_PREVIEW_ORIGINS", "1") == "1":
+    allow_origin_regex = r"^https://[a-z0-9-]+\.vercel\.app$"
 
 app.add_middleware(
     CORSMiddleware,
@@ -77,6 +79,7 @@ async def health():
 # --- Waitlist ---
 class WaitlistSignup(BaseModel):
     email: EmailStr
+    name: str | None = None
 
 
 @app.post("/waitlist")
@@ -89,6 +92,7 @@ async def waitlist_signup(payload: WaitlistSignup):
         raise HTTPException(status_code=500, detail="Email service not configured.")
 
     resend.api_key = api_key
+    name = payload.name.strip() if payload.name else None
 
     try:
         resend.Emails.send(
@@ -98,6 +102,7 @@ async def waitlist_signup(payload: WaitlistSignup):
                 "subject": "New waitlist signup",
                 "html": (
                     "<p>New waitlist signup:</p>"
+                    f"{f'<p>Name: <strong>{name}</strong></p>' if name else ''}"
                     f"<p><strong>{payload.email}</strong></p>"
                 ),
             }

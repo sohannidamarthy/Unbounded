@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { getSportsbookMeta, SportsbookLogo } from "../components/sportsbookMeta";
@@ -38,6 +38,7 @@ type SignupFormState = {
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 const SAVED_EMAIL_KEY = "unbounded.saved_email";
+const SIGNUP_TAB_KEY = "unbounded.active_signup_tab";
 
 const COUNTRY_OPTIONS = [
   { value: "US", label: "United States" },
@@ -564,11 +565,15 @@ function validateDateOfBirth(value: string) {
 
 export default function AuthPage() {
   const router = useRouter();
+  const signupTabIdRef = useRef("");
   const [mode, setMode] = useState<AuthMode>("login");
   const [signupStep, setSignupStep] = useState<SignupStep>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [messageTone, setMessageTone] = useState<MessageTone>("info");
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [forgotIdentifier, setForgotIdentifier] = useState("");
+  const [forgotMessage, setForgotMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
@@ -582,6 +587,12 @@ export default function AuthPage() {
   const [tutorialIndex, setTutorialIndex] = useState(0);
   const [didSkipPreferences, setDidSkipPreferences] = useState(false);
   const todayIso = useMemo(() => new Date().toISOString().slice(0, 10), []);
+
+  if (!signupTabIdRef.current) {
+    signupTabIdRef.current = `${Date.now()}-${Math.random()
+      .toString(16)
+      .slice(2)}`;
+  }
 
   const apiBase = useMemo(() => {
     const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
@@ -673,6 +684,33 @@ export default function AuthPage() {
   }, []);
 
   useEffect(() => {
+    if (mode !== "signup") {
+      const activeSignupTab = localStorage.getItem(SIGNUP_TAB_KEY);
+      if (activeSignupTab === signupTabIdRef.current) {
+        localStorage.removeItem(SIGNUP_TAB_KEY);
+      }
+      return;
+    }
+
+    const activeSignupTab = localStorage.getItem(SIGNUP_TAB_KEY);
+    if (!activeSignupTab) {
+      localStorage.setItem(SIGNUP_TAB_KEY, signupTabIdRef.current);
+    }
+
+    const releaseSignupTab = () => {
+      if (localStorage.getItem(SIGNUP_TAB_KEY) === signupTabIdRef.current) {
+        localStorage.removeItem(SIGNUP_TAB_KEY);
+      }
+    };
+
+    window.addEventListener("beforeunload", releaseSignupTab);
+    return () => {
+      window.removeEventListener("beforeunload", releaseSignupTab);
+      releaseSignupTab();
+    };
+  }, [mode]);
+
+  useEffect(() => {
     if (!regionOptions.some((option) => option.value === signupForm.state)) {
       setSignupForm((current) => ({ ...current, state: "" }));
     }
@@ -750,6 +788,9 @@ export default function AuthPage() {
 
   const updateSignupField = (field: keyof SignupFormState, value: string) => {
     setSignupForm((current) => ({ ...current, [field]: value }));
+    if (field === "email" && rememberEmail) {
+      localStorage.setItem(SAVED_EMAIL_KEY, value.trim());
+    }
     if (field === "username" || field === "password" || field === "confirmPassword") {
       setPasswordError(null);
     }
@@ -762,6 +803,26 @@ export default function AuthPage() {
       setSelectedSportsbooks([]);
       setSportsbookSearch("");
       setShowAllSportsbooks(false);
+    }
+  };
+
+  const claimSignupTab = () => {
+    const activeSignupTab = localStorage.getItem(SIGNUP_TAB_KEY);
+    if (activeSignupTab && activeSignupTab !== signupTabIdRef.current) {
+      setMessageTone("error");
+      setMessage(
+        "Signup is already open in another tab. Finish or close that tab before starting another signup."
+      );
+      return false;
+    }
+
+    localStorage.setItem(SIGNUP_TAB_KEY, signupTabIdRef.current);
+    return true;
+  };
+
+  const clearSignupTab = () => {
+    if (localStorage.getItem(SIGNUP_TAB_KEY) === signupTabIdRef.current) {
+      localStorage.removeItem(SIGNUP_TAB_KEY);
     }
   };
 
@@ -823,6 +884,10 @@ export default function AuthPage() {
 
   const completeSignup = async (skippedTutorials: boolean) => {
     if (isSubmitting) {
+      return;
+    }
+
+    if (!claimSignupTab()) {
       return;
     }
 
@@ -898,23 +963,37 @@ export default function AuthPage() {
         return;
       }
 
-      setMode("login");
-      setSignupStep(1);
-      setEmail(signupForm.email.trim());
-      setLoginPassword("");
-      localStorage.removeItem(TOKEN_STORAGE_KEY);
+      const payload = await response.json();
+      const accessToken =
+        payload.access_token || payload.accessToken || payload.token;
 
       if (rememberEmail) {
         localStorage.setItem(SAVED_EMAIL_KEY, signupForm.email.trim());
       }
 
+      if (!accessToken) {
+        setMode("login");
+        setSignupStep(1);
+        setEmail(signupForm.email.trim());
+        setLoginPassword("");
+        localStorage.removeItem(TOKEN_STORAGE_KEY);
+        resetSignupFlow();
+        clearSignupTab();
+        setMessageTone("success");
+        setMessage("Account created. Log in with your email and password to continue.");
+        return;
+      }
+
+      localStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
+      clearSignupTab();
       resetSignupFlow();
       setMessageTone("success");
       setMessage(
         skippedTutorials
-          ? "Account created. You skipped tutorials for now. Log in to continue."
-          : "Account created. Log in with your email and password to continue."
+          ? "Account created. You skipped tutorials for now. Redirecting..."
+          : "Account created. Redirecting..."
       );
+      router.push("/dashboard");
     } catch (error) {
       const details =
         error instanceof Error ? error.message : String(error ?? "");
@@ -937,6 +1016,9 @@ export default function AuthPage() {
     setPasswordError(null);
 
     if (mode === "signup" && signupStep === 1) {
+      if (!claimSignupTab()) {
+        return;
+      }
       if (!validateSignupStepOne()) {
         return;
       }
@@ -965,7 +1047,9 @@ export default function AuthPage() {
 
     if (!emailValue) {
       setMessageTone("error");
-      setMessage("Use an email address to log in for now.");
+      setMessage(
+        "Use the email address on your account. Username and phone login are not connected yet."
+      );
       return;
     }
 
@@ -1052,6 +1136,29 @@ export default function AuthPage() {
       current.includes(sportsbook)
         ? current.filter((item) => item !== sportsbook)
         : [...current, sportsbook]
+    );
+  };
+
+  const handleForgotPasswordSubmit = (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    const identifier = forgotIdentifier.trim();
+
+    if (!identifier) {
+      setForgotMessage("Enter the email, phone, or username on the account.");
+      return;
+    }
+
+    if (!identifier.includes("@")) {
+      setForgotMessage(
+        "Password recovery currently sends to the email on the account. Enter that email to continue."
+      );
+      return;
+    }
+
+    setForgotMessage(
+      "If an account exists for that email, reset instructions will be sent."
     );
   };
 
@@ -1143,11 +1250,11 @@ export default function AuthPage() {
               {mode === "login" ? (
                 <>
                   <label className="field">
-                    <span>Email or mobile number</span>
+                    <span>Email, phone, or username</span>
                     <input
                       name="email"
                       type="text"
-                      placeholder="Email or mobile number"
+                      placeholder="Email, phone, or username"
                       autoComplete="username"
                       required
                       value={email}
@@ -1211,6 +1318,17 @@ export default function AuthPage() {
                     />
                     <span>Remember email on this device</span>
                   </label>
+                  <button
+                    type="button"
+                    className="auth-inline-link"
+                    onClick={() => {
+                      setForgotIdentifier(email);
+                      setForgotMessage(null);
+                      setIsForgotPasswordOpen(true);
+                    }}
+                  >
+                    Forgot password?
+                  </button>
                 </>
               ) : signupStep === 1 ? (
                 <>
@@ -1449,6 +1567,26 @@ export default function AuthPage() {
                   <div className="field-hint">
                     Use a capital letter, at least 10 characters and include at least one symbol.
                   </div>
+
+                  <label className="remember-field remember-field--signup">
+                    <input
+                      type="checkbox"
+                      checked={rememberEmail}
+                      onChange={(event) => {
+                        const nextChecked = event.target.checked;
+                        setRememberEmail(nextChecked);
+                        if (nextChecked && signupForm.email) {
+                          localStorage.setItem(
+                            SAVED_EMAIL_KEY,
+                            signupForm.email.trim()
+                          );
+                        } else {
+                          localStorage.removeItem(SAVED_EMAIL_KEY);
+                        }
+                      }}
+                    />
+                    <span>Remember this account on this device</span>
+                  </label>
                 </>
               ) : isSignupStepTwo ? (
                 <>
@@ -1749,6 +1887,61 @@ export default function AuthPage() {
 
             {message ? (
               <div className={`auth-message ${messageTone}`}>{message}</div>
+            ) : null}
+
+            {isForgotPasswordOpen ? (
+              <div
+                className="auth-dialog-backdrop"
+                role="presentation"
+                onClick={() => setIsForgotPasswordOpen(false)}
+              >
+                <section
+                  className="auth-dialog"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="forgot-password-title"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    className="newsletter-modal-close"
+                    aria-label="Close password reset"
+                    onClick={() => setIsForgotPasswordOpen(false)}
+                  >
+                    ×
+                  </button>
+                  <span className="billing-eyebrow">Account recovery</span>
+                  <h2 id="forgot-password-title">Reset your password</h2>
+                  <p>
+                    Enter the email on your account. Username and phone recovery
+                    will route through that email.
+                  </p>
+                  <form
+                    className="auth-dialog-form"
+                    onSubmit={handleForgotPasswordSubmit}
+                  >
+                    <label className="field">
+                      <span>Email, phone, or username</span>
+                      <input
+                        type="text"
+                        value={forgotIdentifier}
+                        onChange={(event) =>
+                          setForgotIdentifier(event.target.value)
+                        }
+                        placeholder="you@example.com"
+                        autoComplete="username"
+                        required
+                      />
+                    </label>
+                    {forgotMessage ? (
+                      <div className="auth-message info">{forgotMessage}</div>
+                    ) : null}
+                    <button className="auth-primary" type="submit">
+                      Send reset instructions
+                    </button>
+                  </form>
+                </section>
+              </div>
             ) : null}
 
             <div className="auth-actions" />

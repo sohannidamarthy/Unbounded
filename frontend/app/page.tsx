@@ -129,6 +129,7 @@ export default function Home() {
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") || "").trim();
+    const name = String(formData.get("name") || "").trim();
     const apiBase =
       process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
       "http://localhost:8000";
@@ -137,7 +138,7 @@ export default function Home() {
       const response = await fetch(`${apiBase}/waitlist`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, name: name || null })
       });
 
       if (!response.ok) {
@@ -314,8 +315,9 @@ export default function Home() {
           <div className="section-header">
             <h2>Pricing plans</h2>
             <p>
-              Choose Select, Premium, or Executive. Annual payment is highlighted
-              because it saves 10% across the year.
+              Choose Select, Premium, or Executive. Select starts at $1.99 per
+              day on this page, and annual payment is highlighted because it
+              saves 10% across the year.
             </p>
           </div>
           <PricingTierCards />
@@ -337,10 +339,11 @@ export default function Home() {
           <div className="workflow-card">
             <div className="why-header">
               <div>
-                <h2>Why Unbounded?</h2>
+                <h2>Why Unbounded works</h2>
                 <p>
-                  Unbounded keeps your edge in one place, with live markets,
-                  automation, and workflows that cut through the noise.
+                  Unbounded keeps the parts that usually get split across tabs
+                  in one professional workflow: scanning, sizing, sharing,
+                  tracking, and review.
                 </p>
               </div>
               <div className="why-badges">
@@ -353,22 +356,22 @@ export default function Home() {
               <div className="why-highlight">
                 <h3>Unbounded</h3>
                 <ul>
-                  <li>Unified scan, tag, share, and execution flow</li>
-                  <li>AI-assisted signal filters and recap highlights</li>
-                  <li>Custom alerts tuned to your edge</li>
-                  <li>Transparent pricing with no hidden fees</li>
-                  <li>Live betting workflows included</li>
-                  <li>Withdrawal guidance built into the process</li>
+                  <li>Unified scan, tag, share, and execution workflow</li>
+                  <li>AI-assisted signal filters, recaps, and bet notes</li>
+                  <li>Profit tracking tied back to real decisions</li>
+                  <li>Transparent tier pricing before signup</li>
+                  <li>Live betting and withdrawal workflow support</li>
+                  <li>Built for individual bettors and small teams</li>
                 </ul>
               </div>
               <div className="why-contrast">
                 <h3>Similar tools</h3>
                 <ul>
-                  <li>Separate tools for scanning and betting</li>
-                  <li>Generic alerts without context</li>
-                  <li>Extra fees for live betting features</li>
-                  <li>Limited withdrawal guidance</li>
-                  <li>More toggling between tabs and exports</li>
+                  <li>Separate scanners, calculators, and trackers</li>
+                  <li>Alerts without stake size or decision context</li>
+                  <li>Live betting features hidden behind add-ons</li>
+                  <li>Little guidance after the bet is placed</li>
+                  <li>More manual exporting and tab switching</li>
                 </ul>
               </div>
             </div>
@@ -504,6 +507,12 @@ export default function Home() {
               workflow notes.
             </p>
             <form className="pricing-form newsletter-modal-form" onSubmit={handlePricingSubmit}>
+              <input
+                name="name"
+                type="text"
+                placeholder="Name or username"
+                autoComplete="name"
+              />
               <input
                 name="email"
                 type="email"

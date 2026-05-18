@@ -59,6 +59,8 @@ class UserProfile(BaseModel):
 class SignupResponse(BaseModel):
     message: str
     user: UserProfile
+    access_token: str
+    token_type: str = "bearer"
 
 
 def _normalize_email(email: str) -> str:
@@ -174,14 +176,16 @@ async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
     except Exception:
         logger.exception("Failed to cache signup profile for user %s", user.id)
 
+    token = create_access_token(str(user.id))
     return SignupResponse(
-        message="Account created. Please log in to continue.",
+        message="Account created.",
         user=UserProfile(
             id=str(user.id),
             email=user.email,
             is_active=user.is_active,
             is_admin=user.is_admin,
         ),
+        access_token=token,
     )
 
 
