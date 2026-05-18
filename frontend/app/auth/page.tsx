@@ -896,6 +896,7 @@ export default function AuthPage() {
     setIsSubmitting(true);
     setMessage(null);
     setPasswordError(null);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
 
     try {
       const emailForApi = getEmailForApi(signupForm.email);
@@ -945,6 +946,7 @@ export default function AuthPage() {
           skipped_tutorials: skippedTutorials
         })
       });
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
 
       if (response.status === 429) {
         setMessageTone("error");
