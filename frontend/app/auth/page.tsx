@@ -608,6 +608,8 @@ export default function AuthPage() {
     process.env.NEXT_PUBLIC_AUTH_LOGIN_URL || `${apiBase}/auth/login`;
   const signupEndpoint =
     process.env.NEXT_PUBLIC_AUTH_SIGNUP_URL || `${apiBase}/auth/signup`;
+  const forgotPasswordEndpoint = `${apiBase}/auth/forgot-password`;
+  const resendVerificationEndpoint = `${apiBase}/auth/resend-verification`;
   const isLoginApiConfigured = Boolean(
     apiBase || process.env.NEXT_PUBLIC_AUTH_LOGIN_URL
   );
@@ -964,36 +966,24 @@ export default function AuthPage() {
       }
 
       const payload = await response.json();
-      const accessToken =
-        payload.access_token || payload.accessToken || payload.token;
 
       if (rememberEmail) {
         localStorage.setItem(SAVED_EMAIL_KEY, signupForm.email.trim());
       }
 
-      if (!accessToken) {
-        setMode("login");
-        setSignupStep(1);
-        setEmail(signupForm.email.trim());
-        setLoginPassword("");
-        localStorage.removeItem(TOKEN_STORAGE_KEY);
-        resetSignupFlow();
-        clearSignupTab();
-        setMessageTone("success");
-        setMessage("Account created. Log in with your email and password to continue.");
-        return;
-      }
-
-      localStorage.setItem(TOKEN_STORAGE_KEY, accessToken);
-      clearSignupTab();
+      setMode("login");
+      setSignupStep(1);
+      setEmail(signupForm.email.trim());
+      setLoginPassword("");
+      localStorage.removeItem(TOKEN_STORAGE_KEY);
       resetSignupFlow();
+      clearSignupTab();
       setMessageTone("success");
       setMessage(
-        skippedTutorials
-          ? "Account created. You skipped tutorials for now. Redirecting..."
-          : "Account created. Redirecting..."
+        typeof payload.message === "string"
+          ? payload.message
+          : "Account created. Check your email to verify the account before logging in."
       );
-      router.push("/dashboard");
     } catch (error) {
       const details =
         error instanceof Error ? error.message : String(error ?? "");
@@ -1084,6 +1074,13 @@ export default function AuthPage() {
         return;
       }
 
+      if (response.status === 403) {
+        setLoginPassword("");
+        setMessageTone("error");
+        setMessage("Verify your email before logging in. Check your inbox or request a new verification link.");
+        return;
+      }
+
       if (response.status === 429) {
         setMessageTone("error");
         setMessage("Too many attempts. Please wait a minute and try again.");
@@ -1139,7 +1136,7 @@ export default function AuthPage() {
     );
   };
 
-  const handleForgotPasswordSubmit = (
+  const handleForgotPasswordSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
@@ -1157,9 +1154,41 @@ export default function AuthPage() {
       return;
     }
 
-    setForgotMessage(
-      "If an account exists for that email, reset instructions will be sent."
-    );
+    try {
+      const response = await fetch(forgotPasswordEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: identifier })
+      });
+      setForgotMessage(
+        response.ok
+          ? "If an account exists for that email, reset instructions will be sent."
+          : "Password reset is unavailable right now. Try again in a moment."
+      );
+    } catch {
+      setForgotMessage("Password reset is unavailable right now. Try again in a moment.");
+    }
+  };
+
+  const handleResendVerification = async () => {
+    const emailValue = getEmailForApi(email);
+    if (!emailValue) {
+      setMessageTone("error");
+      setMessage("Enter your account email first.");
+      return;
+    }
+    try {
+      await fetch(resendVerificationEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailValue })
+      });
+      setMessageTone("success");
+      setMessage("If that account needs verification, a new link has been sent.");
+    } catch {
+      setMessageTone("error");
+      setMessage("Could not resend verification right now.");
+    }
   };
 
   const isSignupStepTwo = mode === "signup" && signupStep === 2;
@@ -1328,6 +1357,13 @@ export default function AuthPage() {
                     }}
                   >
                     Forgot password?
+                  </button>
+                  <button
+                    type="button"
+                    className="auth-inline-link"
+                    onClick={handleResendVerification}
+                  >
+                    Resend verification email
                   </button>
                 </>
               ) : signupStep === 1 ? (

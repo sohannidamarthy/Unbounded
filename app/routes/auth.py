@@ -1,6 +1,11 @@
 import logging
+import hashlib
+import os
+import secrets
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import resend
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
@@ -54,13 +59,26 @@ class UserProfile(BaseModel):
     email: EmailStr
     is_active: bool
     is_admin: bool
+    is_email_verified: bool
 
 
 class SignupResponse(BaseModel):
     message: str
     user: UserProfile
-    access_token: str
     token_type: str = "bearer"
+
+
+class EmailPayload(BaseModel):
+    email: EmailStr
+
+
+class VerifyEmailPayload(BaseModel):
+    token: str = Field(min_length=20)
+
+
+class ResetPasswordPayload(BaseModel):
+    token: str = Field(min_length=20)
+    password: str = Field(min_length=10, max_length=100)
 
 
 def _normalize_email(email: str) -> str:
@@ -101,6 +119,73 @@ def _validate_signup_password(password: str) -> Optional[str]:
     return None
 
 
+def _now() -> datetime:
+    return datetime.now(timezone.utc)
+
+
+def _token_hash(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def _new_token() -> str:
+    return secrets.token_urlsafe(32)
+
+
+def _frontend_url(path: str, token: str) -> str:
+    base = (
+        os.getenv("FRONTEND_SITE_URL")
+        or os.getenv("NEXT_PUBLIC_SITE_URL")
+        or os.getenv("PUBLIC_SITE_URL")
+        or "http://localhost:3000"
+    ).rstrip("/")
+    return f"{base}{path}?token={token}"
+
+
+def _send_email(*, to: str, subject: str, html: str) -> None:
+    api_key = os.getenv("RESEND_API_KEY")
+    from_email = os.getenv("AUTH_FROM_EMAIL") or os.getenv("WAITLIST_FROM_EMAIL")
+    if not api_key or not from_email:
+        raise RuntimeError("Email service not configured.")
+    resend.api_key = api_key
+    resend.Emails.send({"from": from_email, "to": to, "subject": subject, "html": html})
+
+
+def _issue_email_verification(db: Session, user: User) -> None:
+    token = _new_token()
+    user.email_verification_token_hash = _token_hash(token)
+    user.email_verification_expires_at = _now() + timedelta(hours=24)
+    db.commit()
+
+    verify_url = _frontend_url("/verify-email", token)
+    _send_email(
+        to=user.email,
+        subject="Verify your Unbounded email",
+        html=(
+            "<p>Verify your Unbounded account email:</p>"
+            f'<p><a href="{verify_url}">Verify email</a></p>'
+            "<p>This link expires in 24 hours.</p>"
+        ),
+    )
+
+
+def _issue_password_reset(db: Session, user: User) -> None:
+    token = _new_token()
+    user.password_reset_token_hash = _token_hash(token)
+    user.password_reset_expires_at = _now() + timedelta(hours=1)
+    db.commit()
+
+    reset_url = _frontend_url("/reset-password", token)
+    _send_email(
+        to=user.email,
+        subject="Reset your Unbounded password",
+        html=(
+            "<p>Reset your Unbounded password:</p>"
+            f'<p><a href="{reset_url}">Reset password</a></p>'
+            "<p>This link expires in 1 hour. If you did not request it, you can ignore this email.</p>"
+        ),
+    )
+
+
 @router.post("/signup", response_model=SignupResponse)
 async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
     email = _normalize_email(payload.email)
@@ -122,6 +207,7 @@ async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
         password_hash=hash_password(payload.password),
         is_active=True,
         is_admin=False,
+        is_email_verified=False,
     )
 
     db.add(user)
@@ -176,16 +262,24 @@ async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
     except Exception:
         logger.exception("Failed to cache signup profile for user %s", user.id)
 
-    token = create_access_token(str(user.id))
+    try:
+        _issue_email_verification(db, user)
+    except Exception:
+        logger.exception("Failed to send verification email for user %s", user.id)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Account created, but verification email could not be sent. Check Resend configuration and use resend verification.",
+        )
+
     return SignupResponse(
-        message="Account created.",
+        message="Account created. Check your email to verify the account before logging in.",
         user=UserProfile(
             id=str(user.id),
             email=user.email,
             is_active=user.is_active,
             is_admin=user.is_admin,
+            is_email_verified=user.is_email_verified,
         ),
-        access_token=token,
     )
 
 
@@ -206,5 +300,75 @@ def login(payload: AuthPayload, db: Session = Depends(get_db)):
             detail="User is inactive.",
         )
 
+    if not user.is_email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email not verified.",
+        )
+
     token = create_access_token(str(user.id))
     return AuthResponse(access_token=token)
+
+
+@router.post("/verify-email")
+def verify_email(payload: VerifyEmailPayload, db: Session = Depends(get_db)):
+    token_hash = _token_hash(payload.token)
+    user = db.scalar(
+        select(User).where(User.email_verification_token_hash == token_hash)
+    )
+    if not user or not user.email_verification_expires_at:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid verification link.")
+    if user.email_verification_expires_at < _now():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Verification link expired.")
+
+    user.is_email_verified = True
+    user.email_verified_at = _now()
+    user.email_verification_token_hash = None
+    user.email_verification_expires_at = None
+    db.commit()
+    return {"status": "ok"}
+
+
+@router.post("/resend-verification")
+def resend_verification(payload: EmailPayload, db: Session = Depends(get_db)):
+    user = _find_user_by_email(db, _normalize_email(payload.email))
+    if user and not user.is_email_verified:
+        try:
+            _issue_email_verification(db, user)
+        except Exception:
+            logger.exception("Failed to resend verification email for user %s", user.id)
+    return {"status": "ok"}
+
+
+@router.post("/forgot-password")
+def forgot_password(payload: EmailPayload, db: Session = Depends(get_db)):
+    user = _find_user_by_email(db, _normalize_email(payload.email))
+    if user and user.is_active:
+        try:
+            _issue_password_reset(db, user)
+        except Exception:
+            logger.exception("Failed to send password reset email for user %s", user.id)
+    return {"status": "ok"}
+
+
+@router.post("/reset-password")
+def reset_password(payload: ResetPasswordPayload, db: Session = Depends(get_db)):
+    password_error = _validate_signup_password(payload.password)
+    if password_error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=password_error,
+        )
+
+    token_hash = _token_hash(payload.token)
+    user = db.scalar(select(User).where(User.password_reset_token_hash == token_hash))
+    if not user or not user.password_reset_expires_at:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid reset link.")
+    if user.password_reset_expires_at < _now():
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Reset link expired.")
+
+    user.password_hash = hash_password(payload.password)
+    user.password_reset_token_hash = None
+    user.password_reset_expires_at = None
+    db.commit()
+    return {"status": "ok"}
