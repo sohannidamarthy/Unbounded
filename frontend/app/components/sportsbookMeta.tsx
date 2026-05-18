@@ -111,8 +111,31 @@ const fallbackMeta = {
   shortLabel: "SB",
 };
 
+const SPORTSBOOK_ALIASES: Record<string, keyof typeof SPORTSBOOK_META> = {
+  betmgm: "BetMGM",
+  caesars: "Caesars",
+  cz: "Caesars",
+  dk: "DraftKings",
+  draftkings: "DraftKings",
+  "draft kings": "DraftKings",
+  espnbet: "ESPN BET",
+  "espn bet": "ESPN BET",
+  fanduel: "FanDuel",
+  fd: "FanDuel",
+  fanatics: "Fanatics",
+  pointsbet: "PointsBet",
+  "points bet": "PointsBet",
+  pb: "PointsBet",
+};
+
 export function getSportsbookMeta(name: string) {
-  return SPORTSBOOK_META[name] ?? fallbackMeta;
+  const direct = SPORTSBOOK_META[name];
+  if (direct) {
+    return direct;
+  }
+  const normalized = name.trim().toLowerCase().replace(/[_-]+/g, " ");
+  const alias = SPORTSBOOK_ALIASES[normalized] ?? SPORTSBOOK_ALIASES[normalized.replace(/\s+/g, "")];
+  return alias ? SPORTSBOOK_META[alias] : fallbackMeta;
 }
 
 function getLogoCandidates(logoDomain: string) {

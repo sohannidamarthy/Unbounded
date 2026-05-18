@@ -11,6 +11,7 @@ from app.db.session import init_db
 from app.redis_client import get_redis, close_redis
 from app.routes.auth import router as auth_router
 from app.routes.debug import router as debug_router
+from app.routes.arbs import router as arbs_router
 from app.routes.sports import router as sports_router
 
 logger = logging.getLogger(__name__)
@@ -123,3 +124,4 @@ app.include_router(ws_arbs_router)
 app.include_router(debug_router)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(sports_router)
+app.include_router(arbs_router)

@@ -3367,6 +3367,13 @@ a {
   color: #0b2239;
 }
 
+.dashboard-event-popout-saved {
+  margin-top: 10px;
+  color: #62d789;
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .dashboard-event-popout-league-row {
   margin-top: 8px;
   display: flex;
@@ -3482,6 +3489,9 @@ a {
 }
 
 .dashboard-event-popout-market-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: rgba(247, 241, 232, 0.9);
   font-weight: 600;
 }

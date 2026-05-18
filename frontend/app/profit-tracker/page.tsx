@@ -20,7 +20,21 @@ type ProfitEvent = {
   categories: Source[];
 };
 
-const now = new Date("2026-02-17T00:00:00.000Z");
+type SavedLocalBet = {
+  id: string;
+  savedAt?: string;
+  board?: "Live bets" | "Arbitrage" | "EV";
+  matchup?: string;
+  sport?: string;
+  betType?: BetType;
+  oddsA?: string;
+  oddsB?: string;
+  estimatedNet?: number;
+};
+
+const SAVED_BETS_STORAGE_KEY = "unbounded.saved_bets";
+
+const now = new Date();
 
 const events: ProfitEvent[] = [
   {
@@ -186,6 +200,7 @@ const getDateRange = (period: Period, value: string) => {
 };
 
 export default function ProfitTrackerPage() {
+  const [savedEvents, setSavedEvents] = useState<ProfitEvent[]>([]);
   const [period, setPeriod] = useState<Period>("month");
   const [periodValues, setPeriodValues] = useState<Record<Period, string>>({
     day: toDateInputValue(now),
@@ -215,9 +230,40 @@ export default function ProfitTrackerPage() {
     [period, periodValues]
   );
 
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(SAVED_BETS_STORAGE_KEY);
+      const savedBets = raw ? (JSON.parse(raw) as SavedLocalBet[]) : [];
+      if (!Array.isArray(savedBets)) {
+        return;
+      }
+      setSavedEvents(
+        savedBets.map((bet) => ({
+          id: bet.id,
+          settledAt: bet.savedAt ?? new Date().toISOString(),
+          matchup: bet.matchup ?? "Saved opportunity",
+          sport: bet.sport ?? "Sports",
+          betType: bet.betType ?? "moneyline",
+          odds: [bet.oddsA, bet.oddsB].filter(Boolean).join(" / ") || "--",
+          net: Number.isFinite(Number(bet.estimatedNet)) ? Number(bet.estimatedNet) : 0,
+          categories:
+            bet.board === "Arbitrage"
+              ? ["arb"]
+              : bet.board === "EV"
+                ? ["ev"]
+                : ["live"],
+        }))
+      );
+    } catch {
+      setSavedEvents([]);
+    }
+  }, []);
+
+  const allEvents = useMemo(() => [...savedEvents, ...events], [savedEvents]);
+
   const inScope = useMemo(
     () =>
-      events
+      allEvents
         .filter((entry) => {
           const settled = new Date(entry.settledAt);
           return settled >= selectedRange.start && settled < selectedRange.end;
@@ -230,7 +276,7 @@ export default function ProfitTrackerPage() {
           (a, b) =>
             new Date(a.settledAt).getTime() - new Date(b.settledAt).getTime()
         ),
-    [selectedRange, selectedBetTypes, selectedSources]
+    [allEvents, selectedRange, selectedBetTypes, selectedSources]
   );
 
   const totalNet = useMemo(

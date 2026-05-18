@@ -121,6 +121,8 @@ def blobs_to_rows(blobs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                 if not isinstance(leg, dict):
                     continue
                 odds_decimal = leg.get("odds_decimal")
+                odds_american = leg.get("odds_american")
+                bet_url = leg.get("bet_url")
                 leg_ts = leg.get("ts_ingested_ms", blob_ts)
 
                 if odds_decimal is None or leg_ts is None:
@@ -139,6 +141,8 @@ def blobs_to_rows(blobs: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
                     "book": book,
                     "outcome_key": outcome_key,
                     "odds_decimal": float(odds_decimal),
+                    "odds_american": odds_american,
+                    "bet_url": bet_url,
                     "ts_ingested_ms": int(leg_ts),
                 })
     return rows
@@ -286,6 +290,8 @@ def main() -> None:
                         "outcome_key": outcome,
                         "book": row["book"],
                         "odds_decimal": float(row["odds_decimal"]),
+                        "odds_american": row.get("odds_american"),
+                        "bet_url": row.get("bet_url"),
                         "ts_ingested_ms": ts,
                         "line": any_row.get("line"),
                         "market_instance_id": market_instance_id,

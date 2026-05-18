@@ -6,8 +6,129 @@ import { useRouter } from "next/navigation";
 import { ALL_BET_TYPES, BET_TYPE_LABELS, BET_TYPE_OPTIONS, type BetType } from "../components/betTypeConfig";
 import { DashboardHeader } from "../components/DashboardHeader";
 import { DraggableBetCalculatorPopup } from "../components/DraggableBetCalculatorPopup";
+import { SportsbookLogo, getSportsbookMeta } from "../components/sportsbookMeta";
 
 const SAVED_EMAIL_KEY = "unbounded.saved_email";
+const TOKEN_STORAGE_KEY = "unbounded.access_token";
+const SAVED_BETS_STORAGE_KEY = "unbounded.saved_bets";
+
+type LiveArbLeg = {
+  outcome_key: string;
+  book: string;
+  odds_decimal: number;
+  odds_american?: number | string;
+  ts_ingested_ms?: number;
+  line?: number | string | null;
+  market_instance_id?: string;
+  bet_url?: string;
+};
+
+type LiveArbPayload = {
+  arb_id: string;
+  sport: string;
+  league?: string;
+  event_id?: string;
+  event_name?: string;
+  start_time_ms?: number;
+  market_key?: string;
+  market_instance_id?: string;
+  line?: number | string | null;
+  roi?: number;
+  roi_raw?: number;
+  legs?: LiveArbLeg[];
+};
+
+type DashboardArbRow = {
+  id: string;
+  start: string;
+  sport: string;
+  league: string;
+  match: string;
+  betType: BetType;
+  netProfit: string;
+  roi: number;
+  legs: LiveArbLeg[];
+  isLiveData: boolean;
+};
+
+function decimalToAmerican(decimal: number) {
+  if (!Number.isFinite(decimal) || decimal <= 1) {
+    return "--";
+  }
+  if (decimal >= 2) {
+    return `+${Math.round((decimal - 1) * 100)}`;
+  }
+  return `${Math.round(-100 / (decimal - 1))}`;
+}
+
+function formatStartTime(startTimeMs?: number) {
+  if (!startTimeMs) {
+    return "Live";
+  }
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  }).format(new Date(startTimeMs));
+}
+
+function mapMarketToBetType(marketKey?: string): BetType {
+  const normalized = (marketKey ?? "").toLowerCase();
+  if (normalized.includes("prop")) {
+    return "player-prop";
+  }
+  if (normalized.includes("alt")) {
+    return "alt-line";
+  }
+  if (normalized.includes("spread")) {
+    return "spread";
+  }
+  if (normalized.includes("total")) {
+    return "total";
+  }
+  return "moneyline";
+}
+
+function sportLabel(value?: string) {
+  const normalized = (value ?? "").toLowerCase();
+  if (normalized.includes("nba") || normalized.includes("basketball")) {
+    return "Basketball";
+  }
+  if (normalized.includes("nfl") || normalized.includes("football")) {
+    return "Football";
+  }
+  if (normalized.includes("mlb") || normalized.includes("baseball")) {
+    return "Baseball";
+  }
+  if (normalized.includes("soccer") || normalized.includes("mls") || normalized.includes("epl")) {
+    return "Soccer";
+  }
+  return value || "Sports";
+}
+
+function mapArbPayloadToRow(arb: LiveArbPayload): DashboardArbRow {
+  const roi = Number(arb.roi ?? arb.roi_raw ?? 0);
+  const legs = Array.isArray(arb.legs) ? arb.legs : [];
+  const eventName = arb.event_name || arb.event_id || "Live event";
+  const legSummary = legs
+    .slice(0, 2)
+    .map((leg) => `${leg.outcome_key} (${decimalToAmerican(Number(leg.odds_decimal))})`)
+    .join(" vs. ");
+  const marketSuffix = arb.line != null ? ` ${arb.line}` : "";
+
+  return {
+    id: arb.arb_id,
+    start: formatStartTime(arb.start_time_ms),
+    sport: sportLabel(arb.sport),
+    league: arb.league || String(arb.sport || "").toUpperCase() || "Live",
+    match: legSummary || `${eventName}${marketSuffix}`,
+    betType: mapMarketToBetType(arb.market_key),
+    netProfit: `+${(roi * 100).toFixed(2)}%`,
+    roi,
+    legs,
+    isLiveData: true,
+  };
+}
 
 function formatDisplayName(value: string | null) {
   if (!value) {
@@ -51,6 +172,9 @@ export default function DashboardPage() {
     teamB: string;
     oddsA: string;
     oddsB: string;
+    betType?: BetType;
+    legs?: LiveArbLeg[];
+    isLiveData?: boolean;
   };
   const liveBetValue = 25;
   const [expandedPanel, setExpandedPanel] = useState<
@@ -90,6 +214,9 @@ export default function DashboardPage() {
   const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
   const [includeSelfInLeaderboard, setIncludeSelfInLeaderboard] = useState(false);
   const [currentUserName, setCurrentUserName] = useState("You");
+  const [liveArbRows, setLiveArbRows] = useState<DashboardArbRow[]>([]);
+  const [arbFeedStatus, setArbFeedStatus] = useState<"connecting" | "live" | "empty" | "offline">("connecting");
+  const [savedBetStatus, setSavedBetStatus] = useState("");
   const isLiveExpanded = expandedPanel === "live";
   const isWithdrawalExpanded = expandedPanel === "withdrawal";
   const isToolsExpanded = expandedPanel === "tools";
@@ -151,46 +278,66 @@ export default function DashboardPage() {
     Baseball: 2.05,
     Soccer: 2.4,
   };
-  const arbTableRows = [
+  const previewArbTableRows: DashboardArbRow[] = [
     {
+      id: "preview-pacers-lakers",
       start: "12:00 AM CT",
       sport: "Basketball",
       league: "NBA",
       match: "Pacers (+110) vs. Lakers (-110)",
       betType: "moneyline" as BetType,
       netProfit: "+$42",
+      roi: 0,
+      legs: [],
+      isLiveData: false,
     },
     {
+      id: "preview-heat-celtics",
       start: "1:30 AM CT",
       sport: "Basketball",
       league: "NBA",
       match: "Heat (+145) vs. Celtics (-160)",
       betType: "player-prop" as BetType,
       netProfit: "+$31",
+      roi: 0,
+      legs: [],
+      isLiveData: false,
     },
     {
+      id: "preview-wolves-reapers",
       start: "3:15 PM CT",
       sport: "Football",
       league: "NFL",
       match: "Wolves (+120) vs. Reapers (-130)",
       betType: "spread" as BetType,
       netProfit: "+$27",
+      roi: 0,
+      legs: [],
+      isLiveData: false,
     },
     {
+      id: "preview-dodgers-mets",
       start: "6:10 PM CT",
       sport: "Baseball",
       league: "MLB",
       match: "Dodgers (-105) vs. Mets (+102)",
       betType: "total" as BetType,
       netProfit: "+$18",
+      roi: 0,
+      legs: [],
+      isLiveData: false,
     },
     {
+      id: "preview-harbor-northbridge",
       start: "7:45 PM CT",
       sport: "Soccer",
       league: "MLS",
       match: "Harbor FC (+180) vs. Northbridge (-190)",
       betType: "alt-line" as BetType,
       netProfit: "+$22",
+      roi: 0,
+      legs: [],
+      isLiveData: false,
     },
   ];
   const leaderboardPreviewBoards = [
@@ -230,6 +377,69 @@ export default function DashboardPage() {
   useEffect(() => {
     setCurrentUserName(formatDisplayName(window.localStorage.getItem(SAVED_EMAIL_KEY)));
   }, []);
+
+  useEffect(() => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const token = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+    let isMounted = true;
+
+    fetch(`${apiBase}/v1/arbs?sport=all&limit=50`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Arb feed request failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((payload: { arbs?: LiveArbPayload[] }) => {
+        if (!isMounted) {
+          return;
+        }
+        const rows = (payload.arbs ?? []).map(mapArbPayloadToRow);
+        setLiveArbRows(rows);
+        setArbFeedStatus(rows.length ? "live" : "empty");
+      })
+      .catch(() => {
+        if (isMounted) {
+          setArbFeedStatus("offline");
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const wsUrl = apiBase.replace(/^http/i, "ws").replace(/\/$/, "") + "/ws/arbs";
+    const socket = new WebSocket(wsUrl);
+
+    socket.onopen = () => setArbFeedStatus((current) => (current === "live" ? "live" : "empty"));
+    socket.onmessage = (event) => {
+      try {
+        const payload = JSON.parse(event.data) as LiveArbPayload & { type?: string };
+        if (payload.type === "ping" || !payload.arb_id) {
+          return;
+        }
+        const row = mapArbPayloadToRow(payload);
+        setLiveArbRows((current) => {
+          const next = [row, ...current.filter((item) => item.id !== row.id)];
+          return next.slice(0, 50);
+        });
+        setArbFeedStatus("live");
+      } catch {
+        setArbFeedStatus("offline");
+      }
+    };
+    socket.onerror = () => setArbFeedStatus("offline");
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   const liveTableRows: {
     start: string;
     sport: Sport;
@@ -325,10 +535,15 @@ export default function DashboardPage() {
     .filter((row) => selectedLiveBetTypes.includes(row.betType))
     .slice(0, 3);
   const activeArbBetTypes = arbEvView === "arb" ? selectedArbBetTypes : selectedEvBetTypes;
+  const arbTableRows = arbEvView === "arb" && liveArbRows.length > 0 ? liveArbRows : previewArbTableRows;
   const filteredArbRows = arbTableRows.filter((row) =>
     activeArbBetTypes.includes(row.betType)
   );
   const visibleArbRows = filteredArbRows.slice(0, 3);
+  const bestArbEdge = liveArbRows.length
+    ? `${(Math.max(...liveArbRows.map((row) => row.roi)) * 100).toFixed(2)}%`
+    : "Waiting";
+  const topArbSport = liveArbRows[0]?.sport ?? "Waiting";
   const liveDataSport: Sport =
     activeSport === "All" ? "Basketball" : activeSport;
   const allLiveBetTypesSelected = selectedLiveBetTypes.length === ALL_BET_TYPES.length;
@@ -595,6 +810,9 @@ export default function DashboardPage() {
     league,
     match,
     odds,
+    betType,
+    legs,
+    isLiveData,
   }: {
     id: string;
     board: "Live bets" | "Arbitrage" | "EV";
@@ -603,8 +821,13 @@ export default function DashboardPage() {
     league: string;
     match: string;
     odds?: string;
+    betType?: BetType;
+    legs?: LiveArbLeg[];
+    isLiveData?: boolean;
   }): EventPopout => {
     const parsed = parseMatchup(match, odds);
+    const firstLeg = legs?.[0];
+    const secondLeg = legs?.[1];
     return {
       id,
       board,
@@ -612,10 +835,13 @@ export default function DashboardPage() {
       sport,
       league,
       match,
-      teamA: parsed.teamA,
-      teamB: parsed.teamB,
-      oddsA: parsed.oddsA,
-      oddsB: parsed.oddsB,
+      teamA: firstLeg?.outcome_key ?? parsed.teamA,
+      teamB: secondLeg?.outcome_key ?? parsed.teamB,
+      oddsA: firstLeg ? decimalToAmerican(Number(firstLeg.odds_decimal)) : parsed.oddsA,
+      oddsB: secondLeg ? decimalToAmerican(Number(secondLeg.odds_decimal)) : parsed.oddsB,
+      betType,
+      legs,
+      isLiveData,
     };
   };
   const openEventPopout = (event: EventPopout) => {
@@ -623,6 +849,7 @@ export default function DashboardPage() {
     setManualEntryMode(false);
     setManualOddsA(event.oddsA);
     setManualOddsB(event.oddsB);
+    setSavedBetStatus("");
   };
   const activeOddsA = manualEntryMode ? manualOddsA : eventPopout?.oddsA ?? "";
   const activeOddsB = manualEntryMode ? manualOddsB : eventPopout?.oddsB ?? "";
@@ -651,6 +878,33 @@ export default function DashboardPage() {
     if (!eventPopout || eventPopout.id !== rowId) {
       return null;
     }
+    const saveBetLocally = () => {
+      const savedBet = {
+        id: `${eventPopout.id}-${Date.now()}`,
+        sourceId: eventPopout.id,
+        savedAt: new Date().toISOString(),
+        board: eventPopout.board,
+        matchup: eventPopout.match,
+        sport: eventPopout.sport,
+        league: eventPopout.league,
+        betType: eventPopout.betType ?? "moneyline",
+        oddsA: activeOddsA,
+        oddsB: activeOddsB,
+        estimatedNet: Number(calculatedNetProfit),
+        legs: eventPopout.legs ?? [],
+      };
+      const existing = JSON.parse(window.localStorage.getItem(SAVED_BETS_STORAGE_KEY) || "[]");
+      const next = Array.isArray(existing) ? [savedBet, ...existing].slice(0, 100) : [savedBet];
+      window.localStorage.setItem(SAVED_BETS_STORAGE_KEY, JSON.stringify(next));
+      setSavedBetStatus("Saved locally");
+    };
+    const openBetLeg = (leg: LiveArbLeg) => {
+      const fallbackHref = getSportsbookMeta(leg.book).siteHref;
+      const href = leg.bet_url || fallbackHref;
+      if (href && href !== "#") {
+        window.open(href, "_blank", "noopener,noreferrer");
+      }
+    };
     return (
       <div className="dashboard-event-dropdown-row">
         <aside className="dashboard-event-popout" aria-label="Selected event">
@@ -679,7 +933,12 @@ export default function DashboardPage() {
           </div>
           <div className="dashboard-event-popout-market">
             <div className="dashboard-event-popout-market-row">
-              <span>{eventPopout.teamA}</span>
+              <span>
+                {eventPopout.legs?.[0] ? (
+                  <SportsbookLogo sportsbook={eventPopout.legs[0].book} size={22} />
+                ) : null}
+                {eventPopout.teamA}
+              </span>
               {manualEntryMode ? (
                 <input
                   value={manualOddsA}
@@ -691,7 +950,12 @@ export default function DashboardPage() {
               )}
             </div>
             <div className="dashboard-event-popout-market-row">
-              <span>{eventPopout.teamB}</span>
+              <span>
+                {eventPopout.legs?.[1] ? (
+                  <SportsbookLogo sportsbook={eventPopout.legs[1].book} size={22} />
+                ) : null}
+                {eventPopout.teamB}
+              </span>
               {manualEntryMode ? (
                 <input
                   value={manualOddsB}
@@ -703,6 +967,20 @@ export default function DashboardPage() {
               )}
             </div>
           </div>
+          {eventPopout.legs?.length ? (
+            <div className="dashboard-event-popout-actions">
+              {eventPopout.legs.map((leg) => (
+                <button
+                  type="button"
+                  className="dashboard-event-popout-btn"
+                  key={`${eventPopout.id}-${leg.book}-${leg.outcome_key}`}
+                  onClick={() => openBetLeg(leg)}
+                >
+                  Bet {leg.outcome_key} at {leg.book}
+                </button>
+              ))}
+            </div>
+          ) : null}
           <div className="dashboard-event-popout-grid">
             <div>
               <span>Start</span>
@@ -724,11 +1002,14 @@ export default function DashboardPage() {
             <button
               type="button"
               className="dashboard-event-popout-btn dashboard-event-popout-btn--primary"
-              onClick={() => setManualEntryMode(false)}
+              onClick={saveBetLocally}
             >
               Enter bet
             </button>
           </div>
+          {savedBetStatus ? (
+            <div className="dashboard-event-popout-saved">{savedBetStatus}</div>
+          ) : null}
         </aside>
       </div>
     );
@@ -894,6 +1175,7 @@ export default function DashboardPage() {
                               league: row.league,
                               match: row.match,
                               odds: row.odds,
+                              betType: row.betType,
                             })
                           )
                         }
@@ -1025,6 +1307,7 @@ export default function DashboardPage() {
                                 league: row.league,
                                 match: row.match,
                                 odds: row.odds,
+                                betType: row.betType,
                               })
                             )
                           }
@@ -1209,22 +1492,24 @@ export default function DashboardPage() {
                   </h3>
                   <p>
                     {arbEvView === "arb"
-                      ? "Three fast looks from the current arb board."
+                      ? arbFeedStatus === "live"
+                        ? "Live arb board synced from backend feed."
+                        : "Current arb board will switch to live opportunities when the feed publishes."
                       : "Three quick positive EV looks from the current board."}
                   </p>
                 </div>
                 <div className="dashboard-compact-stats">
                   <div className="dashboard-compact-stat">
                     <span>{arbEvView === "arb" ? "Live arbs" : "Live +EV"}</span>
-                    <strong>{arbEvView === "arb" ? "18" : "27"}</strong>
+                    <strong>{arbEvView === "arb" ? liveArbRows.length : "27"}</strong>
                   </div>
                   <div className="dashboard-compact-stat">
                     <span>Top sport</span>
-                    <strong>Basketball</strong>
+                    <strong>{arbEvView === "arb" ? topArbSport : "Basketball"}</strong>
                   </div>
                   <div className="dashboard-compact-stat">
                     <span>Best edge</span>
-                    <strong>{arbEvView === "arb" ? "4.8%" : "+6.2%"}</strong>
+                    <strong>{arbEvView === "arb" ? bestArbEdge : "+6.2%"}</strong>
                   </div>
                 </div>
               </div>
@@ -1309,21 +1594,50 @@ export default function DashboardPage() {
                     No {arbEvView === "arb" ? "arbitrage" : "positive EV"} bets match the selected bet types.
                   </div>
                 ) : null}
-                {visibleArbRows.map((row) => (
-                  <div className="dashboard-arb-row" role="row" key={`${arbEvView}-${row.start}-${row.match}`}>
-                    <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                      {row.start}
-                    </span>
-                    <span className="dashboard-arb-cell dashboard-arb-cell--details">
-                      <span className="dashboard-arb-league">{row.league}</span>
-                      <span className="dashboard-arb-match">{row.match}</span>
-                      <span className="dashboard-arb-sport">{row.sport}</span>
-                      <span className="dashboard-bet-type-badge dashboard-bet-type-badge--inline">
-                        {BET_TYPE_LABELS[row.betType]}
-                      </span>
-                    </span>
-                  </div>
-                ))}
+                {visibleArbRows.map((row) => {
+                  const rowId = `${arbEvView}-${row.id}`;
+                  return (
+                    <Fragment key={rowId}>
+                      <div
+                        className={`dashboard-arb-row${
+                          eventPopout?.id === rowId ? " is-selected" : ""
+                        }`}
+                        role="row"
+                        onClick={() =>
+                          openEventPopout(
+                            buildEventPopout({
+                              id: rowId,
+                              board: arbEvView === "arb" ? "Arbitrage" : "EV",
+                              start: row.start,
+                              sport: row.sport,
+                              league: row.league,
+                              match: row.match,
+                              betType: row.betType,
+                              legs: row.legs,
+                              isLiveData: row.isLiveData,
+                            })
+                          )
+                        }
+                      >
+                        <span className="dashboard-arb-cell dashboard-arb-cell--time">
+                          {row.start}
+                        </span>
+                        <span className="dashboard-arb-cell dashboard-arb-cell--details">
+                          <span className="dashboard-arb-league">{row.league}</span>
+                          <span className="dashboard-arb-match">{row.match}</span>
+                          <span className="dashboard-arb-sport">{row.sport}</span>
+                          <span className="dashboard-net-profit-badge">
+                            Edge {row.netProfit}
+                          </span>
+                          <span className="dashboard-bet-type-badge dashboard-bet-type-badge--inline">
+                            {BET_TYPE_LABELS[row.betType]}
+                          </span>
+                        </span>
+                      </div>
+                      {renderEventDropdown(rowId)}
+                    </Fragment>
+                  );
+                })}
               </div>
             </section>
             <section

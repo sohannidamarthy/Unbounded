@@ -42,7 +42,7 @@ async def write_latest_market_blob(
     start_time_ms: int,
     market_key: str,
     line: Optional[float],
-    # books is: {book_key: {outcome_key: {odds_decimal, odds_american?, ts_ingested_ms}}}
+    # books is: {book_key: {outcome_key: {odds_decimal, odds_american?, bet_url?, ts_ingested_ms}}}
     books: Dict[str, Dict[str, Dict[str, Any]]],
     outcomes: list[str],
 ) -> str:
