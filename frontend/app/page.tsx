@@ -55,6 +55,7 @@ export default function Home() {
   const [isPricingSubmitting, setIsPricingSubmitting] = useState(false);
   const [pricingNotified, setPricingNotified] = useState(false);
   const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
+  const [newsletterSource, setNewsletterSource] = useState<"newsletter" | "founders">("newsletter");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const heroImage = HERO_IMAGES[activeHeroIndex];
@@ -80,6 +81,11 @@ export default function Home() {
 
   const handleLogoutClick = () => {
     handleLogout();
+  };
+
+  const openWaitlistModal = (source: "newsletter" | "founders") => {
+    setNewsletterSource(source);
+    setIsNewsletterOpen(true);
   };
 
   useEffect(() => {
@@ -176,7 +182,7 @@ export default function Home() {
           <a href="/arbitrage">Arbitrage</a>
           <a href="/positive-ev">Positive EV</a>
           <a href="/tools">Tools</a>
-          <a href="/tutorials">Tutorials</a>
+          <a href="/tutorials">Discover</a>
           <a href="#pricing">Pricing</a>
         </nav>
         <div className="header-actions">
@@ -205,7 +211,7 @@ export default function Home() {
                     Billing and User payment
                   </a>
                   <a className="account-dropdown-item" role="menuitem" href="/tutorials">
-                    Tutorials
+                    Discover
                   </a>
                   <button
                     className="account-dropdown-item"
@@ -272,9 +278,13 @@ export default function Home() {
                 >
                   Create account
                 </a>
-                <a className="ghost pulse-on-hover" href="#">
-                  Enter promo code
-                </a>
+                <button
+                  className="ghost pulse-on-hover"
+                  type="button"
+                  onClick={() => openWaitlistModal("founders")}
+                >
+                  Founders Circle
+                </button>
               </div>
             </div>
           </div>
@@ -329,7 +339,7 @@ export default function Home() {
             <button
               className="primary pulse-on-hover"
               type="button"
-              onClick={() => setIsNewsletterOpen(true)}
+              onClick={() => openWaitlistModal("newsletter")}
             >
               Join newsletter
             </button>
@@ -347,21 +357,21 @@ export default function Home() {
                 </p>
               </div>
               <div className="why-badges">
-                <span>No hidden fees</span>
-                <span>Live betting included</span>
-                <span>Withdrawal advice</span>
+                <span>100+ sportsbook workflows</span>
+                <span>Fast withdrawal notes</span>
+                <span>Profit tracking included</span>
               </div>
             </div>
             <div className="why-comparison">
               <div className="why-highlight">
                 <h3>Unbounded</h3>
                 <ul>
-                  <li>Unified scan, tag, share, and execution workflow</li>
-                  <li>AI-assisted signal filters, recaps, and bet notes</li>
-                  <li>Profit tracking tied back to real decisions</li>
+                  <li>Scan arbitrage and +EV boards without jumping between tools</li>
+                  <li>Track profit, notes, and outcomes in one reviewable place</li>
+                  <li>Use a simple calculator and validator before saving bets</li>
                   <li>Transparent tier pricing before signup</li>
-                  <li>Live betting and withdrawal workflow support</li>
-                  <li>Built for individual bettors and small teams</li>
+                  <li>Coverage designed around 100+ sportsbook workflows</li>
+                  <li>Fastest withdrawal methods documented by sportsbook as coverage expands</li>
                 </ul>
               </div>
               <div className="why-contrast">
@@ -369,36 +379,54 @@ export default function Home() {
                 <ul>
                   <li>Separate scanners, calculators, and trackers</li>
                   <li>Alerts without stake size or decision context</li>
-                  <li>Live betting features hidden behind add-ons</li>
+                  <li>Useful features held back behind unclear add-ons</li>
                   <li>Little guidance after the bet is placed</li>
                   <li>More manual exporting and tab switching</li>
                 </ul>
               </div>
             </div>
-            <div className="workflow-steps">
-              <div>
-                <span>01</span>
-                <p>Live sweep with AI-prioritized opportunities</p>
-              </div>
-              <div>
-                <span>02</span>
-                <p>Team-ready workflows from alert to action</p>
-              </div>
-              <div>
-                <span>03</span>
-                <p>Audit-ready recaps for every decision</p>
-              </div>
+            <div className="workflow-benefits">
+              <article>
+                <strong>Simple enough to use daily</strong>
+                <p>Boards, calculator, tracker, and education stay connected so the workflow feels like one tool.</p>
+              </article>
+              <article>
+                <strong>Built beyond top-tier users</strong>
+                <p>Select, Premium, and Executive users all get clear value, with features scaling by workflow depth.</p>
+              </article>
+              <article>
+                <strong>Founder feedback loop</strong>
+                <p>Early members help decide what gets added next across dashboards, tutorials, and discovery.</p>
+              </article>
             </div>
           </div>
+        </section>
+
+        <section id="founders-circle" className="section founders-circle">
+          <div>
+            <span className="billing-eyebrow">Exclusive Founders Council</span>
+            <h2>Join the first 300 Founders Circle spots.</h2>
+            <p>
+              Get launch updates, early feature notes, waitlist discounts, and
+              a direct line into what Unbounded builds next.
+            </p>
+          </div>
+          <button
+            className="primary pulse-on-hover"
+            type="button"
+            onClick={() => openWaitlistModal("founders")}
+          >
+            Join Founders Circle
+          </button>
         </section>
 
         <section id="testimonials" className="section testimonials">
           <div className="section-header testimonials-header">
             <div>
-              <h2>Trusted by operators who live the edge</h2>
+              <h2>Trusted by founders and operators building sharper workflows</h2>
               <p>
-                Sharp bettors rely on Unbounded to cut
-                delay, document decisions, and move faster during live windows.
+                Early users rely on Unbounded to cut delay, document decisions,
+                and move faster during live windows.
               </p>
             </div>
             <div className="testimonial-controls">
@@ -475,9 +503,15 @@ export default function Home() {
           <a href="/arbitrage">Arbitrage</a>
           <a href="/positive-ev">Positive EV</a>
           <a href="/tools">Tools</a>
-          <a href="/tutorials">Tutorials</a>
+          <a href="/tutorials">Discover</a>
           <a href="/billing">Billing</a>
+          <a href="/status">Status</a>
+          <a href="/terms">Terms</a>
+          <a href="/disclaimer">Disclaimer</a>
         </div>
+        <p className="footer-legal">
+          21+ only. Unbounded is an education, tracking, and workflow tool; it does not place bets or guarantee profit.
+        </p>
       </footer>
       {isNewsletterOpen ? (
         <div
@@ -500,11 +534,18 @@ export default function Home() {
             >
               ×
             </button>
-            <span className="billing-eyebrow">Newsletter</span>
-            <h2 id="newsletter-title">Get Unbounded updates</h2>
+            <span className="billing-eyebrow">
+              {newsletterSource === "founders" ? "Founders Circle" : "Newsletter"}
+            </span>
+            <h2 id="newsletter-title">
+              {newsletterSource === "founders"
+                ? "Join the Founders Circle"
+                : "Get Unbounded updates"}
+            </h2>
             <p>
-              Product updates, tier announcements, and practical betting
-              workflow notes.
+              {newsletterSource === "founders"
+                ? "Claim a waitlist spot for launch updates, discounts, and early feature notes. Founders Circle starts with 300 spots."
+                : "Product updates, tier announcements, and practical betting workflow notes."}
             </p>
             <form className="pricing-form newsletter-modal-form" onSubmit={handlePricingSubmit}>
               <input

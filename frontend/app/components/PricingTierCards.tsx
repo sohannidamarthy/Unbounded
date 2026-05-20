@@ -48,7 +48,7 @@ export function PricingTierCards({ context = "marketing" }: PricingTierCardsProp
               ))}
             </ul>
             <p className="tier-sportsbook-note">
-              Supports workflows across 100+ sportsbooks.
+              Built for workflows across 100+ sportsbooks, with withdrawal and account notes documented as coverage expands.
             </p>
             <a className="primary pulse-on-hover" href="/billing">
               Choose {plan.name}

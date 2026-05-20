@@ -220,13 +220,14 @@ const TIER_OPTIONS: {
     value: "executive",
     label: "Executive",
     accent: "gold",
-    description: "Highest-signal tier for operators who want priority tools.",
+    description: "Priority tier for operators who want early feature access and higher-signal tools.",
     features: [
       "Everything in Premium",
       "AI bet recommendations and smart parlay builder",
       "Time-to-decay meter and historical odds",
       "Predictive line movement signals",
-      "Private Executive leaderboard"
+      "Private Executive leaderboard",
+      "Priority Founders Circle previews"
     ]
   }
 ];
@@ -1625,6 +1626,11 @@ export default function AuthPage() {
                     />
                     <span>Remember this account on this device</span>
                   </label>
+                  <p className="auth-legal-note">
+                    By creating an account, you confirm you are 21+ where
+                    required and agree to the <a href="/terms">Terms</a> and{" "}
+                    <a href="/disclaimer">Responsible betting disclaimer</a>.
+                  </p>
                 </>
               ) : isSignupStepTwo ? (
                 <>

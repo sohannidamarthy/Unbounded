@@ -56,7 +56,7 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
           <a href="/arbitrage">Arbitrage</a>
           <a href="/positive-ev">Positive EV</a>
           <a href="/tools">Tools</a>
-          <a href="/tutorials">Tutorials</a>
+          <a href="/tutorials">Discover</a>
         </nav>
         <div className="header-actions">
           {isAuthReady ? (
@@ -79,9 +79,9 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
                   <a className="account-dropdown-item" role="menuitem" href="/billing">
                     Billing and User payment
                   </a>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
-                    Tutorials
-                  </button>
+                  <a className="account-dropdown-item" role="menuitem" href="/tutorials">
+                    Discover
+                  </a>
                   <button
                     className="account-dropdown-item"
                     type="button"
@@ -113,9 +113,15 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
           <a href="/arbitrage">Arbitrage</a>
           <a href="/positive-ev">Positive EV</a>
           <a href="/tools">Tools</a>
-          <a href="/tutorials">Tutorials</a>
+          <a href="/tutorials">Discover</a>
           <a href="/billing">Billing</a>
+          <a href="/status">Status</a>
+          <a href="/terms">Terms</a>
+          <a href="/disclaimer">Disclaimer</a>
         </div>
+        <p className="footer-legal">
+          21+ only. Unbounded is an education, tracking, and workflow tool; it does not place bets or guarantee profit.
+        </p>
       </footer>
     </div>
   );

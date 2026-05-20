@@ -16,15 +16,15 @@ export const PRICING_PLANS: PricingPlan[] = [
     annualMonthlyEquivalent: "1.79",
     tag: "Tier one",
     description:
-      "Core access to precision-driven arbitrage and AI-powered insights.",
+      "Core access for learning the workflow, tracking bets, and testing basic market edges.",
     features: [
-      "Limited arbitrage access for moneyline only",
+      "Moneyline arbitrage access",
       "Limited +EV opportunities and live odds coverage",
       "Profit calculator",
       "Public leaderboard and top bets feed",
       "Validator and manual entry tool",
       "Sports and league selector",
-      "Light ads and minimal pop-ups",
+      "Founders Circle waitlist updates",
       "Newsletter-only mode included",
       "7-day free trial"
     ]
@@ -36,14 +36,14 @@ export const PRICING_PLANS: PricingPlan[] = [
     annualMonthlyEquivalent: "12.59",
     tag: "Most popular",
     description:
-      "Full access for active bettors who want sharper boards, signals, and recommendations.",
+      "Full access for active bettors who want sharper boards, cleaner signals, and fewer tabs.",
     features: [
       "All arbitrage opportunities and +EV bets",
       "Live odds",
       "Profit calculator",
       "Public leaderboard with leaders' bets",
       "Validator and manual entry",
-      "Fastest withdrawal methods",
+      "Fastest withdrawal methods by sportsbook",
       "Sports and league selector",
       "Friction score",
       "Community-enabled bet flagging and trust scoring",
@@ -60,7 +60,7 @@ export const PRICING_PLANS: PricingPlan[] = [
     annualMonthlyEquivalent: "23.39",
     tag: "Best annual value",
     description:
-      "Priority workflow access for heavier operators who want the highest-signal tools.",
+      "Priority access for operators who want the highest-signal workflow and earliest feature drops.",
     features: [
       "Everything in Premium",
       "AI bet recommendations and AI smart parlay builder",
@@ -69,6 +69,7 @@ export const PRICING_PLANS: PricingPlan[] = [
       "Predictive line movement signals",
       "AI confidence score per bet",
       "Private Executive leaderboard",
+      "Priority Founders Circle feature previews",
       "Executive-only opportunities and more"
     ]
   }

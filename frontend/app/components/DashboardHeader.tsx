@@ -168,7 +168,7 @@ export function DashboardHeader({ onOpenBetCalculator }: DashboardHeaderProps) {
               href="/tutorials"
               onClick={() => setIsAccountMenuOpen(false)}
             >
-              Tutorials
+              Discover
             </a>
             <button
               className="account-dropdown-item"
