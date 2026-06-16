@@ -4862,6 +4862,8 @@ a {
 }
 
 .site-header {
+  position: relative;
+  z-index: 100;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
@@ -5918,7 +5920,7 @@ a {
   background: rgba(0, 22, 40, 0.55);
 }
 
-.pricing-waitlist h3 {
+.pricing-waitlist h3 { color: #f2c969 !important;
   font-size: 18px;
 }
 

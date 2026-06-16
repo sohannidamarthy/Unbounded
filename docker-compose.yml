@@ -38,6 +38,51 @@ services:
       - redisdata:/data
     command: ["redis-server", "--appendonly", "yes"]
 
+
+  ingestion:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ingestion
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+    command: ["poetry", "run", "python", "-m", "app.services.ingestion.ingest_odds_api"]
+
+  ev_calculator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ev_calculator
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+    command: ["poetry", "run", "python", "-m", "app.services.ingestion.ev_calculator"]
+
+  arb_scanner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: arb_scanner
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/app
+    command: ["poetry", "run", "python", "-m", "app.workers.arb_scanner"]
 volumes:
   pgdata:
   redisdata:

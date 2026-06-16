@@ -11,9 +11,9 @@ export type PricingPlan = {
 export const PRICING_PLANS: PricingPlan[] = [
   {
     name: "Select",
-    monthlyPrice: "1.99",
-    annualPrice: "21.49",
-    annualMonthlyEquivalent: "1.79",
+    monthlyPrice: "0.99",
+    annualPrice: "323.89",
+    annualMonthlyEquivalent: "29.99",
     tag: "Tier one",
     description:
       "Core access for learning the workflow, tracking bets, and testing basic market edges.",
@@ -31,9 +31,9 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     name: "Premium",
-    monthlyPrice: "13.99",
-    annualPrice: "151.09",
-    annualMonthlyEquivalent: "12.59",
+    monthlyPrice: "3.33",
+    annualPrice: "1079.89",
+    annualMonthlyEquivalent: "99.99",
     tag: "Most popular",
     description:
       "Full access for active bettors who want sharper boards, cleaner signals, and fewer tabs.",
@@ -55,9 +55,9 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     name: "Executive",
-    monthlyPrice: "25.99",
-    annualPrice: "280.69",
-    annualMonthlyEquivalent: "23.39",
+    monthlyPrice: "6.66",
+    annualPrice: "2159.89",
+    annualMonthlyEquivalent: "199.99",
     tag: "Best annual value",
     description:
       "Priority access for operators who want the highest-signal workflow and earliest feature drops.",

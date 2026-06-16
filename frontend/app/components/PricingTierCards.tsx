@@ -11,7 +11,7 @@ export function PricingTierCards({ context = "marketing" }: PricingTierCardsProp
         const pricePeriod =
           context === "marketing" && plan.name === "Select"
             ? "per day"
-            : "per month";
+            : "per day";
 
         return (
           <article

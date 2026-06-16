@@ -325,9 +325,7 @@ export default function Home() {
           <div className="section-header">
             <h2>Pricing plans</h2>
             <p>
-              Choose Select, Premium, or Executive. Select starts at $1.99 per
-              day on this page, and annual payment is highlighted because it
-              saves 10% across the year.
+              Choose Select, Premium, or Executive. Select starts at $0.99/day. Scale up to Premium or Executive for live odds, AI tools, and the sharpest edge on the market. No hidden fees. Pay annually and save 10%.
             </p>
           </div>
           <PricingTierCards />
