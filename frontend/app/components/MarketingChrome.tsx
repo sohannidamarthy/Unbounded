@@ -73,11 +73,11 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
                   <a className="account-dropdown-item" role="menuitem" href="/dashboard">
                     Dashboard
                   </a>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
+                  <a className="account-dropdown-item" role="menuitem" href="/dashboard?panel=settings">
                     Settings
-                  </button>
+                  </a>
                   <a className="account-dropdown-item" role="menuitem" href="/billing">
-                    Billing and User payment
+                    Billing &amp; payments
                   </a>
                   <a className="account-dropdown-item" role="menuitem" href="/tutorials">
                     Discover
@@ -104,24 +104,38 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
       </header>
       {children}
       <footer className="site-footer">
-        <div className="footer-brand">
-          <strong>Unbounded</strong>
-          <span>Precision betting workflows, education, and account tools.</span>
+        <div className="footer-top">
+          <div className="footer-brand">
+            <strong>Unbounded</strong>
+            <span>Precision betting workflows, education, and account tools.</span>
+          </div>
+          <div className="footer-columns">
+            <div className="footer-column">
+              <h4>Product</h4>
+              <a href="/arbitrage">Arbitrage</a>
+              <a href="/positive-ev">Positive EV</a>
+              <a href="/tools">Tools</a>
+              <a href="/billing">Pricing</a>
+            </div>
+            <div className="footer-column">
+              <h4>Learn</h4>
+              <a href="/tutorials">Discover</a>
+              <a href="/status">Status</a>
+              <a href="/billing">Billing</a>
+            </div>
+            <div className="footer-column">
+              <h4>Legal</h4>
+              <a href="/terms">Terms</a>
+              <a href="/disclaimer">Disclaimer</a>
+            </div>
+          </div>
         </div>
-        <div className="footer-links">
-          <a href="/">Home</a>
-          <a href="/arbitrage">Arbitrage</a>
-          <a href="/positive-ev">Positive EV</a>
-          <a href="/tools">Tools</a>
-          <a href="/tutorials">Discover</a>
-          <a href="/billing">Billing</a>
-          <a href="/status">Status</a>
-          <a href="/terms">Terms</a>
-          <a href="/disclaimer">Disclaimer</a>
+        <div className="footer-bottom">
+          <p className="footer-legal">
+            21+ only. Unbounded is an education, tracking, and workflow tool; it does not place bets or guarantee profit.
+          </p>
+          <span className="footer-copyright">© {new Date().getFullYear()} Unbounded</span>
         </div>
-        <p className="footer-legal">
-          21+ only. Unbounded is an education, tracking, and workflow tool; it does not place bets or guarantee profit.
-        </p>
       </footer>
     </div>
   );

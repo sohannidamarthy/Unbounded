@@ -114,54 +114,57 @@ export function DashboardHeader({ onOpenBetCalculator }: DashboardHeaderProps) {
             className={`account-dropdown${isAccountMenuOpen ? " is-open" : ""}`}
             role="menu"
           >
-            <button
+            <a
               className="account-dropdown-item"
-              type="button"
               role="menuitem"
+              href="/settings"
               onClick={() => setIsAccountMenuOpen(false)}
             >
               Settings
-            </button>
+            </a>
             <a
               className="account-dropdown-item"
               role="menuitem"
               href="/billing"
               onClick={() => setIsAccountMenuOpen(false)}
             >
-              Billing and User payment
+              Billing &amp; payments
             </a>
-            <button
+            <a
               className="account-dropdown-item"
-              type="button"
               role="menuitem"
+              href="/daily-bets"
               onClick={() => setIsAccountMenuOpen(false)}
             >
               Daily Bets
-            </button>
-            <button
+            </a>
+            <a
               className="account-dropdown-item"
-              type="button"
               role="menuitem"
+              href="/profit-tracker"
               onClick={() => setIsAccountMenuOpen(false)}
             >
               Live ROI
-            </button>
+            </a>
             <button
-              className="account-dropdown-item"
+              className="account-dropdown-item account-dropdown-item--locked"
               type="button"
               role="menuitem"
+              aria-disabled="true"
               onClick={() => setIsAccountMenuOpen(false)}
             >
+              <span className="account-lock-icon" aria-hidden="true">🔒</span>
               Group Chats
+              <span className="account-soon-badge">Soon</span>
             </button>
-            <button
+            <a
               className="account-dropdown-item"
-              type="button"
               role="menuitem"
+              href="/withdrawals"
               onClick={() => setIsAccountMenuOpen(false)}
             >
               Withdrawals
-            </button>
+            </a>
             <a
               className="account-dropdown-item"
               role="menuitem"

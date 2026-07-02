@@ -59,6 +59,7 @@ type LiveEvPayload = {
 type DashboardArbRow = {
   id: string;
   start: string;
+  isLive: boolean;
   sport: string;
   league: string;
   match: string;
@@ -79,6 +80,13 @@ function decimalToAmerican(decimal: number) {
   return `${Math.round(-100 / (decimal - 1))}`;
 }
 
+function formatTeamName(name: string): string {
+  return name
+    .split("_")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 function formatStartTime(startTimeMs?: number) {
   if (!startTimeMs) {
     return "Live";
@@ -88,6 +96,10 @@ function formatStartTime(startTimeMs?: number) {
     minute: "2-digit",
     timeZoneName: "short",
   }).format(new Date(startTimeMs));
+}
+
+function isEventLive(startTimeMs?: number) {
+  return !startTimeMs || startTimeMs <= Date.now();
 }
 
 function mapMarketToBetType(marketKey?: string): BetType {
@@ -130,13 +142,14 @@ function mapArbPayloadToRow(arb: LiveArbPayload): DashboardArbRow {
   const eventName = arb.event_name || arb.event_id || "Live event";
   const legSummary = legs
     .slice(0, 2)
-    .map((leg) => `${leg.outcome_key} (${decimalToAmerican(Number(leg.odds_decimal))})`)
+    .map((leg) => `${formatTeamName(leg.outcome_key)} (${decimalToAmerican(Number(leg.odds_decimal))})`)
     .join(" vs. ");
   const marketSuffix = arb.line != null ? ` ${arb.line}` : "";
 
   return {
     id: arb.arb_id,
     start: formatStartTime(arb.start_time_ms),
+    isLive: isEventLive(arb.start_time_ms),
     sport: sportLabel(arb.sport),
     league: arb.league || String(arb.sport || "").toUpperCase() || "Live",
     match: legSummary || `${eventName}${marketSuffix}`,
@@ -173,6 +186,7 @@ function mapEvPayloadToRow(ev: LiveEvPayload): DashboardArbRow {
   return {
     id: ev.ev_id,
     start: formatStartTime(ev.start_time_ms),
+    isLive: isEventLive(ev.start_time_ms),
     sport: sportLabel(ev.sport),
     league: ev.league || String(ev.sport || "").toUpperCase() || "EV",
     match: `${ev.event_name || ev.event_id || "EV event"} - ${selection}`,
@@ -485,8 +499,11 @@ export default function DashboardPage() {
     .slice(0, 3);
   const activeArbBetTypes = arbEvView === "arb" ? selectedArbBetTypes : selectedEvBetTypes;
   const arbTableRows = arbEvView === "arb" ? liveArbRows : liveEvRows;
-  const filteredArbRows = arbTableRows.filter((row) =>
-    activeArbBetTypes.includes(row.betType)
+  const filteredArbRows = arbTableRows.filter(
+    (row) =>
+      // Arbitrage only surfaces positive net-profit bets.
+      (arbEvView !== "arb" || row.roi > 0) &&
+      activeArbBetTypes.includes(row.betType)
   );
   const visibleArbRows = filteredArbRows.slice(0, 3);
   const bestArbEdge = liveArbRows.length
@@ -1324,7 +1341,14 @@ export default function DashboardPage() {
                         }
                       >
                         <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                          {row.start}
+                          {row.isLive ? (
+                            <span className="dashboard-live-badge">
+                              <span className="dashboard-live-dot" aria-hidden="true" />
+                              Live
+                            </span>
+                          ) : (
+                            row.start
+                          )}
                         </span>
                         <span className="dashboard-arb-cell dashboard-arb-cell--details">
                           <span className="dashboard-arb-league">{row.league}</span>

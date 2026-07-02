@@ -250,6 +250,13 @@ function mapMarketToBetType(marketKey?: string): BetType {
   return "moneyline";
 }
 
+function formatTeamName(name: string): string {
+  return name
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 function decimalToAmerican(decimal: number) {
   if (!Number.isFinite(decimal) || decimal <= 1) {
     return "--";

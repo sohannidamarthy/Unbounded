@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PricingTierCards } from "./components/PricingTierCards";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
@@ -19,32 +19,32 @@ const TESTIMONIALS = [
   {
     quote:
       "We cut our scan-to-bet time in half. The live alerts feel tailored instead of noisy.",
-    name: "Anonymous",
-    role: "Operations lead, Midwest betting group"
+    name: "Operations lead",
+    role: "Midwest betting group"
   },
   {
     quote:
-      "The recap trail keeps our team aligned on why we passed or pressed. That alone is huge.",
-    name: "Anonymous",
-    role: "Trading manager, private syndicate"
+      "The recap trail keeps our team aligned on why we passed or pressed. That visibility is invaluable.",
+    name: "Trading manager",
+    role: "Private syndicate"
   },
   {
     quote:
       "I finally have one place for alerts, staking, and withdrawals. No more spreadsheet sprawl.",
-    name: "Anonymous",
-    role: "Independent bettor"
+    name: "Independent bettor",
+    role: "Full-time"
   },
   {
     quote:
-      "We added two operators without adding chaos. The audit trail makes reviews painless.",
-    name: "Anonymous",
-    role: "Partner, multi-state group"
+      "We added two operators without adding friction. The audit trail makes reviews painless.",
+    name: "Partner",
+    role: "Multi-state group"
   },
   {
     quote:
-      "Live windows used to be frantic. Now the alert stack and notes keep us consistent.",
-    name: "Anonymous",
-    role: "Lead analyst, small team"
+      "Live windows used to be hectic. Now the alert stack and notes keep us consistent.",
+    name: "Lead analyst",
+    role: "Small team"
   }
 ];
 
@@ -52,12 +52,13 @@ export default function Home() {
   const [activeHeroIndex, setActiveHeroIndex] = useState(0);
   const [activeSecondaryIndex, setActiveSecondaryIndex] = useState(0);
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
-  const [isPricingSubmitting, setIsPricingSubmitting] = useState(false);
-  const [pricingNotified, setPricingNotified] = useState(false);
-  const [isNewsletterOpen, setIsNewsletterOpen] = useState(false);
-  const [newsletterSource, setNewsletterSource] = useState<"newsletter" | "founders">("newsletter");
+  const [isTestimonialPaused, setIsTestimonialPaused] = useState(false);
+  const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false);
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [isNewsletterExpanded, setIsNewsletterExpanded] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const newsletterInputRef = useRef<HTMLInputElement | null>(null);
   const heroImage = HERO_IMAGES[activeHeroIndex];
   const secondaryImage = SECONDARY_IMAGES[activeSecondaryIndex];
   const activeTestimonial = TESTIMONIALS[activeTestimonialIndex];
@@ -79,13 +80,11 @@ export default function Home() {
     setIsAuthenticated(false);
   };
 
-  const handleLogoutClick = () => {
-    handleLogout();
-  };
-
-  const openWaitlistModal = (source: "newsletter" | "founders") => {
-    setNewsletterSource(source);
-    setIsNewsletterOpen(true);
+  const expandNewsletter = () => {
+    setIsNewsletterExpanded(true);
+    window.requestAnimationFrame(() => {
+      newsletterInputRef.current?.focus();
+    });
   };
 
   useEffect(() => {
@@ -111,6 +110,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (isTestimonialPaused) {
+      return;
+    }
     const intervalId = window.setInterval(() => {
       setActiveTestimonialIndex(
         (current) => (current + 1) % TESTIMONIALS.length
@@ -120,18 +122,23 @@ export default function Home() {
     return () => {
       window.clearInterval(intervalId);
     };
-  }, []);
+  }, [isTestimonialPaused]);
 
-  const handlePricingSubmit = async (
+  const showTestimonial = (next: number) => {
+    setActiveTestimonialIndex(
+      (next + TESTIMONIALS.length) % TESTIMONIALS.length
+    );
+  };
+
+  const handleNewsletterSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    if (isPricingSubmitting) {
+    if (isNewsletterSubmitting) {
       return;
     }
 
-    setIsPricingSubmitting(true);
-    setPricingNotified(true);
+    setIsNewsletterSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
     const email = String(formData.get("email") || "").trim();
@@ -150,17 +157,13 @@ export default function Home() {
       if (!response.ok) {
         throw new Error("Request failed");
       }
-
-      event.currentTarget.reset();
-      setPricingNotified(true);
-      setIsNewsletterOpen(false);
     } catch (error) {
-      // Keep optimistic "Notified!" even if the request errors.
+      // Keep optimistic confirmation even if the request errors.
     } finally {
-      setIsPricingSubmitting(false);
+      setNewsletterSubscribed(true);
+      setIsNewsletterSubmitting(false);
     }
   };
-
 
   return (
     <div className="site">
@@ -204,11 +207,11 @@ export default function Home() {
                   >
                     Dashboard
                   </a>
-                  <button className="account-dropdown-item" type="button" role="menuitem">
+                  <a className="account-dropdown-item" role="menuitem" href="/dashboard?panel=settings">
                     Settings
-                  </button>
+                  </a>
                   <a className="account-dropdown-item" role="menuitem" href="/billing">
-                    Billing and User payment
+                    Billing &amp; payments
                   </a>
                   <a className="account-dropdown-item" role="menuitem" href="/tutorials">
                     Discover
@@ -217,7 +220,7 @@ export default function Home() {
                     className="account-dropdown-item"
                     type="button"
                     role="menuitem"
-                    onClick={handleLogoutClick}
+                    onClick={handleLogout}
                   >
                     Log out
                   </button>
@@ -268,8 +271,8 @@ export default function Home() {
               <p className="eyebrow">Premium access</p>
               <h2>Unlock sharper market insight.</h2>
               <p className="lede">
-                A focused workspace for odds, alerts, and edge tracking. Start
-                now or enter a promo to upgrade.
+                A focused workspace for odds, alerts, and edge tracking. Create
+                an account or explore the pricing tiers to get started.
               </p>
               <div className="hero-banner-actions">
                 <a
@@ -278,13 +281,9 @@ export default function Home() {
                 >
                   Create account
                 </a>
-                <button
-                  className="ghost pulse-on-hover"
-                  type="button"
-                  onClick={() => openWaitlistModal("founders")}
-                >
-                  Founders Circle
-                </button>
+                <a className="ghost pulse-on-hover" href="#pricing">
+                  View pricing
+                </a>
               </div>
             </div>
           </div>
@@ -325,22 +324,44 @@ export default function Home() {
           <div className="section-header">
             <h2>Pricing plans</h2>
             <p>
-              Choose Select, Premium, or Executive. Select starts at $0.99/day. Scale up to Premium or Executive for live odds, AI tools, and the sharpest edge on the market. No hidden fees. Pay annually and save 10%.
+              Choose Select, Premium, or Executive. Select starts at $1.99 per
+              day on this page, and annual payment is highlighted because it
+              saves 10% across the year.
             </p>
           </div>
           <PricingTierCards />
-          <div className="pricing-waitlist">
-            <div>
+          <div className={`pricing-waitlist ${isNewsletterExpanded ? "is-expanded" : ""}`}>
+            <div className="pricing-waitlist-copy">
               <h3>Stay updated</h3>
               <p>Receive product updates, tier announcements, and betting workflow notes.</p>
             </div>
-            <button
-              className="primary pulse-on-hover"
-              type="button"
-              onClick={() => openWaitlistModal("newsletter")}
-            >
-              Join newsletter
-            </button>
+            {newsletterSubscribed ? (
+              <p className="newsletter-inline-success" role="status">
+                You&apos;re subscribed. Watch your inbox for the next update.
+              </p>
+            ) : isNewsletterExpanded ? (
+              <form className="newsletter-inline-form" onSubmit={handleNewsletterSubmit}>
+                <input
+                  ref={newsletterInputRef}
+                  name="email"
+                  type="email"
+                  placeholder="Email address"
+                  autoComplete="email"
+                  required
+                />
+                <button className="primary pulse-on-hover" type="submit">
+                  {isNewsletterSubmitting ? "Subscribing..." : "Subscribe"}
+                </button>
+              </form>
+            ) : (
+              <button
+                className="primary pulse-on-hover"
+                type="button"
+                onClick={expandNewsletter}
+              >
+                Join newsletter
+              </button>
+            )}
           </div>
         </section>
         <section id="workflow" className="section workflow">
@@ -393,29 +414,11 @@ export default function Home() {
                 <p>Select, Premium, and Executive users all get clear value, with features scaling by workflow depth.</p>
               </article>
               <article>
-                <strong>Founder feedback loop</strong>
-                <p>Early members help decide what gets added next across dashboards, tutorials, and discovery.</p>
+                <strong>Continuous improvement</strong>
+                <p>Member feedback helps decide what gets added next across dashboards, tutorials, and discovery.</p>
               </article>
             </div>
           </div>
-        </section>
-
-        <section id="founders-circle" className="section founders-circle">
-          <div>
-            <span className="billing-eyebrow">Exclusive Founders Council</span>
-            <h2>Join the first 300 Founders Circle spots.</h2>
-            <p>
-              Get launch updates, early feature notes, waitlist discounts, and
-              a direct line into what Unbounded builds next.
-            </p>
-          </div>
-          <button
-            className="primary pulse-on-hover"
-            type="button"
-            onClick={() => openWaitlistModal("founders")}
-          >
-            Join Founders Circle
-          </button>
         </section>
 
         <section id="testimonials" className="section testimonials">
@@ -427,149 +430,94 @@ export default function Home() {
                 and move faster during live windows.
               </p>
             </div>
-            <div className="testimonial-controls">
-              <button
-                type="button"
-                className="testimonial-arrow"
-                onClick={() =>
-                  setActiveTestimonialIndex(
-                    (current) =>
-                      (current - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
-                  )
-                }
-                aria-label="Previous testimonial"
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                className="testimonial-arrow"
-                onClick={() =>
-                  setActiveTestimonialIndex(
-                    (current) => (current + 1) % TESTIMONIALS.length
-                  )
-                }
-                aria-label="Next testimonial"
-              >
-                ›
-              </button>
-            </div>
           </div>
-          <div className="testimonial-card" key={activeTestimonial.quote}>
-            <div className="testimonial-quote">
-              <p>“{activeTestimonial.quote}”</p>
-            </div>
-            <div className="testimonial-meta">
-              <div className="testimonial-avatar" aria-hidden="true">
-                <span>?</span>
+          <div
+            className="testimonial-stage"
+            onMouseEnter={() => setIsTestimonialPaused(true)}
+            onMouseLeave={() => setIsTestimonialPaused(false)}
+          >
+            <button
+              type="button"
+              className="testimonial-arrow testimonial-arrow--prev"
+              onClick={() => showTestimonial(activeTestimonialIndex - 1)}
+              aria-label="Previous testimonial"
+            >
+              ‹
+            </button>
+            <div className="testimonial-card" key={activeTestimonial.quote}>
+              <div className="testimonial-quote">
+                <p>“{activeTestimonial.quote}”</p>
               </div>
-              <div>
-                <strong>{activeTestimonial.name}</strong>
-                <span>{activeTestimonial.role}</span>
+              <div className="testimonial-meta">
+                <div className="testimonial-avatar" aria-hidden="true">
+                  <span>{activeTestimonial.name.charAt(0)}</span>
+                </div>
+                <div>
+                  <strong>{activeTestimonial.name}</strong>
+                  <span>{activeTestimonial.role}</span>
+                </div>
+              </div>
+              <div className="testimonial-dots" role="tablist">
+                {TESTIMONIALS.map((testimonial, index) => (
+                  <button
+                    key={testimonial.quote}
+                    type="button"
+                    className={`dot ${activeTestimonialIndex === index ? "active" : ""
+                      }`}
+                    aria-pressed={activeTestimonialIndex === index}
+                    onClick={() => setActiveTestimonialIndex(index)}
+                  />
+                ))}
               </div>
             </div>
-            <div className="testimonial-dots" role="tablist">
-              {TESTIMONIALS.map((testimonial, index) => (
-                <button
-                  key={testimonial.quote}
-                  type="button"
-                  className={`dot ${activeTestimonialIndex === index ? "active" : ""
-                    }`}
-                  aria-pressed={activeTestimonialIndex === index}
-                  onClick={() => setActiveTestimonialIndex(index)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="testimonial-gallery" className="section testimonial-gallery">
-          <div className="testimonial-images">
-            <div className="testimonial-image" aria-hidden="true" />
-            <div className="testimonial-image" aria-hidden="true" />
+            <button
+              type="button"
+              className="testimonial-arrow testimonial-arrow--next"
+              onClick={() => showTestimonial(activeTestimonialIndex + 1)}
+              aria-label="Next testimonial"
+            >
+              ›
+            </button>
           </div>
         </section>
       </main>
 
       <footer className="site-footer">
-        <div className="footer-brand">
-          <strong>Unbounded</strong>
-          <span>Precision betting workflows, education, and account tools.</span>
+        <div className="footer-top">
+          <div className="footer-brand">
+            <strong>Unbounded</strong>
+            <span>Precision betting workflows, education, and account tools.</span>
+          </div>
+          <div className="footer-columns">
+            <div className="footer-column">
+              <h4>Product</h4>
+              <a href="/arbitrage">Arbitrage</a>
+              <a href="/positive-ev">Positive EV</a>
+              <a href="/tools">Tools</a>
+              <a href="#pricing">Pricing</a>
+            </div>
+            <div className="footer-column">
+              <h4>Learn</h4>
+              <a href="/tutorials">Discover</a>
+              <a href="/status">Status</a>
+              <a href="/billing">Billing</a>
+            </div>
+            <div className="footer-column">
+              <h4>Legal</h4>
+              <a href="/terms">Terms</a>
+              <a href="/disclaimer">Disclaimer</a>
+            </div>
+          </div>
         </div>
-        <div className="footer-links">
-          <a href="/">Home</a>
-          <a href="/arbitrage">Arbitrage</a>
-          <a href="/positive-ev">Positive EV</a>
-          <a href="/tools">Tools</a>
-          <a href="/tutorials">Discover</a>
-          <a href="/billing">Billing</a>
-          <a href="/status">Status</a>
-          <a href="/terms">Terms</a>
-          <a href="/disclaimer">Disclaimer</a>
+        <div className="footer-bottom">
+          <p className="footer-legal">
+            21+ only. Unbounded is an education, tracking, and workflow tool; it does not place bets or guarantee profit.
+          </p>
+          <span className="footer-copyright">
+            © {new Date().getFullYear()} Unbounded
+          </span>
         </div>
-        <p className="footer-legal">
-          21+ only. Unbounded is an education, tracking, and workflow tool; it does not place bets or guarantee profit.
-        </p>
       </footer>
-      {isNewsletterOpen ? (
-        <div
-          className="newsletter-modal-backdrop"
-          role="presentation"
-          onClick={() => setIsNewsletterOpen(false)}
-        >
-          <section
-            className="newsletter-modal"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="newsletter-title"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              className="newsletter-modal-close"
-              type="button"
-              aria-label="Close newsletter form"
-              onClick={() => setIsNewsletterOpen(false)}
-            >
-              ×
-            </button>
-            <span className="billing-eyebrow">
-              {newsletterSource === "founders" ? "Founders Circle" : "Newsletter"}
-            </span>
-            <h2 id="newsletter-title">
-              {newsletterSource === "founders"
-                ? "Join the Founders Circle"
-                : "Get Unbounded updates"}
-            </h2>
-            <p>
-              {newsletterSource === "founders"
-                ? "Claim a waitlist spot for launch updates, discounts, and early feature notes. Founders Circle starts with 300 spots."
-                : "Product updates, tier announcements, and practical betting workflow notes."}
-            </p>
-            <form className="pricing-form newsletter-modal-form" onSubmit={handlePricingSubmit}>
-              <input
-                name="name"
-                type="text"
-                placeholder="Name or username"
-                autoComplete="name"
-              />
-              <input
-                name="email"
-                type="email"
-                placeholder="Email address"
-                autoComplete="email"
-                required
-              />
-              <button className="primary pulse-on-hover" type="submit">
-                {isPricingSubmitting
-                  ? "Sending..."
-                  : pricingNotified
-                    ? "Subscribed"
-                    : "Subscribe"}
-              </button>
-            </form>
-          </section>
-        </div>
-      ) : null}
     </div>
   );
 }
