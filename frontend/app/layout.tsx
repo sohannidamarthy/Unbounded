@@ -1,5 +1,6 @@
 import "./globals.css";
 import { SiteChatbot } from "./components/SiteChatbot";
+import LayoutWrapper from "./components/LayoutWrapper";
 
 export const metadata = {
   title: "Unbounded",
@@ -23,7 +24,7 @@ export default function RootLayout({
             }}
           />
         ) : null}
-        {children}
+        <LayoutWrapper>{children}</LayoutWrapper>
         <SiteChatbot />
       </body>
     </html>

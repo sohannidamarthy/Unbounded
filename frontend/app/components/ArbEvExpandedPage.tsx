@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 import { DashboardHeader } from "./DashboardHeader";
 import { ALL_BET_TYPES, BET_TYPE_LABELS, BET_TYPE_OPTIONS, type BetType } from "./betTypeConfig";
@@ -91,6 +92,7 @@ type LiveEvPayload = {
   expected_value?: number;
 };
 
+const SAVED_BETS_STORAGE_KEY = "unbounded.saved_bets";
 const sportOptions: Sport[] = ["Basketball", "Football", "Baseball", "Soccer"];
 const bookOptions: Book[] = [...ARBEV_BOOK_OPTIONS];
 
@@ -358,6 +360,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const [draftBetTypes, setDraftBetTypes] = useState<BetType[]>([...ALL_BET_TYPES]);
   const [openPageFilter, setOpenPageFilter] = useState<PageFilterMenu>(null);
   const [filterNotification, setFilterNotification] = useState<string | null>(null);
+  const [savedBetStatus, setSavedBetStatus] = useState("");
   const [selectedTutorialCategory, setSelectedTutorialCategory] =
     useState<TutorialCategory>("all");
   const [selectedTutorialPaths, setSelectedTutorialPaths] = useState<string[]>(
@@ -533,6 +536,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     setManualEntryMode(false);
     setManualOddsA(event.oddsA);
     setManualOddsB(event.oddsB);
+    setSavedBetStatus("");
   };
 
   const activeOddsA = manualEntryMode ? manualOddsA : eventPopout?.oddsA ?? "";
@@ -567,6 +571,32 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     if (!eventPopout || eventPopout.id !== rowId) {
       return null;
     }
+
+    const saveBetLocally = () => {
+      try {
+        const savedBet = {
+          id: `${eventPopout.id}-${Date.now()}`,
+          sourceId: eventPopout.id,
+          savedAt: new Date().toISOString(),
+          board: eventPopout.board,
+          matchup: eventPopout.match,
+          sport: eventPopout.sport,
+          league: eventPopout.league,
+          betType: eventPopout.betType ?? "moneyline",
+          oddsA: activeOddsA,
+          oddsB: activeOddsB,
+          estimatedNet: Number(calculatedNetProfit),
+          legs: eventPopout.legs ?? [],
+        };
+        const existing = JSON.parse(window.localStorage.getItem(SAVED_BETS_STORAGE_KEY) || "[]");
+        const next = Array.isArray(existing) ? [savedBet, ...existing].slice(0, 100) : [savedBet];
+        window.localStorage.setItem(SAVED_BETS_STORAGE_KEY, JSON.stringify(next));
+        setManualEntryMode(false);
+        setSavedBetStatus("Saved.");
+      } catch {
+        setSavedBetStatus("Could not save this bet.");
+      }
+    };
 
     const openBetLeg = (leg: LiveBetLeg) => {
       const fallbackHref = getSportsbookMeta(leg.book).siteHref;
@@ -673,11 +703,17 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
             <button
               type="button"
               className="dashboard-event-popout-btn dashboard-event-popout-btn--primary"
-              onClick={() => setManualEntryMode(false)}
+              onClick={saveBetLocally}
             >
               Enter bet
             </button>
           </div>
+          {savedBetStatus ? (
+            <div className="dashboard-event-popout-saved">
+              {savedBetStatus}{" "}
+              <Link href="/profit-tracker">Open Profit Tracker</Link>
+            </div>
+          ) : null}
         </aside>
       </div>
     );
@@ -787,12 +823,17 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const activeBoardRows = arbEvView === "ev" ? liveEvRows : liveArbRows;
   const filteredRows = activeBoardRows.filter(
     (row) =>
+      (arbEvView !== "arb" || row.roi > 0) &&
       selectedSports.includes(row.sport) &&
       selectedBetTypes.includes(row.betType) &&
       (allBooksSelected ||
         !row.books.length ||
         row.books.some((book) => selectedBooks.includes(book as Book)))
   );
+  const topArbBets = liveArbRows
+    .filter((row) => row.roi > 0)
+    .sort((left, right) => right.roi - left.roi)
+    .slice(0, 10);
 
   const toggleDraftSport = (sport: Sport) => {
     setDraftSports((current) =>
@@ -852,6 +893,94 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
 
       <main className="arb-ev-page-main">
         <div className="arb-ev-page-shell">
+          {arbEvView === "arb" ? (
+            <section
+              className="top-bets-rail top-bets-rail--arb"
+              aria-label="Top 10 arbitrage bets of the day"
+            >
+              <div className="top-bets-rail-head">
+                <div>
+                  <span className="top-bets-rail-kicker">Daily leaders</span>
+                  <h2>Top 10 Arbitrage Bets of the Day</h2>
+                  <p className="top-bets-rail-note">
+                    Click a bet to add it and see the profit on your tracker.
+                  </p>
+                </div>
+                <Link href="/profit-tracker" className="top-bets-rail-link">
+                  See profits
+                </Link>
+              </div>
+              {topArbBets.length === 0 ? (
+                <p className="top-bets-rail-empty">
+                  No profitable arbitrage bets yet today.
+                </p>
+              ) : (
+                <div className="top-bets-table-wrap">
+                  <div
+                    className="dashboard-arb-table is-expanded top-bets-table"
+                    role="table"
+                    aria-label="Top 10 arbitrage bets of the day"
+                  >
+                    <div className="dashboard-arb-row dashboard-arb-row--header" role="row">
+                      <span role="columnheader">Rank</span>
+                      <span role="columnheader">Match</span>
+                      <span role="columnheader">Sport</span>
+                      <span role="columnheader">League</span>
+                      <span role="columnheader">Net profit</span>
+                    </div>
+                    {topArbBets.map((row, index) => {
+                      const rowId = `top10-${row.id}`;
+                      return (
+                        <Fragment key={rowId}>
+                          <div
+                            className={`dashboard-arb-row${
+                              eventPopout?.id === rowId ? " is-selected" : ""
+                            }`}
+                            role="row"
+                            onClick={() =>
+                              openEventPopout(
+                                buildEventPopout({
+                                  id: rowId,
+                                  board: "Arbitrage",
+                                  start: row.start,
+                                  sport: row.sport,
+                                  league: row.league,
+                                  match: row.match,
+                                  betType: row.betType,
+                                  legs: row.legs,
+                                })
+                              )
+                            }
+                          >
+                            <span className="dashboard-arb-cell top-bet-rank">
+                              #{index + 1}
+                            </span>
+                            <span className="dashboard-arb-cell dashboard-arb-cell--match">
+                              <span>{row.match}</span>
+                              <span className="dashboard-bet-type-badge">
+                                {BET_TYPE_LABELS[row.betType]}
+                              </span>
+                            </span>
+                            <span className="dashboard-arb-cell dashboard-arb-cell--sport">
+                              {row.sport}
+                            </span>
+                            <span className="dashboard-arb-cell dashboard-arb-cell--league">
+                              {row.league}
+                            </span>
+                            <span className="dashboard-arb-cell dashboard-arb-cell--net">
+                              {row.netProfit}
+                            </span>
+                          </div>
+                          {renderEventDropdown(rowId)}
+                        </Fragment>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </section>
+          ) : null}
+
           <section
             className={`arb-ev-specialization arb-ev-specialization--${arbEvView}`}
             aria-label={
@@ -895,35 +1024,18 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
           </section>
 
           <section
-            className={`${
-              arbEvView === "arb" ? "dashboard-arb" : "dashboard-ev"
-            } arb-ev-page-panel`}
+            className="dashboard-arb arb-ev-page-panel"
             aria-label={arbEvView === "arb" ? "Arbitrage bets per day" : "EV bets per day"}
           >
-            <div
-              className={
-                arbEvView === "arb" ? "dashboard-arb-header" : "dashboard-ev-header"
-              }
-            >
+            <div className="dashboard-arb-header">
               <div>
                 <h3>
                   {activePageConfig.panelTitle}
                 </h3>
                 <p>{activePageConfig.panelDescription}</p>
               </div>
-              <div
-                className={
-                  arbEvView === "arb"
-                    ? "dashboard-arb-controls"
-                    : "dashboard-ev-controls"
-                }
-                ref={pageFiltersRef}
-              >
-                <label
-                  className={`${
-                    arbEvView === "arb" ? "dashboard-arb-field" : "dashboard-ev-field"
-                  } dashboard-page-filter-field`}
-                >
+              <div className="dashboard-arb-controls" ref={pageFiltersRef}>
+                <label className="dashboard-arb-field dashboard-page-filter-field">
                   <span>Date</span>
                   <input type="date" />
                 </label>

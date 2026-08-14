@@ -103,7 +103,7 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
         </div>
       </header>
       {children}
-      <footer className="site-footer">
+      {/* <footer className="site-footer">
         <div className="footer-top">
           <div className="footer-brand">
             <strong>Unbounded</strong>
@@ -136,7 +136,7 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
           </p>
           <span className="footer-copyright">© {new Date().getFullYear()} Unbounded</span>
         </div>
-      </footer>
+      </footer> */}
     </div>
   );
 }
