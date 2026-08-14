@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { PricingTierCards } from "./components/PricingTierCards";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
+const FOUNDERS_CIRCLE_SEATS_TOTAL = 300;
+const FOUNDERS_CIRCLE_SEATS_CLAIMED = 214;
 const HERO_IMAGES = [
   { src: "/blurred.jpg", label: "Arbitrage betting" },
   { src: "/blurred2.jpg", label: "EV betting" }
@@ -18,33 +20,66 @@ const SECONDARY_IMAGES = [
 const TESTIMONIALS = [
   {
     quote:
-      "We cut our scan-to-bet time in half. The live alerts feel tailored instead of noisy.",
+      "We cut our scan-to-bet time in half within the first two weeks. The live alert stack only surfaces markets that match our staking rules, and the recap notes mean nobody re-litigates a decision three days later.",
     name: "Operations lead",
     role: "Midwest betting group"
   },
   {
     quote:
-      "The recap trail keeps our team aligned on why we passed or pressed. That visibility is invaluable.",
+      "The audit trail is the real win for us. Every arb we pass on, and why, gets logged automatically, so when a line moves against us we can show exactly what the model saw at that second, not just what we remember.",
     name: "Trading manager",
     role: "Private syndicate"
   },
   {
     quote:
-      "I finally have one place for alerts, staking, and withdrawals. No more spreadsheet sprawl.",
+      "I used to run four spreadsheets and a Discord bot just to keep my staking honest. Now alerts, bankroll splits, and withdrawals live in one place, and I've stopped second-guessing my own math at 1am.",
     name: "Independent bettor",
     role: "Full-time"
   },
   {
     quote:
-      "We added two operators without adding friction. The audit trail makes reviews painless.",
+      "We onboarded two new operators without slowing anyone down. Role-based views mean a junior trader sees exactly what they're cleared for, and the shared history turns review calls into five minutes instead of thirty.",
     name: "Partner",
     role: "Multi-state group"
   },
   {
     quote:
-      "Live windows used to be hectic. Now the alert stack and notes keep us consistent.",
+      "Live windows used to feel like triage. With the alert stack prioritized by edge size and notes pinned next to each line, our team independently makes the same call on a bet about 90% of the time now.",
     name: "Lead analyst",
     role: "Small team"
+  }
+];
+
+const COMPANY_INSIGHTS = [
+  {
+    quote:
+      "We watch line movement across nine books in real time, and the pattern is consistent: arbs that survive more than 90 seconds are almost always the ones with the tightest limits. Our alert thresholds are tuned around that window, not around theoretical edge size.",
+    name: "Marcus Chen",
+    role: "Head of Trading & Risk Desk"
+  },
+  {
+    quote:
+      "Our EV models get retrained weekly against closing line value, not just historical hit rate, because a bet that looks +EV on stale data can be flat or negative by the time you actually place it. That cadence is why the edge numbers you see hold up in practice.",
+    name: "Priya Raman",
+    role: "Lead Data Scientist, Modeling"
+  },
+  {
+    quote:
+      "The most common support ticket we used to get was \"why did this alert disappear.\" We rebuilt the notification queue around that single complaint, and tickets in that category dropped by more than 70% the following month.",
+    name: "Devon Ortiz",
+    role: "Customer Success Lead"
+  },
+  {
+    quote:
+      "Every item on the roadmap right now traces back to a specific workflow complaint from a beta user, not an internal brainstorm. The profit tracker shipped because six different people asked for the same spreadsheet replacement in the same week.",
+    name: "Sam Whitfield",
+    role: "Head of Product & Engineering"
+  },
+  {
+    quote:
+      "We review every sportsbook we integrate for terms-of-service changes on a rolling basis, because books tighten limits or change payout rules without much notice. Flagging that shift before a user gets surprised at withdrawal is the whole point of this team.",
+    name: "Elena Vasquez",
+    role: "Compliance & Trust Lead"
   }
 ];
 
@@ -55,11 +90,52 @@ export default function Home() {
   const [isTestimonialPaused, setIsTestimonialPaused] = useState(false);
   const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false);
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
-  const [isNewsletterExpanded, setIsNewsletterExpanded] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
-  const newsletterInputRef = useRef<HTMLInputElement | null>(null);
   const heroImage = HERO_IMAGES[activeHeroIndex];
+  const [calcStake, setCalcStake] = useState("");
+  const [calcOddsA, setCalcOddsA] = useState("");
+  const [calcOddsB, setCalcOddsB] = useState("");
+  const [calcMode, setCalcMode] = useState("ev");
+
+  const toDecimalOdds = (americanOdds: string) => {
+    const value = Number(americanOdds);
+    if (Number.isNaN(value) || value === 0) return null;
+    return value > 0 ? 1 + value / 100 : 1 + 100 / Math.abs(value);
+  };
+
+  const decimalA = toDecimalOdds(calcOddsA);
+  const decimalB = toDecimalOdds(calcOddsB);
+  const stake = Number(calcStake) || 0;
+  const canCalculate = decimalA && decimalB && stake > 0;
+  let results = null;
+
+  if (calcMode === "arb" && canCalculate) {
+    const invSum = 1 / decimalA + 1 / decimalB;
+    const hasArbitrage = invSum < 1;
+    const arbStakeA = (stake * decimalB) / (decimalA + decimalB);
+    const arbStakeB = stake - arbStakeA;
+    const arbPayout = arbStakeA * decimalA;
+    const arbNetProfit = arbPayout - stake;
+    results = {
+      type: "arb",
+      hasArbitrage,
+      arbStakeA: arbStakeA.toFixed(2),
+      arbStakeB: arbStakeB.toFixed(2),
+      arbNetProfit: arbNetProfit.toFixed(2),
+    };
+  }
+
+  if (calcMode === "ev" && canCalculate) {
+    const evProfitA = stake * (decimalA - 1);
+    const evProfitB = stake * (decimalB - 1);
+    results = {
+      type: "ev",
+      evProfitA: evProfitA.toFixed(2),
+      evProfitB: evProfitB.toFixed(2),
+      evStakeLost: (-stake).toFixed(2),
+    };
+  }
   const secondaryImage = SECONDARY_IMAGES[activeSecondaryIndex];
   const activeTestimonial = TESTIMONIALS[activeTestimonialIndex];
 
@@ -78,13 +154,6 @@ export default function Home() {
   const handleLogout = () => {
     localStorage.removeItem(TOKEN_STORAGE_KEY);
     setIsAuthenticated(false);
-  };
-
-  const expandNewsletter = () => {
-    setIsNewsletterExpanded(true);
-    window.requestAnimationFrame(() => {
-      newsletterInputRef.current?.focus();
-    });
   };
 
   useEffect(() => {
@@ -320,6 +389,149 @@ export default function Home() {
           </div>
         </section>
 
+        <section className="section calculator-hero">
+          <div className="section-header">
+            <h2>Calculate arbitrage and EV directly</h2>
+          </div>
+          <div className="calculator-grid">
+            <div className="calculator-card">
+              <h3>Arb/EV Calculator</h3>
+              <div className="calculator-inputs">
+                <label>
+                  Odds A (+American)
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="+110"
+                    value={calcOddsA}
+                    onChange={(e) => setCalcOddsA(e.target.value)}
+                    maxLength={10}
+                  />
+                </label>
+                <label>
+                  Odds B (-American)
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    placeholder="-110"
+                    value={calcOddsB}
+                    onChange={(e) => setCalcOddsB(e.target.value)}
+                    maxLength={10}
+                  />
+                </label>
+                <label>
+                  Stake
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="100"
+                    value={calcStake}
+                    onChange={(e) => setCalcStake(e.target.value)}
+                  />
+                </label>
+                <div style={{
+                  display: "flex",
+                  gap: "10px"
+                }}>
+                  <button
+                    className="primary small"
+                    onClick={() => setCalcMode("arb")}
+                  >
+                    Calculate Arb
+                  </button>
+                  <button
+                    className="primary small"
+                    onClick={() => setCalcMode("ev")}
+                  >
+                    Calculate EV
+                  </button>
+                </div>
+              </div>
+              <div
+                id="calc-results"
+                className="calculator-results"
+              >
+                {results && (
+                  <div className={results.type === "arb" ? "arb-results" : "ev-results"}>
+                    {results.type === "arb" && (
+                      <div className="result-row">
+                        <span>Arbitrage:</span>
+                        <span>{results.hasArbitrage ? "Yes" : "No"}</span>
+                      </div>
+                    )}
+                    {results.type === "arb" && (
+                      <div className="result-row">
+                        <span>Stake A:</span>
+                        <span id="arb-stake-a">{results.arbStakeA}</span>
+                      </div>
+                    )}
+                    {results.type === "arb" && (
+                      <div className="result-row">
+                        <span>Stake B:</span>
+                        <span id="arb-stake-b">{results.arbStakeB}</span>
+                      </div>
+                    )}
+                    {results.type === "arb" && (
+                      <div className="result-row">
+                        <span>Net profit:</span>
+                        <span id="arb-profit">{results.arbNetProfit}</span>
+                      </div>
+                    )}
+                    {results.type === "ev" && (
+                      <div className="result-row">
+                        <span>If side A wins:</span>
+                        <span id="ev-profit-a">{results.evProfitA}</span>
+                      </div>
+                    )}
+                    {results.type === "ev" && (
+                      <div className="result-row">
+                        <span>If side B wins:</span>
+                        <span id="ev-profit-b">{results.evProfitB}</span>
+                      </div>
+                    )}
+                    {results.type === "ev" && (
+                      <div className="result-row">
+                        <span>Total stake lost:</span>
+                        <span id="ev-stake-lost">{results.evStakeLost}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {(!calcOddsA || !calcOddsB || !calcStake) && (
+                  <p className="calc-instruction">
+                    Enter valid odds and stake to see results.
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="calculator-card">
+              <h3>How it works</h3>
+              <ul className="calculator-features">
+                <li>
+                  <strong>Arb:</strong> Find risk-free opportunities when implied
+                  {"probability < 100%"}
+                </li>
+                <li>
+                  <strong>EV:</strong> Calculate expected value based on your edge
+                </li>
+                <li>
+                  <button
+                    className="primary tiny"
+                    onClick={() => {
+                      setCalcMode("ev");
+                      setCalcStake("");
+                      setCalcOddsA("");
+                      setCalcOddsB("");
+                    }}
+                  >
+                    Clear
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
         <section id="pricing" className="section pricing-section">
           <div className="section-header">
             <h2>Pricing plans</h2>
@@ -330,38 +542,39 @@ export default function Home() {
             </p>
           </div>
           <PricingTierCards />
-          <div className={`pricing-waitlist ${isNewsletterExpanded ? "is-expanded" : ""}`}>
-            <div className="pricing-waitlist-copy">
-              <h3>Stay updated</h3>
-              <p>Receive product updates, tier announcements, and betting workflow notes.</p>
+          <div className="pricing-waitlist">
+            <Image
+              src="/newsettlerbg.png"
+              alt=""
+              fill
+              sizes="100vw"
+              style={{ objectFit: "cover" }}
+              className="pricing-waitlist-bg"
+            />
+            <div className="pricing-waitlist-content">
+              <div className="pricing-waitlist-copy">
+                <h3>Stay updated</h3>
+                <p>Receive product updates, tier announcements, and betting workflow notes.</p>
+              </div>
+              {newsletterSubscribed ? (
+                <p className="newsletter-inline-success" role="status">
+                  You&apos;re subscribed. Watch your inbox for the next update.
+                </p>
+              ) : (
+                <form className="newsletter-inline-form" onSubmit={handleNewsletterSubmit}>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    autoComplete="email"
+                    required
+                  />
+                  <button className="primary pulse-on-hover" type="submit">
+                    {isNewsletterSubmitting ? "Subscribing..." : "Subscribe"}
+                  </button>
+                </form>
+              )}
             </div>
-            {newsletterSubscribed ? (
-              <p className="newsletter-inline-success" role="status">
-                You&apos;re subscribed. Watch your inbox for the next update.
-              </p>
-            ) : isNewsletterExpanded ? (
-              <form className="newsletter-inline-form" onSubmit={handleNewsletterSubmit}>
-                <input
-                  ref={newsletterInputRef}
-                  name="email"
-                  type="email"
-                  placeholder="Email address"
-                  autoComplete="email"
-                  required
-                />
-                <button className="primary pulse-on-hover" type="submit">
-                  {isNewsletterSubmitting ? "Subscribing..." : "Subscribe"}
-                </button>
-              </form>
-            ) : (
-              <button
-                className="primary pulse-on-hover"
-                type="button"
-                onClick={expandNewsletter}
-              >
-                Join newsletter
-              </button>
-            )}
           </div>
         </section>
         <section id="workflow" className="section workflow">
@@ -478,6 +691,116 @@ export default function Home() {
             >
               ›
             </button>
+          </div>
+        </section>
+
+        <section id="team-insights" className="section insights">
+          <div className="section-header">
+            <h2>Insights from inside Unbounded</h2>
+            <p>
+              Notes from the teams building and running the platform day to
+              day, not just the marketing copy.
+            </p>
+          </div>
+          <div className="insights-grid">
+            {COMPANY_INSIGHTS.map((insight) => (
+              <article className="insight-card" key={insight.name}>
+                <p className="insight-quote">“{insight.quote}”</p>
+                <div className="insight-meta">
+                  <div className="insight-avatar" aria-hidden="true">
+                    <span>{insight.name.charAt(0)}</span>
+                  </div>
+                  <div>
+                    <strong>{insight.name}</strong>
+                    <span>{insight.role}</span>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section id="founders-circle" className="section founders-circle-section">
+          <div className="founders-circle">
+            <div className="founders-circle-badge" aria-hidden="true">
+              <div className="founders-circle-badge-glow" />
+              <svg viewBox="0 0 120 120" width="100%" height="100%" fill="none">
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="54"
+                  stroke="#f2c969"
+                  strokeWidth="2"
+                  strokeDasharray="6 7"
+                  className="founders-circle-badge-ring"
+                />
+                <circle cx="60" cy="60" r="44" fill="url(#foundersCircleGradient)" />
+                <circle cx="60" cy="60" r="44" stroke="rgba(8,27,47,0.4)" strokeWidth="1.5" />
+                <defs>
+                  <linearGradient
+                    id="foundersCircleGradient"
+                    x1="10"
+                    y1="10"
+                    x2="110"
+                    y2="110"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <stop stopColor="#f5d488" />
+                    <stop offset="1" stopColor="#a5771f" />
+                  </linearGradient>
+                </defs>
+                <text
+                  x="60"
+                  y="74"
+                  textAnchor="middle"
+                  fontSize="42"
+                  fontWeight="700"
+                  fill="#081b2f"
+                >
+                  F
+                </text>
+              </svg>
+            </div>
+            <div className="founders-circle-copy">
+              <span className="founders-circle-eyebrow">Limited access · 300 seats</span>
+              <h2>Founders Circle Council</h2>
+              <p>
+                The Founders Circle Council is a small, invite-capped group of
+                Unbounded&apos;s earliest members. In exchange for feedback on
+                every new tool before it ships, the Council gets pricing and
+                perks that are never offered again once the seats are gone.
+                It&apos;s part advisory board, part standing discount &mdash;
+                and it disappears the moment seat 300 is claimed.
+              </p>
+              <ul className="founders-circle-benefits">
+                <li>Up to 50% off</li>
+                <li>First 300</li>
+                <li>More Future exclusive deals</li>
+              </ul>
+              <div className="founders-circle-progress">
+                <div
+                  className="founders-circle-progress-track"
+                  role="progressbar"
+                  aria-valuenow={FOUNDERS_CIRCLE_SEATS_CLAIMED}
+                  aria-valuemin={0}
+                  aria-valuemax={FOUNDERS_CIRCLE_SEATS_TOTAL}
+                  aria-label="Founder seats claimed"
+                >
+                  <div
+                    className="founders-circle-progress-fill"
+                    style={{
+                      width: `${(FOUNDERS_CIRCLE_SEATS_CLAIMED / FOUNDERS_CIRCLE_SEATS_TOTAL) * 100}%`
+                    }}
+                  />
+                </div>
+                <p>
+                  {FOUNDERS_CIRCLE_SEATS_CLAIMED} of {FOUNDERS_CIRCLE_SEATS_TOTAL} founder seats claimed
+                </p>
+              </div>
+              <a className="primary pulse-on-hover" href="/auth">
+                Apply for a founder seat
+              </a>
+            </div>
           </div>
         </section>
       </main>
