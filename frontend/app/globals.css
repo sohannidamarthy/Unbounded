@@ -453,7 +453,8 @@ a {
 
 .arb-ev-specialization-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 18px;
 }
 
@@ -2971,6 +2972,39 @@ a {
   }
 }
 
+/* Arbitrage / EV board tables: same live badge, sized up and given a resting
+   glow so it's the first thing the eye lands on in the row. */
+.dashboard-live-badge--table {
+  padding: 6px 14px 6px 11px;
+  font-size: 12px;
+  box-shadow: 0 0 0 0 rgba(255, 70, 70, 0.5), 0 0 14px rgba(255, 70, 70, 0.45);
+  animation: liveBadgePulseTable 1.8s ease-out infinite;
+}
+
+.dashboard-live-badge--table .dashboard-live-dot {
+  width: 9px;
+  height: 9px;
+}
+
+@keyframes liveBadgePulseTable {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 70, 70, 0.55), 0 0 14px rgba(255, 70, 70, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 11px rgba(255, 70, 70, 0), 0 0 14px rgba(255, 70, 70, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 70, 70, 0), 0 0 14px rgba(255, 70, 70, 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-live-badge--table {
+    animation: none;
+    box-shadow: 0 0 14px rgba(255, 70, 70, 0.45);
+  }
+}
+
 .dashboard-live-time-badge {
   display: inline-flex;
   align-items: center;
@@ -3037,20 +3071,20 @@ a {
 }
 
 .dashboard-arb-table.is-expanded .dashboard-arb-row {
-  grid-template-columns: 1.05fr 0.75fr 0.65fr 2fr 0.8fr;
+  grid-template-columns: 1.05fr 1.75fr 0.65fr 0.65fr 0.8fr;
   column-gap: 16px;
   padding: 20px 24px;
 }
 
 .dashboard-arb-table.is-expanded .dashboard-arb-row--header {
-  grid-template-columns: 1.05fr 0.75fr 0.65fr 2fr 0.8fr;
+  grid-template-columns: 1.05fr 1.75fr 0.65fr 0.65fr 0.8fr;
   column-gap: 16px;
 }
 
 .dashboard-arb-table.is-expanded .dashboard-arb-row > span,
 .dashboard-arb-table.is-expanded .dashboard-arb-row--header > span {
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   line-height: 1.2;
 }
 
@@ -11679,7 +11713,7 @@ a {
   color: #f6a5ad;
 }
 
-/* Control-room analytics (personal + community) */
+/* Control-room analytics (personal + site-wide) */
 .arb-ev-analytics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -11695,6 +11729,10 @@ a {
   color: rgba(242, 201, 105, 0.82);
 }
 
+.arb-ev-analytics .arb-ev-specialization-stats {
+  grid-template-columns: 1fr;
+}
+
 .arb-ev-specialization-stat--community {
   border-color: rgba(120, 170, 255, 0.32);
 }
@@ -11706,6 +11744,73 @@ a {
 @media (max-width: 860px) {
   .arb-ev-analytics {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Top-right "customizable bet types" control, reused across sections */
+.top-bets-rail-actions,
+.arb-ev-specialization-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.arb-ev-specialization-actions {
+  justify-content: flex-end;
+}
+
+.section-bet-type-filter {
+  position: relative;
+}
+
+.section-bet-type-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(181, 136, 33, 0.35);
+  background: linear-gradient(180deg, rgba(8, 24, 40, 0.88), rgba(6, 17, 29, 0.82));
+  color: #f7f1e8;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.section-bet-type-trigger:hover,
+.section-bet-type-trigger.is-open {
+  border-color: rgba(181, 136, 33, 0.62);
+  background: linear-gradient(180deg, rgba(10, 29, 47, 0.94), rgba(7, 19, 33, 0.9));
+}
+
+.section-bet-type-trigger-icon {
+  font-size: 13px;
+  color: rgba(242, 201, 105, 0.85);
+}
+
+.section-bet-type-trigger-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(247, 241, 232, 0.6);
+  font-size: 10px;
+}
+
+.section-bet-type-trigger-value {
+  color: #f7f1e8;
+}
+
+.section-bet-type-menu {
+  left: auto;
+  right: 0;
+}
+
+@media (max-width: 560px) {
+  .section-bet-type-menu {
+    left: 0;
+    right: auto;
   }
 }
 

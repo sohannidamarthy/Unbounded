@@ -64,6 +64,7 @@ type LiveArbPayload = {
 type ArbEvTableRow = {
   id: string;
   start: string;
+  isLive: boolean;
   sport: Sport;
   league: string;
   match: string;
@@ -72,6 +73,15 @@ type ArbEvTableRow = {
   roi: number;
   legs: LiveBetLeg[];
   books: string[];
+};
+
+type SavedLocalBet = {
+  id: string;
+  savedAt?: string;
+  board?: "Live bets" | "Arbitrage" | "EV";
+  sport?: string;
+  betType?: BetType;
+  estimatedNet?: number;
 };
 
 type LiveEvPayload = {
@@ -98,43 +108,12 @@ const bookOptions: Book[] = [...ARBEV_BOOK_OPTIONS];
 
 const pageConfigs = {
   arb: {
-    heroKicker: "Arbitrage Control Room",
-    heroTitle: "Find clean two-way and multi-way arbitrage windows faster.",
+    heroKicker: "Arbitrage Control Hub",
+    heroTitle: "Your arbitrage activity, and how it compares to everyone else on Unbounded.",
     heroDescription:
-      "Built for operators who care about timing, payout balance, and execution discipline. This page is tuned around live arbitrage workflow instead of a generic board shell.",
+      "A real-time analytics view of this board: what you've personally tracked next to what every signed-in user is seeing live right now.",
     panelTitle: "Arbitrage control board",
     panelDescription: "Track daily arbitrage opportunities, verify the matchup, and keep your preferred execution settings tight.",
-    stats: [
-      {
-        label: "Live arbs tracked",
-        value: "148",
-        detail: "Across books with current filters and saved stacks.",
-      },
-      {
-        label: "Median lock window",
-        value: "42 sec",
-        detail: "Average time before one side starts drifting.",
-      },
-      {
-        label: "Best board mix",
-        value: "NBA + MLB",
-        detail: "Highest steady conversion today.",
-      },
-    ],
-    cards: [
-      {
-        title: "Execution lanes",
-        body: "Two-way arb, three-way arb, and ladder structures each move differently once the market tightens.",
-      },
-      {
-        title: "Pressure checks",
-        body: "Use the event drawer to validate both sides before the edge disappears.",
-      },
-      {
-        title: "Book preference",
-        body: "Keep the combinations you trust visible and cut down wasted clicks.",
-      },
-    ],
     tutorialCategories: [
       { value: "all", label: "All" },
       { value: "concepts", label: "Concepts" },
@@ -152,43 +131,12 @@ const pageConfigs = {
     ],
   },
   ev: {
-    heroKicker: "Positive EV Decision Desk",
-    heroTitle: "Separate real value from noisy prices with a sharper EV workflow.",
+    heroKicker: "Positive EV Control Hub",
+    heroTitle: "Your +EV activity, and how it compares to everyone else on Unbounded.",
     heroDescription:
-      "This page leans into expected-value decision making: probability translation, model confidence, and cleaner candidate-bet review instead of a generic shared board.",
+      "A real-time analytics view of this board: what you've personally tracked next to what every signed-in user is seeing live right now.",
     panelTitle: "Positive EV decision board",
     panelDescription: "Track daily positive EV looks, keep preferred filters active, and review candidate bets with the calculator flow close by.",
-    stats: [
-      {
-        label: "Candidate +EV bets",
-        value: "0",
-        detail: "Waiting for live or seeded EV opportunities.",
-      },
-      {
-        label: "Best edge cluster",
-        value: "Waiting",
-        detail: "Updates when EV rows are loaded.",
-      },
-      {
-        label: "Model confidence",
-        value: "Waiting",
-        detail: "Populates from live candidate rows.",
-      },
-    ],
-    cards: [
-      {
-        title: "Price translation",
-        body: "Convert the board into probabilities fast enough that strong value stands out immediately.",
-      },
-      {
-        title: "Selection discipline",
-        body: "Use EV type filters to keep your process consistent instead of chasing everything green.",
-      },
-      {
-        title: "Review loop",
-        body: "Fold what you learn back into your preferred settings so the board keeps improving.",
-      },
-    ],
     tutorialCategories: [
       { value: "all", label: "All" },
       { value: "concepts", label: "Concepts" },
@@ -280,6 +228,10 @@ function formatStartTime(timestamp?: number) {
   }).format(new Date(timestamp));
 }
 
+function isEventLive(timestamp?: number) {
+  return !timestamp || timestamp <= Date.now();
+}
+
 function mapEvPayloadToRow(ev: LiveEvPayload): ArbEvTableRow {
   const selection = ev.selection ?? "EV selection";
   const edge = ev.edge ?? ev.expected_value ?? 0;
@@ -296,6 +248,7 @@ function mapEvPayloadToRow(ev: LiveEvPayload): ArbEvTableRow {
   return {
     id: ev.ev_id ?? `${ev.event_id ?? "ev"}-${selection}`,
     start: formatStartTime(ev.start_time_ms),
+    isLive: isEventLive(ev.start_time_ms),
     sport: mapSportLabel(ev.sport),
     league: ev.league ?? (ev.sport ?? "EV").toUpperCase(),
     match: `${ev.event_name ?? "Event"} - ${selection}`,
@@ -320,6 +273,7 @@ function mapArbPayloadToRow(arb: LiveArbPayload): ArbEvTableRow {
   return {
     id: arb.arb_id ?? `${arb.event_id ?? "arb"}-${arb.market_key ?? "market"}`,
     start: formatStartTime(arb.start_time_ms),
+    isLive: isEventLive(arb.start_time_ms),
     sport: mapSportLabel(arb.sport),
     league: arb.league ?? (arb.sport ?? "Arb").toUpperCase(),
     match: legSummary || `${eventName}${marketSuffix}`,
@@ -329,6 +283,122 @@ function mapArbPayloadToRow(arb: LiveArbPayload): ArbEvTableRow {
     legs,
     books: legs.map((leg) => leg.book),
   };
+}
+
+function SectionBetTypeFilter({
+  label,
+  selected,
+  onChange,
+}: {
+  label: string;
+  selected: BetType[];
+  onChange: (next: BetType[]) => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [draft, setDraft] = useState<BetType[]>(selected);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    setDraft(selected);
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  const toggleDraft = (betType: BetType) => {
+    setDraft((current) =>
+      current.includes(betType)
+        ? current.filter((item) => item !== betType)
+        : [...current, betType]
+    );
+  };
+
+  const triggerLabel = getSelectionLabel(selected, ALL_BET_TYPES, "All bet types", "No bet types");
+
+  return (
+    <div className="section-bet-type-filter" ref={menuRef}>
+      <button
+        type="button"
+        className={`section-bet-type-trigger${isOpen ? " is-open" : ""}`}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        <span className="section-bet-type-trigger-icon" aria-hidden="true">
+          ⚙
+        </span>
+        <span className="section-bet-type-trigger-label">{label}</span>
+        <span className="section-bet-type-trigger-value">{triggerLabel}</span>
+      </button>
+      {isOpen ? (
+        <div
+          className="dashboard-filter-menu section-bet-type-menu"
+          role="dialog"
+          aria-label={`${label} bet types`}
+        >
+          <div className="dashboard-filter-menu-actions">
+            <button type="button" onClick={() => setDraft([...ALL_BET_TYPES])}>
+              Select all
+            </button>
+            <button type="button" onClick={() => setDraft([])}>
+              Clear
+            </button>
+          </div>
+          <div className="dashboard-filter-menu-options">
+            {BET_TYPE_OPTIONS.map((option) => {
+              const isSelected = draft.includes(option.value);
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`dashboard-filter-option${isSelected ? " is-selected" : ""}`}
+                  aria-pressed={isSelected}
+                  onClick={() => toggleDraft(option.value)}
+                >
+                  <span className="dashboard-filter-option-check" aria-hidden="true">
+                    {isSelected ? "✓" : ""}
+                  </span>
+                  <span>{option.label}</span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="dashboard-filter-menu-footer">
+            <button
+              type="button"
+              className="dashboard-filter-save"
+              disabled={draft.length === selected.length && draft.every((item) => selected.includes(item))}
+              onClick={() => {
+                onChange(draft);
+                setIsOpen(false);
+              }}
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
@@ -352,6 +422,9 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
   const [liveArbRows, setLiveArbRows] = useState<ArbEvTableRow[]>([]);
   const [liveEvRows, setLiveEvRows] = useState<ArbEvTableRow[]>([]);
+  const [savedLocalBets, setSavedLocalBets] = useState<SavedLocalBet[]>([]);
+  const [topBetsBetTypes, setTopBetsBetTypes] = useState<BetType[]>([...ALL_BET_TYPES]);
+  const [controlHubBetTypes, setControlHubBetTypes] = useState<BetType[]>([...ALL_BET_TYPES]);
   const [selectedSports, setSelectedSports] = useState<Sport[]>([...sportOptions]);
   const [selectedBooks, setSelectedBooks] = useState<Book[]>([...bookOptions]);
   const [selectedBetTypes, setSelectedBetTypes] = useState<BetType[]>([...ALL_BET_TYPES]);
@@ -384,6 +457,16 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
       setIsBetCalculatorOpen(true);
     }
   }, []);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(SAVED_BETS_STORAGE_KEY);
+      const parsed = raw ? (JSON.parse(raw) as SavedLocalBet[]) : [];
+      setSavedLocalBets(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      setSavedLocalBets([]);
+    }
+  }, [savedBetStatus]);
 
   useEffect(() => {
     let isCancelled = false;
@@ -722,46 +805,73 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const isCurrentTabTracked =
     arbEvView === "arb" ? arbTabProfitTracker : evTabProfitTracker;
   const activePageConfig = pageConfigs[arbEvView];
-  const activeStats =
-    arbEvView === "arb"
-      ? [
-          {
-            label: "Live arbs tracked",
-            value: String(liveArbRows.length),
-            detail: "Synced from the same backend feed as the dashboard.",
-          },
-          {
-            label: "Best edge",
-            value: liveArbRows.length
-              ? `${(Math.max(...liveArbRows.map((row) => row.roi)) * 100).toFixed(2)}%`
-              : "Waiting",
-            detail: "Highest visible arb edge with current filters.",
-          },
-          {
-            label: "Top sport",
-            value: liveArbRows[0]?.sport ?? "Waiting",
-            detail: "Sport with the strongest visible opportunity.",
-          },
-        ]
-      : [
-          {
-            label: "Candidate +EV bets",
-            value: String(liveEvRows.length),
-            detail: "Synced from the same backend feed as the dashboard.",
-          },
-          {
-            label: "Best edge",
-            value: liveEvRows.length
-              ? `${(Math.max(...liveEvRows.map((row) => row.roi)) * 100).toFixed(1)}% EV`
-              : "Waiting",
-            detail: "Highest visible EV edge with current filters.",
-          },
-          {
-            label: "Top sport",
-            value: liveEvRows[0]?.sport ?? "Waiting",
-            detail: "Sport with the strongest visible EV candidate.",
-          },
-        ];
+
+  const boardLabel = arbEvView === "arb" ? "Arbitrage" : "EV";
+  const relevantSavedBets = savedLocalBets.filter(
+    (bet) =>
+      (!bet.board || bet.board === boardLabel || bet.board === "Live bets") &&
+      (!bet.betType || controlHubBetTypes.includes(bet.betType))
+  );
+  const personalNet = relevantSavedBets.reduce(
+    (sum, bet) => sum + (Number.isFinite(Number(bet.estimatedNet)) ? Number(bet.estimatedNet) : 0),
+    0
+  );
+  const personalSportCounts = relevantSavedBets.reduce<Record<string, number>>((acc, bet) => {
+    const sport = bet.sport ?? "Unknown";
+    acc[sport] = (acc[sport] ?? 0) + 1;
+    return acc;
+  }, {});
+  const personalTopSport = Object.entries(personalSportCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+
+  const personalStats = [
+    {
+      label: "Bets you've tracked",
+      value: String(relevantSavedBets.length),
+      detail: relevantSavedBets.length
+        ? `Saved from this ${boardLabel.toLowerCase()} board on this device.`
+        : "Save a bet from the board below to start your own track record.",
+    },
+    {
+      label: "Your est. net",
+      value: relevantSavedBets.length
+        ? `${personalNet >= 0 ? "+" : ""}$${personalNet.toFixed(2)}`
+        : "Waiting",
+      detail: "Estimated payout across everything you've saved.",
+    },
+    {
+      label: "Your top sport",
+      value: personalTopSport ?? "Waiting",
+      detail: "Where most of your tracked action is coming from.",
+    },
+  ];
+
+  const combinedLiveRows = [...liveArbRows, ...liveEvRows].filter((row) =>
+    controlHubBetTypes.includes(row.betType)
+  );
+  const siteSportCounts = combinedLiveRows.reduce<Record<string, number>>((acc, row) => {
+    acc[row.sport] = (acc[row.sport] ?? 0) + 1;
+    return acc;
+  }, {});
+  const siteTopSport = Object.entries(siteSportCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
+  const siteBookCount = new Set(combinedLiveRows.flatMap((row) => row.books)).size;
+
+  const siteStats = [
+    {
+      label: "Live opportunities on Unbounded",
+      value: String(combinedLiveRows.length),
+      detail: "Arb + EV plays every signed-in user is seeing right now.",
+    },
+    {
+      label: "Books represented",
+      value: siteBookCount ? String(siteBookCount) : "Waiting",
+      detail: "Sportsbooks feeding the shared live board this moment.",
+    },
+    {
+      label: "Where the site is looking",
+      value: siteTopSport ?? "Waiting",
+      detail: "Sport with the most live action across all users right now.",
+    },
+  ];
   const tutorialCards = activePageConfig.tutorials
     .map((item) => {
       const seoPage = SEO_PAGES[item.path];
@@ -831,7 +941,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
         row.books.some((book) => selectedBooks.includes(book as Book)))
   );
   const topArbBets = liveArbRows
-    .filter((row) => row.roi > 0)
+    .filter((row) => row.roi > 0 && topBetsBetTypes.includes(row.betType))
     .sort((left, right) => right.roi - left.roi)
     .slice(0, 10);
 
@@ -906,9 +1016,16 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     Click a bet to add it and see the profit on your tracker.
                   </p>
                 </div>
-                <Link href="/profit-tracker" className="top-bets-rail-link">
-                  See profits
-                </Link>
+                <div className="top-bets-rail-actions">
+                  <SectionBetTypeFilter
+                    label="Bet types"
+                    selected={topBetsBetTypes}
+                    onChange={setTopBetsBetTypes}
+                  />
+                  <Link href="/profit-tracker" className="top-bets-rail-link">
+                    See profits
+                  </Link>
+                </div>
               </div>
               {topArbBets.length === 0 ? (
                 <p className="top-bets-rail-empty">
@@ -980,48 +1097,6 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
               )}
             </section>
           ) : null}
-
-          <section
-            className={`arb-ev-specialization arb-ev-specialization--${arbEvView}`}
-            aria-label={
-              arbEvView === "arb"
-                ? "Arbitrage page overview"
-                : "Positive EV page overview"
-            }
-          >
-            <div className="arb-ev-specialization-hero">
-              <div className="arb-ev-specialization-copy">
-                <span className="arb-ev-specialization-kicker">
-                  {activePageConfig.heroKicker}
-                </span>
-                <h1>{activePageConfig.heroTitle}</h1>
-                <p>{activePageConfig.heroDescription}</p>
-              </div>
-              <div className="arb-ev-specialization-cards">
-                {activePageConfig.cards.map((card) => (
-                  <article
-                    className="arb-ev-specialization-card"
-                    key={`${arbEvView}-${card.title}`}
-                  >
-                    <strong>{card.title}</strong>
-                    <p>{card.body}</p>
-                  </article>
-                ))}
-              </div>
-            </div>
-            <div className="arb-ev-specialization-stats">
-              {activeStats.map((stat) => (
-                <article
-                  className="arb-ev-specialization-stat"
-                  key={`${arbEvView}-${stat.label}`}
-                >
-                  <span>{stat.label}</span>
-                  <strong>{stat.value}</strong>
-                  <p>{stat.detail}</p>
-                </article>
-              ))}
-            </div>
-          </section>
 
           <section
             className="dashboard-arb arb-ev-page-panel"
@@ -1332,7 +1407,14 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                       }
                     >
                       <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                        {row.start}
+                        {row.isLive ? (
+                          <span className="dashboard-live-badge dashboard-live-badge--table">
+                            <span className="dashboard-live-dot" aria-hidden="true" />
+                            Live
+                          </span>
+                        ) : (
+                          row.start
+                        )}
                       </span>
                       <span className="dashboard-arb-cell dashboard-arb-cell--sport">
                         {row.sport}
@@ -1529,6 +1611,64 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                 </div>
               </div>
             )}
+          </section>
+
+          <section
+            className={`arb-ev-specialization arb-ev-specialization--${arbEvView}`}
+            aria-label={
+              arbEvView === "arb"
+                ? "Arbitrage page overview"
+                : "Positive EV page overview"
+            }
+          >
+            <div className="arb-ev-specialization-hero">
+              <div className="arb-ev-specialization-copy">
+                <span className="arb-ev-specialization-kicker">
+                  {activePageConfig.heroKicker}
+                </span>
+                <h1>{activePageConfig.heroTitle}</h1>
+                <p>{activePageConfig.heroDescription}</p>
+              </div>
+              <div className="arb-ev-specialization-actions">
+                <SectionBetTypeFilter
+                  label="Bet types"
+                  selected={controlHubBetTypes}
+                  onChange={setControlHubBetTypes}
+                />
+              </div>
+            </div>
+            <div className="arb-ev-analytics">
+              <div>
+                <h2 className="arb-ev-analytics-title">Your activity</h2>
+                <div className="arb-ev-specialization-stats">
+                  {personalStats.map((stat) => (
+                    <article
+                      className="arb-ev-specialization-stat"
+                      key={`${arbEvView}-personal-${stat.label}`}
+                    >
+                      <span>{stat.label}</span>
+                      <strong>{stat.value}</strong>
+                      <p>{stat.detail}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h2 className="arb-ev-analytics-title">Everyone on Unbounded</h2>
+                <div className="arb-ev-specialization-stats">
+                  {siteStats.map((stat) => (
+                    <article
+                      className="arb-ev-specialization-stat arb-ev-specialization-stat--community"
+                      key={`${arbEvView}-site-${stat.label}`}
+                    >
+                      <span>{stat.label}</span>
+                      <strong>{stat.value}</strong>
+                      <p>{stat.detail}</p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            </div>
           </section>
 
           <section
