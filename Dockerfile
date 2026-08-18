@@ -23,6 +23,10 @@ COPY pyproject.toml poetry.lock ./
 # install runtime deps only
 RUN poetry install --only main --no-interaction --no-ansi --no-root
 
+RUN python -c "import importlib.metadata; print('charset-normalizer:', importlib.metadata.version('charset-normalizer'))"
+RUN python -c "import charset_normalizer; print('package:', charset_normalizer.__file__)"
+RUN python -c "import charset_normalizer.md as md; print('md:', md.__file__); print('CharInfo:', hasattr(md, 'CharInfo'))"
+
 # copy the rest of your app
 COPY . .
 
