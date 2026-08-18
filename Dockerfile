@@ -33,4 +33,4 @@ COPY . .
 EXPOSE 8000
 
 # your FastAPI app is app/main.py with `app = FastAPI()`
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "echo DATABASE_URL_SET=${DATABASE_URL:+YES}; echo JWT_SECRET_SET=${JWT_SECRET:+YES}; uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
