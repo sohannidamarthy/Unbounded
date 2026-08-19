@@ -14,3 +14,6 @@ postgres_data/
 frontend/.next/
 frontend/tsconfig.tsbuildinfo
 frontend/node_modules/
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat

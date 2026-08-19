@@ -23,7 +23,8 @@ dependencies = [
     "resend (>=2.6.0,<3.0.0)",
     "websockets (>=16.0,<17.0)",
     "httpx (>=0.28.1,<0.29.0)",
-    "charset-normalizer (==3.4.7)"
+    "charset-normalizer (==3.4.7)",
+    "psycopg2-binary (>=2.9.12,<3.0.0)"
 ]
 
 
