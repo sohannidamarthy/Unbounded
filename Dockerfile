@@ -32,5 +32,8 @@ COPY . .
 
 EXPOSE 8000
 
+# Table creation is handled by Alembic migrations, not create_all() on startup
+ENV SKIP_DB_INIT=1
+
 # your FastAPI app is app/main.py with `app = FastAPI()`
 CMD ["sh", "-c", "echo DATABASE_URL_SET=${DATABASE_URL:+YES}; echo JWT_SECRET_SET=${JWT_SECRET:+YES}; uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
