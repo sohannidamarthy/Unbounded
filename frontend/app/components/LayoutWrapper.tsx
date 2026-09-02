@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 export default function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const hideFooter = pathname === '/auth';
-
+  console.log('test');
   return (
     <>
     {children}
