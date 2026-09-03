@@ -13,9 +13,32 @@ const HERO_IMAGES = [
 ];
 const SECONDARY_IMAGES = [
   { src: "/blurred3.jpg", label: "Track bets" },
-  { src: "/blurred3.jpg", label: "Calculate bets" },
-  { src: "/blurred3.jpg", label: "Live arbitrage feed" },
-  { src: "/blurred3.jpg", label: "EV betting analysis" }
+  { src: "/blurred4.jpg", label: "Calculate bets" },
+  { src: "/blurred2.jpg", label: "Live arbitrage feed" },
+  { src: "/blurred.jpg", label: "EV betting analysis" }
+];
+
+const HOW_IT_WORKS_STEPS = [
+  {
+    title: "Scan the boards",
+    description:
+      "Arbitrage and positive EV boards surface priced-out mismatches across sportsbooks as they open, so you're not tab-hopping between books to spot them yourself."
+  },
+  {
+    title: "Let the calculator flag the edge",
+    description:
+      "Drop the odds into the calculator below and it converts them to implied probability, checks for arbitrage, and shows the payout on each side before you commit a dollar."
+  },
+  {
+    title: "Log the bet",
+    description:
+      "Use the validator and manual entry tool to record stake, odds, and book for every position, so decisions are documented the moment you make them, not reconstructed later."
+  },
+  {
+    title: "Track results",
+    description:
+      "The profit tracker rolls logged bets into running P&L, so you can review what worked without rebuilding a spreadsheet every week."
+  }
 ];
 const TESTIMONIALS = [
   {
@@ -90,6 +113,8 @@ export default function Home() {
   const [isTestimonialPaused, setIsTestimonialPaused] = useState(false);
   const [isNewsletterSubmitting, setIsNewsletterSubmitting] = useState(false);
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [isFoundersCircleSubmitting, setIsFoundersCircleSubmitting] = useState(false);
+  const [foundersCircleSubmitted, setFoundersCircleSubmitted] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthReady, setIsAuthReady] = useState(false);
   const heroImage = HERO_IMAGES[activeHeroIndex];
@@ -117,12 +142,14 @@ export default function Home() {
     const arbStakeB = stake - arbStakeA;
     const arbPayout = arbStakeA * decimalA;
     const arbNetProfit = arbPayout - stake;
+    const holdPct = (invSum - 1) * 100;
     results = {
       type: "arb",
       hasArbitrage,
       arbStakeA: arbStakeA.toFixed(2),
       arbStakeB: arbStakeB.toFixed(2),
       arbNetProfit: arbNetProfit.toFixed(2),
+      holdPct: holdPct.toFixed(2),
     };
   }
 
@@ -231,6 +258,42 @@ export default function Home() {
     } finally {
       setNewsletterSubscribed(true);
       setIsNewsletterSubmitting(false);
+    }
+  };
+
+  const handleFoundersCircleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    if (isFoundersCircleSubmitting) {
+      return;
+    }
+
+    setIsFoundersCircleSubmitting(true);
+
+    const formData = new FormData(event.currentTarget);
+    const firstName = String(formData.get("firstName") || "").trim();
+    const lastName = String(formData.get("lastName") || "").trim();
+    const email = String(formData.get("email") || "").trim();
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+      "http://localhost:8000";
+
+    try {
+      const response = await fetch(`${apiBase}/founders-circle/signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName, email })
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+    } catch (error) {
+      // Keep optimistic confirmation even if the request errors.
+    } finally {
+      setFoundersCircleSubmitted(true);
+      setIsFoundersCircleSubmitting(false);
     }
   };
 
@@ -477,6 +540,12 @@ export default function Home() {
                         <span id="arb-profit">{results.arbNetProfit}</span>
                       </div>
                     )}
+                    {results.type === "arb" && (
+                      <div className="result-row">
+                        <span>Book hold:</span>
+                        <span id="arb-hold">{results.holdPct}%</span>
+                      </div>
+                    )}
                     {results.type === "ev" && (
                       <div className="result-row">
                         <span>If side A wins:</span>
@@ -505,16 +574,44 @@ export default function Home() {
               </div>
             </div>
             <div className="calculator-card">
-              <h3>How it works</h3>
-              <ul className="calculator-features">
-                <li>
-                  <strong>Arb:</strong> Find risk-free opportunities when implied
-                  {"probability < 100%"}
-                </li>
-                <li>
-                  <strong>EV:</strong> Calculate expected value based on your edge
-                </li>
-                <li>
+              <h3>How the math works</h3>
+              <div className="calculator-explainer">
+                <p>
+                  <strong>Implied probability</strong> is what a price says the
+                  market thinks will happen: 1 ÷ decimal odds. American +110
+                  converts to 2.10 decimal, or a 47.6% implied chance; -110
+                  converts to 1.909 decimal, or 52.4%.
+                </p>
+                <p>
+                  <strong>Arbitrage</strong> exists when the implied
+                  probabilities on both sides of a bet add up to less than
+                  100% &mdash; meaning the two books disagree enough that you
+                  can stake both sides and lock in a profit no matter which
+                  one wins.
+                </p>
+                <div className="calculator-explainer-example">
+                  <span>Worked example</span>
+                  <p>
+                    Type +110 into Odds A, -110 into Odds B, and 100 into
+                    Stake above &mdash; the same numbers preloaded as
+                    placeholders &mdash; and switch to Calculate Arb:
+                  </p>
+                  <ul>
+                    <li>47.6% + 52.4% = 100.0% implied &rarr; no arbitrage here (a true arb needs the sum under 100%)</li>
+                    <li>Stake splits proportionally across both sides so the payout matches regardless of winner</li>
+                    <li>&quot;Book hold&quot; in the results shows how far over 100% the market is priced &mdash; the vig you&apos;re paying</li>
+                  </ul>
+                </div>
+                <p>
+                  <strong>Expected value (EV)</strong> is (chance you win ×
+                  amount won) − (chance you lose × amount staked). A bet is
+                  +EV when your estimate of the true win probability is
+                  higher than what the odds imply. The calculator above shows
+                  the payout on each side if it wins &mdash; pairing that with
+                  your own win-probability estimate is what turns it into a
+                  real EV calculation.
+                </p>
+                <div className="calculator-explainer-actions">
                   <button
                     className="primary tiny"
                     onClick={() => {
@@ -524,11 +621,30 @@ export default function Home() {
                       setCalcOddsB("");
                     }}
                   >
-                    Clear
+                    Clear inputs
                   </button>
-                </li>
-              </ul>
+                </div>
+              </div>
             </div>
+          </div>
+        </section>
+
+        <section id="how-it-works" className="section how-it-works">
+          <div className="section-header">
+            <h2>How Unbounded works</h2>
+            <p>
+              Four steps from a mispriced line to a documented, tracked
+              result.
+            </p>
+          </div>
+          <div className="workflow-steps">
+            {HOW_IT_WORKS_STEPS.map((step, index) => (
+              <div key={step.title}>
+                <span>Step {index + 1}</span>
+                <strong>{step.title}</strong>
+                <p>{step.description}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -589,7 +705,7 @@ export default function Home() {
                 </p>
               </div>
               <div className="why-badges">
-                <span>100+ sportsbook workflows</span>
+                <span>17 sportsbooks integrated</span>
                 <span>Fast withdrawal notes</span>
                 <span>Profit tracking included</span>
               </div>
@@ -602,7 +718,7 @@ export default function Home() {
                   <li>Track profit, notes, and outcomes in one reviewable place</li>
                   <li>Use a simple calculator and validator before saving bets</li>
                   <li>Transparent tier pricing before signup</li>
-                  <li>Coverage designed around 100+ sportsbook workflows</li>
+                  <li>Coverage designed around 17 integrated sportsbook workflows</li>
                   <li>Fastest withdrawal methods documented by sportsbook as coverage expands</li>
                 </ul>
               </div>
@@ -797,9 +913,50 @@ export default function Home() {
                   {FOUNDERS_CIRCLE_SEATS_CLAIMED} of {FOUNDERS_CIRCLE_SEATS_TOTAL} founder seats claimed
                 </p>
               </div>
-              <a className="primary pulse-on-hover" href="/auth">
-                Apply for a founder seat
-              </a>
+              {foundersCircleSubmitted ? (
+                <p className="founders-circle-success" role="status">
+                  You&apos;re on the list. We&apos;ll follow up by email if a
+                  founder seat opens up for you.
+                </p>
+              ) : (
+                <form
+                  className="founders-circle-form"
+                  onSubmit={handleFoundersCircleSubmit}
+                >
+                  <div className="founders-circle-form-row">
+                    <input
+                      name="firstName"
+                      type="text"
+                      placeholder="First name"
+                      autoComplete="given-name"
+                      required
+                    />
+                    <input
+                      name="lastName"
+                      type="text"
+                      placeholder="Last name"
+                      autoComplete="family-name"
+                      required
+                    />
+                  </div>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Email address"
+                    autoComplete="email"
+                    required
+                  />
+                  <button
+                    className="primary pulse-on-hover"
+                    type="submit"
+                    disabled={isFoundersCircleSubmitting}
+                  >
+                    {isFoundersCircleSubmitting
+                      ? "Submitting..."
+                      : "Apply for a founder seat"}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </section>

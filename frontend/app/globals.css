@@ -6357,6 +6357,10 @@ a {
   opacity: 0.92;
 }
 
+.why-contrast h3 {
+  color: #f2c969;
+}
+
 .why-comparison h3 {
   font-size: 16px;
   letter-spacing: 0.02em;
@@ -6388,10 +6392,6 @@ a {
   box-shadow: 0 0 12px rgba(242, 200, 105, 0.6);
 }
 
-.why-contrast li::before {
-  background: rgba(255, 255, 255, 0.35);
-  box-shadow: none;
-}
 
 .workflow-steps {
   display: grid;
@@ -6425,6 +6425,18 @@ a {
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--bull-gold);
+}
+
+.workflow-steps strong {
+  color: #f7f3ea;
+  font-size: 17px;
+}
+
+.workflow-steps p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .workflow-benefits {
@@ -12027,4 +12039,120 @@ a {
 
 .calculator-hero .section-header h2 {
     color: var(--bull-gold);
+}
+
+/* ---- Calculator explainer ----
+   Replaces the old two-bullet "How it works" fragment with real formulas
+   and a worked example tied to the calculator's own placeholder odds. */
+.calculator-explainer {
+  display: grid;
+  gap: 14px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: rgba(247, 241, 232, 0.85);
+}
+
+.calculator-explainer strong {
+  color: #f2c969;
+}
+
+.calculator-explainer-example {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(6, 24, 42, 0.6);
+  border: 1px solid rgba(181, 136, 33, 0.25);
+}
+
+.calculator-explainer-example span {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bull-gold);
+}
+
+.calculator-explainer-example ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}
+
+.calculator-explainer-actions {
+  margin-top: 4px;
+}
+
+/* ---- How It Works section ---- */
+.how-it-works .section-header h2 {
+  color: var(--bull-gold);
+}
+
+/* ---- Footer socials ---- */
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(181, 136, 33, 0.35);
+  color: rgba(247, 243, 234, 0.75);
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.footer-social-link:hover {
+  color: var(--bull-gold);
+  border-color: rgba(242, 201, 105, 0.7);
+}
+
+.footer-social-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---- Founders Circle signup form ---- */
+.founders-circle-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+  max-width: 420px;
+}
+
+.founders-circle-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.founders-circle-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(181, 136, 33, 0.35);
+  background: rgba(6, 24, 42, 0.65);
+  color: #f7f3ea;
+  font-size: 14px;
+}
+
+.founders-circle-form input::placeholder {
+  color: rgba(247, 243, 234, 0.45);
+}
+
+.founders-circle-form input:focus {
+  outline: none;
+  border-color: rgba(242, 201, 105, 0.8);
+}
+
+.founders-circle-success {
+  margin-top: 20px;
+  color: #f7f3ea;
+  font-size: 14px;
 }
