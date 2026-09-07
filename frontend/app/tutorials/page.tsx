@@ -6,6 +6,30 @@ export default function TutorialsSeoPage() {
     <div style={{position:"relative",minHeight:"100vh"}}>
       <SeoPageShell path="/tutorials" />
       <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(11,26,46,0.88)",zIndex:40,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:"16px",pointerEvents:"none"}}>
+        <a
+          href="/"
+          aria-label="Close"
+          style={{
+            position:"absolute",
+            top:"20px",
+            right:"20px",
+            width:"36px",
+            height:"36px",
+            borderRadius:"999px",
+            border:"1px solid rgba(212,160,23,0.4)",
+            background:"rgba(212,160,23,0.1)",
+            color:"#e8f0f8",
+            display:"flex",
+            alignItems:"center",
+            justifyContent:"center",
+            fontSize:"18px",
+            lineHeight:1,
+            textDecoration:"none",
+            pointerEvents:"auto",
+          }}
+        >
+          &times;
+        </a>
         <div style={{pointerEvents:"auto",border:"1px solid rgba(212,160,23,0.4)",borderRadius:"12px",padding:"8px 20px",background:"rgba(212,160,23,0.1)"}}>
           <span style={{color:"#d4a017",fontSize:"12px",fontWeight:500,letterSpacing:"0.1em",textTransform:"uppercase"}}>Coming Soon</span>
         </div>
