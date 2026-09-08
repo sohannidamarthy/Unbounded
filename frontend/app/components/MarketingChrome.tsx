@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import Container from "./container/Container";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 
@@ -36,71 +37,75 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
 
   return (
     <div className="site marketing-page">
-      <header className="site-header">
-        <div className="brand">
-          <a className="brand-home-link" href={homeHref} aria-label="Unbounded home">
-            <Image
-              src="/unbounded.jpeg"
-              alt="Unbounded logo"
-              width={56}
-              height={56}
-              priority
-            />
-          </a>
-          <a className="brand-text brand-home-link" href={homeHref}>
-            <span>Unbounded</span>
-          </a>
-        </div>
-        <nav className="nav-links">
-          <a href="/">Home</a>
-          <a href="/arbitrage">Arbitrage</a>
-          <a href="/positive-ev">Positive EV</a>
-          <a href="/tools">Tools</a>
-          <a href="/tutorials">Discover</a>
-        </nav>
-        <div className="header-actions">
-          {isAuthReady ? (
-            isAuthenticated ? (
-              <div className="account-menu">
-                <button
-                  className="primary header-primary pulse-on-hover"
-                  type="button"
-                  aria-haspopup="menu"
-                >
-                  Account
-                </button>
-                <div className="account-dropdown" role="menu">
-                  <a className="account-dropdown-item" role="menuitem" href="/dashboard">
-                    Dashboard
-                  </a>
-                  <a className="account-dropdown-item" role="menuitem" href="/dashboard?panel=settings">
-                    Settings
-                  </a>
-                  <a className="account-dropdown-item" role="menuitem" href="/billing">
-                    Billing &amp; payments
-                  </a>
-                  <a className="account-dropdown-item" role="menuitem" href="/tutorials">
-                    Discover
-                  </a>
-                  <button
-                    className="account-dropdown-item"
-                    type="button"
-                    role="menuitem"
-                    onClick={handleLogoutClick}
-                  >
-                    Log out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <a className="primary header-primary pulse-on-hover" href="/auth">
-                Log in
+      <header>
+        <Container>
+          <div className="site-header">
+            <div className="brand">
+              <a className="brand-home-link" href={homeHref} aria-label="Unbounded home">
+                <Image
+                  src="/unbounded.jpeg"
+                  alt="Unbounded logo"
+                  width={56}
+                  height={56}
+                  priority
+                />
               </a>
-            )
-          ) : (
-            <div className="header-actions-placeholder" aria-hidden="true" />
-          )}
-        </div>
+              <a className="brand-text brand-home-link" href={homeHref}>
+                <span>Unbounded</span>
+              </a>
+            </div>
+            <nav className="nav-links">
+              <a href="/">Home</a>
+              <a href="/arbitrage">Arbitrage</a>
+              <a href="/positive-ev">Positive EV</a>
+              <a href="/tools">Tools</a>
+              <a href="/tutorials">Discover</a>
+            </nav>
+            <div className="header-actions">
+              {isAuthReady ? (
+                isAuthenticated ? (
+                  <div className="account-menu">
+                    <button
+                      className="primary header-primary pulse-on-hover"
+                      type="button"
+                      aria-haspopup="menu"
+                    >
+                      Account
+                    </button>
+                    <div className="account-dropdown" role="menu">
+                      <a className="account-dropdown-item" role="menuitem" href="/dashboard">
+                        Dashboard
+                      </a>
+                      <a className="account-dropdown-item" role="menuitem" href="/dashboard?panel=settings">
+                        Settings
+                      </a>
+                      <a className="account-dropdown-item" role="menuitem" href="/billing">
+                        Billing &amp; payments
+                      </a>
+                      <a className="account-dropdown-item" role="menuitem" href="/tutorials">
+                        Discover
+                      </a>
+                      <button
+                        className="account-dropdown-item"
+                        type="button"
+                        role="menuitem"
+                        onClick={handleLogoutClick}
+                      >
+                        Log out
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <a className="primary header-primary pulse-on-hover" href="/auth">
+                    Log in
+                  </a>
+                )
+              ) : (
+                <div className="header-actions-placeholder" aria-hidden="true" />
+              )}
+            </div>
+          </div>
+        </Container>
       </header>
       {children}
       {/* The real footer is rendered globally by LayoutWrapper.tsx (every
