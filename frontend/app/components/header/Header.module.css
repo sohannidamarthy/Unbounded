@@ -1,0 +1,45 @@
+.siteHeader {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.brandHomeLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.brandHomeLink img {
+  display: block;
+}
+
+.brandText {
+  margin-left: 10px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #071826;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.navLinks a {
+  text-decoration: none;
+  color: #071826;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.navLinks a:hover {
+  color: #8f9dad;
+}

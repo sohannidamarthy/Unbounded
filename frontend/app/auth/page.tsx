@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { getSportsbookMeta, SportsbookLogo } from "../components/sportsbookMeta";
+import Container from "../components/container/Container";
 
 type AuthMode = "login" | "signup";
 type MessageTone = "success" | "error" | "info";
@@ -190,47 +191,47 @@ const TIER_OPTIONS: {
   description: string;
   features: string[];
 }[] = [
-  {
-    value: "select",
-    label: "Select",
-    accent: "red",
-    description: "Entry access for testing the core arbitrage workflow.",
-    features: [
-      "Moneyline arbitrage access",
-      "Limited +EV and live odds coverage",
-      "Profit calculator",
-      "Public leaderboard and top bets feed",
-      "7-day free trial"
-    ]
-  },
-  {
-    value: "premium",
-    label: "Premium",
-    accent: "silver",
-    description: "Full board access for active bettors who want sharper filters.",
-    features: [
-      "All arbitrage and +EV bets",
-      "Live odds and fastest withdrawal methods",
-      "Friction score and trust scoring",
-      "No ads or pop-ups",
-      "Daily top bets and recommendations"
-    ]
-  },
-  {
-    value: "executive",
-    label: "Executive",
-    accent: "gold",
-    description: "Priority tier for operators who want early feature access and higher-signal tools.",
-    features: [
-      "Everything in Premium",
-      "AI bet recommendations and smart parlay builder",
-      "Time-to-decay meter and historical odds",
-      "Predictive line movement signals",
-      "Private Executive leaderboard",
-      "Priority Founders Circle previews"
-    ]
-  }
-];
+    {
+      value: "select",
+      label: "Select",
+      accent: "red",
+      description: "Entry access for testing the core arbitrage workflow.",
+      features: [
+        "Moneyline arbitrage access",
+        "Limited +EV and live odds coverage",
+        "Profit calculator",
+        "Public leaderboard and top bets feed",
+        "7-day free trial"
+      ]
+    },
+    {
+      value: "premium",
+      label: "Premium",
+      accent: "silver",
+      description: "Full board access for active bettors who want sharper filters.",
+      features: [
+        "All arbitrage and +EV bets",
+        "Live odds and fastest withdrawal methods",
+        "Friction score and trust scoring",
+        "No ads or pop-ups",
+        "Daily top bets and recommendations"
+      ]
+    },
+    {
+      value: "executive",
+      label: "Executive",
+      accent: "gold",
+      description: "Priority tier for operators who want early feature access and higher-signal tools.",
+      features: [
+        "Everything in Premium",
+        "AI bet recommendations and smart parlay builder",
+        "Time-to-decay meter and historical odds",
+        "Predictive line movement signals",
+        "Private Executive leaderboard",
+        "Priority Founders Circle previews"
+      ]
+    }
+  ];
 
 const MAX_PASSWORD_LENGTH = 100;
 const MAX_USERNAME_LENGTH = 24;
@@ -940,8 +941,8 @@ export default function AuthPage() {
           active_tutorial_title: activeTutorial?.title || null,
           active_tutorial_index: activeTutorial
             ? recommendedTutorials.findIndex(
-                (tutorial) => tutorial.title === activeTutorial.title
-              )
+              (tutorial) => tutorial.title === activeTutorial.title
+            )
             : null,
           skipped_preferences: didSkipPreferences,
           skipped_tutorials: skippedTutorials
@@ -1199,67 +1200,73 @@ export default function AuthPage() {
 
   return (
     <div className="site auth-page">
-      <header className="site-header">
-        <div className="brand">
-          <Image
-            src="/unbounded.jpeg"
-            alt="Unbounded logo"
-            width={56}
-            height={56}
-            priority
-          />
-          <a className="brand-text brand-home-link" href="/">
-            <span>Unbounded</span>
-          </a>
-        </div>
-        <nav className="nav-links">
-          <a href="/">Home</a>
-          <a href="/arbitrage">Arbitrage</a>
-          <a href="/positive-ev">Value Bets</a>
-          <a href="/billing">Pricing</a>
-          <a href="/tutorials">Tutorials</a>
-        </nav>
+      <header>
+        <Container>
+          <div className="site-header">
+            <div className="brand">
+              <Image
+                src="/unbounded.jpeg"
+                alt="Unbounded logo"
+                width={56}
+                height={56}
+                priority
+              />
+              <a className="brand-text brand-home-link" href="/">
+                <span>Unbounded</span>
+              </a>
+            </div>
+            <nav className="nav-links">
+              <a href="/">Home</a>
+              <a href="/arbitrage">Arbitrage</a>
+              <a href="/positive-ev">Value Bets</a>
+              <a href="/billing">Pricing</a>
+              <a href="/tutorials">Tutorials</a>
+            </nav>
+          </div>
+        </Container>
       </header>
       <main>
         <div className="auth-shell">
           <section className="auth-panel">
-            <div className="auth-panel-topline">
-              <div className="auth-step-marker">
-                {mode === "login"
-                  ? "Account access"
-                  : `Signup step ${signupStep} of 3`}
+            <div className="auth-panel-head">
+              <div className="auth-panel-topline">
+                <div className="auth-step-marker">
+                  {mode === "login"
+                    ? "Account access"
+                    : `Signup step ${signupStep} of 3`}
+                </div>
+                {isSignupStepTwo ? (
+                  <button
+                    type="button"
+                    className="auth-skip"
+                    onClick={() => goToTutorialStep(true)}
+                    disabled={isSubmitting}
+                  >
+                    Skip
+                  </button>
+                ) : null}
               </div>
-              {isSignupStepTwo ? (
-                <button
-                  type="button"
-                  className="auth-skip"
-                  onClick={() => goToTutorialStep(true)}
-                  disabled={isSubmitting}
-                >
-                  Skip
-                </button>
-              ) : null}
+
+              <h1>
+                {mode === "login"
+                  ? "Log in to Unbounded"
+                  : signupStep === 1
+                    ? "Create your account"
+                    : signupStep === 2
+                      ? "Finish your setup"
+                      : "Recommended tutorials"}
+              </h1>
+
+              <p className="auth-subtitle">
+                {mode === "login"
+                  ? "Use the account you already created to continue into the dashboard."
+                  : signupStep === 1
+                    ? "Start with your account details. You can set books and goals on the next screen."
+                    : signupStep === 2
+                      ? `Choose the sportsbooks and betting preferences that fit ${signupForm.state || "your market"}.`
+                      : `Based on your ${signupForm.experienceLevel || "current"} experience level, start here to learn the workflow faster.`}
+              </p>
             </div>
-
-            <h1>
-              {mode === "login"
-                ? "Log in to Unbounded"
-                : signupStep === 1
-                  ? "Create your account"
-                  : signupStep === 2
-                    ? "Finish your setup"
-                    : "Recommended tutorials"}
-            </h1>
-
-            <p className="auth-subtitle">
-              {mode === "login"
-                ? "Use the account you already created to continue into the dashboard."
-                : signupStep === 1
-                  ? "Start with your account details. You can set books and goals on the next screen."
-                  : signupStep === 2
-                    ? `Choose the sportsbooks and betting preferences that fit ${signupForm.state || "your market"}.`
-                    : `Based on your ${signupForm.experienceLevel || "current"} experience level, start here to learn the workflow faster.`}
-            </p>
 
             <div className="auth-toggle-simple">
               <button
@@ -1334,7 +1341,7 @@ export default function AuthPage() {
                     </div>
                   </label>
 
-                  <label className="remember-field">
+                  <label className="remember-field full-width">
                     <input
                       type="checkbox"
                       checked={rememberEmail}
@@ -1350,264 +1357,256 @@ export default function AuthPage() {
                     />
                     <span>Remember email on this device</span>
                   </label>
-                  <button
-                    type="button"
-                    className="auth-inline-link"
-                    onClick={() => {
-                      setForgotIdentifier(email);
-                      setForgotMessage(null);
-                      setIsForgotPasswordOpen(true);
-                    }}
-                  >
-                    Forgot password?
-                  </button>
-                  <button
-                    type="button"
-                    className="auth-inline-link"
-                    onClick={handleResendVerification}
-                  >
-                    Resend verification email
-                  </button>
+                  <div className="full-width space-between">
+                    <button
+                      type="button"
+                      className="auth-inline-link"
+                      onClick={() => {
+                        setForgotIdentifier(email);
+                        setForgotMessage(null);
+                        setIsForgotPasswordOpen(true);
+                      }}
+                    >
+                      Forgot password?
+                    </button>
+                    <button
+                      type="button"
+                      className="auth-inline-link"
+                      onClick={handleResendVerification}
+                    >
+                      Resend verification email
+                    </button>
+                  </div>
                 </>
               ) : signupStep === 1 ? (
                 <>
-                  <div className="auth-grid auth-grid--signup">
-                    <div className="field-stack">
-                      <label className="field">
-                        <span>Email or mobile number</span>
-                        <input
-                          type="text"
-                          placeholder="you@example.com or +1 555 555 5555"
-                          autoComplete="username"
-                          required
-                          value={signupForm.email}
-                          onChange={(event) =>
-                            updateSignupField("email", event.target.value)
-                          }
-                        />
-                      </label>
+                  <label className="field">
+                    <span>Email or mobile number</span>
+                    <input
+                      type="text"
+                      placeholder="you@example.com or +1 555 555 5555"
+                      autoComplete="username"
+                      required
+                      value={signupForm.email}
+                      onChange={(event) =>
+                        updateSignupField("email", event.target.value)
+                      }
+                    />
+                  </label>
 
-                      <div className="auth-tier-picker">
-                        <div className="auth-tier-picker-head">
-                          <span>Choose tier</span>
-                          <p>Select, Premium, or Executive.</p>
-                        </div>
-                        <div className="auth-tier-grid">
-                          {TIER_OPTIONS.map((tier) => {
-                            const isSelected = signupForm.tier === tier.value;
-                            return (
-                              <button
-                                key={tier.value}
-                                type="button"
-                                className={`auth-tier-card auth-tier-card--${tier.accent}${isSelected ? " is-selected" : ""
-                                  }`}
-                                aria-pressed={isSelected}
-                                onClick={() => updateSignupField("tier", tier.value)}
-                              >
-                                <span className="auth-tier-crown" aria-hidden="true">
-                                  <svg viewBox="0 0 24 24">
-                                    <path d="M3 18h18l-2-9-5 4-2-7-2 7-5-4-2 9Z" />
-                                  </svg>
-                                </span>
-                                <span className="auth-tier-label">{tier.label}</span>
-                                <span className="auth-tier-description">
-                                  {tier.description}
-                                </span>
-                                <span className="auth-tier-features">
-                                  {tier.features.map((feature) => (
-                                    <span key={feature}>{feature}</span>
-                                  ))}
-                                </span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
+                  <label className="field">
+                    <span>Username</span>
+                    <input
+                      type="text"
+                      placeholder="Pick a username"
+                      autoComplete="username"
+                      required
+                      maxLength={MAX_USERNAME_LENGTH}
+                      value={signupForm.username}
+                      onChange={(event) =>
+                        updateSignupField("username", event.target.value)
+                      }
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Promo code</span>
+                    <input
+                      type="text"
+                      placeholder="Optional promo code"
+                      autoComplete="off"
+                      value={signupForm.promoCode}
+                      onChange={(event) =>
+                        updateSignupField("promoCode", event.target.value)
+                      }
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Date of Birth</span>
+                    <input
+                      type="date"
+                      required
+                      max={todayIso}
+                      value={signupForm.dateOfBirth}
+                      onChange={(event) =>
+                        updateSignupField("dateOfBirth", event.target.value)
+                      }
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Country</span>
+                    <select
+                      required
+                      value={signupForm.country}
+                      onChange={(event) =>
+                        updateSignupField("country", event.target.value)
+                      }
+                    >
+                      {COUNTRY_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="field">
+                    <span>{regionLabel}</span>
+                    <select
+                      required
+                      value={signupForm.state}
+                      onChange={(event) =>
+                        updateSignupField("state", event.target.value)
+                      }
+                    >
+                      <option value="">Select {regionLabel.toLowerCase()}</option>
+                      {regionOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <div className="auth-tier-picker full-width">
+                    <div className="auth-tier-picker-head">
+                      <span>Choose tier</span>
+                      <p>Select, Premium, or Executive.</p>
                     </div>
-
-                    <div className="field-stack">
-                      <label className="field">
-                        <span>Username</span>
-                        <input
-                          type="text"
-                          placeholder="Pick a username"
-                          autoComplete="username"
-                          required
-                          maxLength={MAX_USERNAME_LENGTH}
-                          value={signupForm.username}
-                          onChange={(event) =>
-                            updateSignupField("username", event.target.value)
-                          }
-                        />
-                      </label>
-
-                      <label className="field">
-                        <span>Promo code</span>
-                        <input
-                          type="text"
-                          placeholder="Optional promo code"
-                          autoComplete="off"
-                          value={signupForm.promoCode}
-                          onChange={(event) =>
-                            updateSignupField("promoCode", event.target.value)
-                          }
-                        />
-                      </label>
-
-                      <label className="field">
-                        <span>Date of Birth</span>
-                        <input
-                          type="date"
-                          required
-                          max={todayIso}
-                          value={signupForm.dateOfBirth}
-                          onChange={(event) =>
-                            updateSignupField("dateOfBirth", event.target.value)
-                          }
-                        />
-                      </label>
+                    <div className="auth-tier-grid">
+                      {TIER_OPTIONS.map((tier) => {
+                        const isSelected = signupForm.tier === tier.value;
+                        return (
+                          <button
+                            key={tier.value}
+                            type="button"
+                            className={`auth-tier-card auth-tier-card--${tier.accent}${isSelected ? " is-selected" : ""
+                              }`}
+                            aria-pressed={isSelected}
+                            onClick={() => updateSignupField("tier", tier.value)}
+                          >
+                            <span className="auth-tier-crown" aria-hidden="true">
+                              <svg viewBox="0 0 24 24">
+                                <path d="M3 18h18l-2-9-5 4-2-7-2 7-5-4-2 9Z" />
+                              </svg>
+                            </span>
+                            <span className="auth-tier-label">{tier.label}</span>
+                            <span className="auth-tier-description">
+                              {tier.description}
+                            </span>
+                            <span className="auth-tier-features">
+                              {tier.features.map((feature) => (
+                                <span key={feature}>{feature}</span>
+                              ))}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
-
-                    <label className="field">
-                      <span>Country</span>
-                      <select
-                        required
-                        value={signupForm.country}
-                        onChange={(event) =>
-                          updateSignupField("country", event.target.value)
-                        }
-                      >
-                        {COUNTRY_OPTIONS.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <label className="field">
-                      <span>{regionLabel}</span>
-                      <select
-                        required
-                        value={signupForm.state}
-                        onChange={(event) =>
-                          updateSignupField("state", event.target.value)
-                        }
-                      >
-                        <option value="">Select {regionLabel.toLowerCase()}</option>
-                        {regionOptions.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
                   </div>
-
-                  <div className="auth-grid auth-grid-tight">
-                    <label className="field">
-                      <span>Password</span>
-                      <div className="field-input field-input--with-info">
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Create password"
-                          autoComplete="new-password"
-                          required
-                          maxLength={MAX_PASSWORD_LENGTH}
-                          value={signupForm.password}
-                          onChange={(event) =>
-                            updateSignupField("password", event.target.value)
-                          }
-                        />
-                        {signupForm.password ? null : (
-                          <div className="auth-requirements">
-                            <button
-                              type="button"
-                              className="auth-requirements-trigger"
-                              aria-label="Password requirements"
-                            >
-                              i
-                            </button>
-                            <div className="auth-requirements-popover">
-                              <strong>Password requirements</strong>
-                              <ul>
-                                {PASSWORD_REQUIREMENTS.map((requirement) => (
-                                  <li key={requirement}>{requirement}</li>
-                                ))}
-                              </ul>
-                            </div>
+                  <label className="field">
+                    <span>Password {signupForm.password ? null : (
+                        <div className="auth-requirements">
+                          <button
+                            type="button"
+                            className="auth-requirements-trigger"
+                            aria-label="Password requirements"
+                          >
+                            i
+                          </button>
+                          <div className="auth-requirements-popover">
+                            <strong>Password requirements</strong>
+                            <ul>
+                              {PASSWORD_REQUIREMENTS.map((requirement) => (
+                                <li key={requirement}>{requirement}</li>
+                              ))}
+                            </ul>
                           </div>
+                        </div>
+                      )}</span>
+                    <div className="field-input field-input--with-info">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Create password"
+                        autoComplete="new-password"
+                        required
+                        maxLength={MAX_PASSWORD_LENGTH}
+                        value={signupForm.password}
+                        onChange={(event) =>
+                          updateSignupField("password", event.target.value)
+                        }
+                      />
+                      
+                      <button
+                        type="button"
+                        className="password-toggle"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                        onClick={() => setShowPassword((current) => !current)}
+                      >
+                        {showPassword ? (
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                            <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                            <path d="M4 4 20 20" />
+                          </svg>
+                        ) : (
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                            <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                          </svg>
                         )}
-                        <button
-                          type="button"
-                          className="password-toggle"
-                          aria-label={showPassword ? "Hide password" : "Show password"}
-                          onClick={() => setShowPassword((current) => !current)}
-                        >
-                          {showPassword ? (
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
-                              <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
-                              <path d="M4 4 20 20" />
-                            </svg>
-                          ) : (
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
-                              <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                    </label>
+                      </button>
+                    </div>
+                  </label>
 
-                    <label className="field">
-                      <span>Confirm password</span>
-                      <div className="field-input">
-                        <input
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Re-enter password"
-                          autoComplete="new-password"
-                          required
-                          maxLength={MAX_PASSWORD_LENGTH}
-                          value={signupForm.confirmPassword}
-                          onChange={(event) =>
-                            updateSignupField("confirmPassword", event.target.value)
-                          }
-                        />
-                        <button
-                          type="button"
-                          className="password-toggle"
-                          aria-label={
-                            showConfirmPassword
-                              ? "Hide confirm password"
-                              : "Show confirm password"
-                          }
-                          onClick={() =>
-                            setShowConfirmPassword((current) => !current)
-                          }
-                        >
-                          {showConfirmPassword ? (
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
-                              <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
-                              <path d="M4 4 20 20" />
-                            </svg>
-                          ) : (
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
-                              <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                    </label>
-                  </div>
+                  <label className="field">
+                    <span>Confirm password</span>
+                    <div className="field-input">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Re-enter password"
+                        autoComplete="new-password"
+                        required
+                        maxLength={MAX_PASSWORD_LENGTH}
+                        value={signupForm.confirmPassword}
+                        onChange={(event) =>
+                          updateSignupField("confirmPassword", event.target.value)
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="password-toggle"
+                        aria-label={
+                          showConfirmPassword
+                            ? "Hide confirm password"
+                            : "Show confirm password"
+                        }
+                        onClick={() =>
+                          setShowConfirmPassword((current) => !current)
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                            <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                            <path d="M4 4 20 20" />
+                          </svg>
+                        ) : (
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M2 12c2.7-4.4 6.8-6.7 10-6.7 3.2 0 7.3 2.3 10 6.7-2.7 4.4-6.8 6.7-10 6.7-3.2 0-7.3-2.3-10-6.7Z" />
+                            <path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z" />
+                          </svg>
+                        )}
+                      </button>
+                    </div>
+                  </label>
 
-                  <div className="field-hint">
+                  <div className="field-hint full-width">
                     Use a capital letter, at least 10 characters and include at least one symbol.
                   </div>
 
-                  <label className="remember-field remember-field--signup">
+                  <label className="remember-field remember-field--signup full-width">
                     <input
                       type="checkbox"
                       checked={rememberEmail}
@@ -1626,7 +1625,7 @@ export default function AuthPage() {
                     />
                     <span>Remember this account on this device</span>
                   </label>
-                  <p className="auth-legal-note">
+                  <p className="auth-legal-note full-width">
                     By creating an account, you confirm you are 21+ where
                     required and agree to the <a href="/terms">Terms</a> and{" "}
                     <a href="/disclaimer">Responsible betting disclaimer</a>.
@@ -1634,8 +1633,8 @@ export default function AuthPage() {
                 </>
               ) : isSignupStepTwo ? (
                 <>
-                  <div className="auth-section">
-                    <div className="auth-section-head">
+                  <div className="auth-section full-width">
+                    <div className="auth-section-head ">
                       <div>
                         <strong>Preferred sportsbooks</strong>
                         <p>
@@ -1668,13 +1667,13 @@ export default function AuthPage() {
                             setSelectedSportsbooks((current) =>
                               allFilteredSportsbooksSelected
                                 ? current.filter(
-                                    (sportsbook) =>
-                                      !filteredSportsbookOptions.includes(sportsbook)
-                                  )
+                                  (sportsbook) =>
+                                    !filteredSportsbookOptions.includes(sportsbook)
+                                )
                                 : uniqueValues([
-                                    ...current,
-                                    ...filteredSportsbookOptions
-                                  ])
+                                  ...current,
+                                  ...filteredSportsbookOptions
+                                ])
                             )
                           }
                         >
@@ -1683,7 +1682,7 @@ export default function AuthPage() {
                             : "Select all"}
                         </button>
                         {filteredSportsbookOptions.length > INITIAL_VISIBLE_SPORTSBOOKS &&
-                        !sportsbookSearch.trim() ? (
+                          !sportsbookSearch.trim() ? (
                           <button
                             type="button"
                             className="auth-section-action"
@@ -1737,7 +1736,7 @@ export default function AuthPage() {
                     ) : null}
                   </div>
 
-                  <div className="auth-grid">
+                  <div className="auth-grid full-width">
                     <label className="field">
                       <span>Max bet</span>
                       <input
@@ -1824,84 +1823,84 @@ export default function AuthPage() {
                   </label>
                 </>
               ) : (
-                <div className="auth-tutorial-stage">
-                  <div className="auth-tutorial-frame">
-                    <div className="auth-tutorial-card">
-                      <span className="auth-tutorial-eyebrow">
-                        {activeTutorial.eyebrow}
-                      </span>
-                      <h2>{activeTutorial.title}</h2>
-                      <p>{activeTutorial.description}</p>
+                <div className="auth-tutorial-stage full-width">                  
+                    <div className="auth-tutorial-frame">
+                      <div className="auth-tutorial-card">
+                        <span className="auth-tutorial-eyebrow">
+                          {activeTutorial.eyebrow}
+                        </span>
+                        <h2>{activeTutorial.title}</h2>
+                        <p>{activeTutorial.description}</p>
 
-                      <div className="auth-tutorial-meta">
-                        <span>{activeTutorial.duration}</span>
-                        <span>{signupForm.experienceLevel || "General track"}</span>
+                        <div className="auth-tutorial-meta">
+                          <span>{activeTutorial.duration}</span>
+                          <span>{signupForm.experienceLevel || "General track"}</span>
+                        </div>
+
+                        <ul className="auth-tutorial-points">
+                          {activeTutorial.points.map((point) => (
+                            <li key={point}>{point}</li>
+                          ))}
+                        </ul>
                       </div>
-
-                      <ul className="auth-tutorial-points">
-                        {activeTutorial.points.map((point) => (
-                          <li key={point}>{point}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-
-                  <div className="auth-tutorial-footer">
-                    <div className="auth-tutorial-nav">
-                      <button
-                        type="button"
-                        className="auth-tutorial-arrow"
-                        onClick={() =>
-                          setTutorialIndex((current) =>
-                            current === 0 ? recommendedTutorials.length - 1 : current - 1
-                          )
-                        }
-                        aria-label="Previous tutorial"
-                      >
-                        ←
-                      </button>
-
-                      <div className="auth-tutorial-dots" aria-label="Tutorial selection">
-                        {recommendedTutorials.map((tutorial, index) => (
-                          <button
-                            key={tutorial.title}
-                            type="button"
-                            className={`auth-tutorial-dot ${index === tutorialIndex ? "active" : ""}`}
-                            onClick={() => setTutorialIndex(index)}
-                            aria-label={`Show tutorial ${index + 1}`}
-                          />
-                        ))}
-                      </div>
-
-                      <button
-                        type="button"
-                        className="auth-tutorial-arrow"
-                        onClick={() =>
-                          setTutorialIndex((current) =>
-                            current === recommendedTutorials.length - 1 ? 0 : current + 1
-                          )
-                        }
-                        aria-label="Next tutorial"
-                      >
-                        →
-                      </button>
                     </div>
 
-                    <button
-                      type="button"
-                      className="auth-link-chip"
-                      onClick={() => void completeSignup(true)}
-                      disabled={isSubmitting}
-                    >
-                      Skip tutorials
-                    </button>
-                  </div>
+                    <div className="auth-tutorial-footer">
+                      <div className="auth-tutorial-nav">
+                        <button
+                          type="button"
+                          className="auth-tutorial-arrow"
+                          onClick={() =>
+                            setTutorialIndex((current) =>
+                              current === 0 ? recommendedTutorials.length - 1 : current - 1
+                            )
+                          }
+                          aria-label="Previous tutorial"
+                        >
+                          ←
+                        </button>
+
+                        <div className="auth-tutorial-dots" aria-label="Tutorial selection">
+                          {recommendedTutorials.map((tutorial, index) => (
+                            <button
+                              key={tutorial.title}
+                              type="button"
+                              className={`auth-tutorial-dot ${index === tutorialIndex ? "active" : ""}`}
+                              onClick={() => setTutorialIndex(index)}
+                              aria-label={`Show tutorial ${index + 1}`}
+                            />
+                          ))}
+                        </div>
+
+                        <button
+                          type="button"
+                          className="auth-tutorial-arrow"
+                          onClick={() =>
+                            setTutorialIndex((current) =>
+                              current === recommendedTutorials.length - 1 ? 0 : current + 1
+                            )
+                          }
+                          aria-label="Next tutorial"
+                        >
+                          →
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        className="auth-link-chip"
+                        onClick={() => void completeSignup(true)}
+                        disabled={isSubmitting}
+                      >
+                        Skip tutorials
+                      </button>
+                    </div>
                 </div>
               )}
 
               {passwordError ? <div className="field-error">{passwordError}</div> : null}
 
-              <div className="auth-form-actions">
+              <div className="auth-form-actions full-width space-between">
                 {mode === "signup" && signupStep > 1 ? (
                   <button
                     type="button"

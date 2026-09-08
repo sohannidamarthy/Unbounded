@@ -3,6 +3,11 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { PricingTierCards } from "./components/PricingTierCards";
+import CommonCarousel from "./components/CommonCarousel";
+import HowCanWeHelp from "./components/howcanwehelp/HowCanWeHelp";
+import Container from "./components/container/Container";
+import SectionHeader from "./components/SectionHeader";
+import Header from "./components/header/Header";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 const FOUNDERS_CIRCLE_SEATS_TOTAL = 300;
@@ -299,526 +304,569 @@ export default function Home() {
 
   return (
     <div className="site">
-      <header className="site-header">
-        <div className="brand">
-          <Image
-            src="/unbounded.jpeg"
-            alt="Unbounded logo"
-            width={56}
-            height={56}
-            priority
-          />
-          <a className="brand-text brand-home-link" href="/">
-            <span>Unbounded</span>
-          </a>
-        </div>
-        <nav className="nav-links">
-          <a href="/">Home</a>
-          <a href="/arbitrage">Arbitrage</a>
-          <a href="/positive-ev">Positive EV</a>
-          <a href="/tools">Tools</a>
-          <a href="/tutorials">Discover</a>
-          <a href="#pricing">Pricing</a>
-        </nav>
-        <div className="header-actions">
-          {isAuthReady ? (
-            isAuthenticated ? (
-              <div className="account-menu">
-                <button
-                  className="primary header-primary pulse-on-hover"
-                  type="button"
-                  aria-haspopup="menu"
-                >
-                  Account
-                </button>
-                <div className="account-dropdown" role="menu">
-                  <a
-                    className="account-dropdown-item"
-                    role="menuitem"
-                    href="/dashboard"
-                  >
-                    Dashboard
-                  </a>
-                  <a className="account-dropdown-item" role="menuitem" href="/dashboard?panel=settings">
-                    Settings
-                  </a>
-                  <a className="account-dropdown-item" role="menuitem" href="/billing">
-                    Billing &amp; payments
-                  </a>
-                  <a className="account-dropdown-item" role="menuitem" href="/tutorials">
-                    Discover
-                  </a>
-                  <button
-                    className="account-dropdown-item"
-                    type="button"
-                    role="menuitem"
-                    onClick={handleLogout}
-                  >
-                    Log out
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <a className="primary header-primary pulse-on-hover" href="/auth">
-                Log in
-              </a>
-            )
-          ) : (
-            <div className="header-actions-placeholder" aria-hidden="true" />
-          )}
-        </div>
-      </header>
-
-      <main>
-        <section className="hero-section">
-          <div className="hero-banner hero-banner-primary">
-            <div className="hero-banner-media">
-              <div
-                className="hero-image-toggle"
-                role="tablist"
-                aria-label="Betting view"
-              >
-                {HERO_IMAGES.map((image, index) => (
-                  <button
-                    key={image.label}
-                    type="button"
-                    className={`toggle-btn ${activeHeroIndex === index ? "active" : ""
-                      }`}
-                    aria-pressed={activeHeroIndex === index}
-                    onClick={() => setActiveHeroIndex(index)}
-                  >
-                    {image.label}
-                  </button>
-                ))}
-              </div>
+      <header>
+        <Container>
+          <div className="site-header">
+            <div className="brand">
               <Image
-                src={heroImage.src}
-                alt="Unbounded preview"
-                width={1200}
-                height={720}
+                src="/unbounded.jpeg"
+                alt="Unbounded logo"
+                width={56}
+                height={56}
                 priority
               />
+              <a className="brand-text brand-home-link" href="/">
+                <span>Unbounded</span>
+              </a>
             </div>
-            <div className="hero-banner-cta">
-              <p className="eyebrow">Premium access</p>
-              <h2>Unlock sharper market insight.</h2>
-              <p className="lede">
-                A focused workspace for odds, alerts, and edge tracking. Create
-                an account or explore the pricing tiers to get started.
-              </p>
-              <div className="hero-banner-actions">
-                <a
-                  className="primary header-primary pulse-on-hover"
-                  href="/auth"
-                >
-                  Create account
-                </a>
-                <a className="ghost pulse-on-hover" href="#pricing">
-                  View pricing
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="hero-banner hero-banner-secondary">
-            <div className="hero-banner-label">
-              <span>Features</span>
-            </div>
-            <div className="hero-banner-media">
-              <div
-                className="hero-image-toggle"
-                role="tablist"
-                aria-label="Betting workflow"
-              >
-                {SECONDARY_IMAGES.map((image, index) => (
-                  <button
-                    key={image.label}
-                    type="button"
-                    className={`toggle-btn ${activeSecondaryIndex === index ? "active" : ""
-                      }`}
-                    aria-pressed={activeSecondaryIndex === index}
-                    onClick={() => setActiveSecondaryIndex(index)}
-                  >
-                    {image.label}
-                  </button>
-                ))}
-              </div>
-              <Image
-                src={secondaryImage.src}
-                alt="Unbounded workflow preview"
-                width={1200}
-                height={720}
-              />
-            </div>
-          </div>
-        </section>
-
-        <section className="section calculator-hero">
-          <div className="section-header">
-            <h2>Calculate arbitrage and EV directly</h2>
-          </div>
-          <div className="calculator-grid">
-            <div className="calculator-card">
-              <h3>Arb/EV Calculator</h3>
-              <div className="calculator-inputs">
-                <label>
-                  Odds A (+American)
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="+110"
-                    value={calcOddsA}
-                    onChange={(e) => setCalcOddsA(e.target.value)}
-                    maxLength={10}
-                  />
-                </label>
-                <label>
-                  Odds B (-American)
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="-110"
-                    value={calcOddsB}
-                    onChange={(e) => setCalcOddsB(e.target.value)}
-                    maxLength={10}
-                  />
-                </label>
-                <label>
-                  Stake
-                  <input
-                    type="number"
-                    min="0"
-                    placeholder="100"
-                    value={calcStake}
-                    onChange={(e) => setCalcStake(e.target.value)}
-                  />
-                </label>
-                <div style={{
-                  display: "flex",
-                  gap: "10px"
-                }}>
-                  <button
-                    className="primary small"
-                    onClick={() => setCalcMode("arb")}
-                  >
-                    Calculate Arb
-                  </button>
-                  <button
-                    className="primary small"
-                    onClick={() => setCalcMode("ev")}
-                  >
-                    Calculate EV
-                  </button>
-                </div>
-              </div>
-              <div
-                id="calc-results"
-                className="calculator-results"
-              >
-                {results && (
-                  <div className={results.type === "arb" ? "arb-results" : "ev-results"}>
-                    {results.type === "arb" && (
-                      <div className="result-row">
-                        <span>Arbitrage:</span>
-                        <span>{results.hasArbitrage ? "Yes" : "No"}</span>
-                      </div>
-                    )}
-                    {results.type === "arb" && (
-                      <div className="result-row">
-                        <span>Stake A:</span>
-                        <span id="arb-stake-a">{results.arbStakeA}</span>
-                      </div>
-                    )}
-                    {results.type === "arb" && (
-                      <div className="result-row">
-                        <span>Stake B:</span>
-                        <span id="arb-stake-b">{results.arbStakeB}</span>
-                      </div>
-                    )}
-                    {results.type === "arb" && (
-                      <div className="result-row">
-                        <span>Net profit:</span>
-                        <span id="arb-profit">{results.arbNetProfit}</span>
-                      </div>
-                    )}
-                    {results.type === "arb" && (
-                      <div className="result-row">
-                        <span>Book hold:</span>
-                        <span id="arb-hold">{results.holdPct}%</span>
-                      </div>
-                    )}
-                    {results.type === "ev" && (
-                      <div className="result-row">
-                        <span>If side A wins:</span>
-                        <span id="ev-profit-a">{results.evProfitA}</span>
-                      </div>
-                    )}
-                    {results.type === "ev" && (
-                      <div className="result-row">
-                        <span>If side B wins:</span>
-                        <span id="ev-profit-b">{results.evProfitB}</span>
-                      </div>
-                    )}
-                    {results.type === "ev" && (
-                      <div className="result-row">
-                        <span>Total stake lost:</span>
-                        <span id="ev-stake-lost">{results.evStakeLost}</span>
-                      </div>
-                    )}
+            <nav className="nav-links">
+              <a href="/">Home</a>
+              <a href="/arbitrage">Arbitrage</a>
+              <a href="/positive-ev">Positive EV</a>
+              <a href="/tools">Tools</a>
+              <a href="/tutorials">Discover</a>
+              <a href="#pricing">Pricing</a>
+            </nav>
+            <div className="header-actions">
+              {isAuthReady ? (
+                isAuthenticated ? (
+                  <div className="account-menu">
+                    <button
+                      className="primary header-primary pulse-on-hover"
+                      type="button"
+                      aria-haspopup="menu"
+                    >
+                      Account
+                    </button>
+                    <div className="account-dropdown" role="menu">
+                      <a
+                        className="account-dropdown-item"
+                        role="menuitem"
+                        href="/dashboard"
+                      >
+                        Dashboard
+                      </a>
+                      <a className="account-dropdown-item" role="menuitem" href="/dashboard?panel=settings">
+                        Settings
+                      </a>
+                      <a className="account-dropdown-item" role="menuitem" href="/billing">
+                        Billing &amp; payments
+                      </a>
+                      <a className="account-dropdown-item" role="menuitem" href="/tutorials">
+                        Discover
+                      </a>
+                      <button
+                        className="account-dropdown-item"
+                        type="button"
+                        role="menuitem"
+                        onClick={handleLogout}
+                      >
+                        Log out
+                      </button>
+                    </div>
                   </div>
-                )}
-                {(!calcOddsA || !calcOddsB || !calcStake) && (
-                  <p className="calc-instruction">
-                    Enter valid odds and stake to see results.
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className="calculator-card">
-              <h3>How the math works</h3>
-              <div className="calculator-explainer">
-                <p>
-                  <strong>Implied probability</strong> is what a price says the
-                  market thinks will happen: 1 ÷ decimal odds. American +110
-                  converts to 2.10 decimal, or a 47.6% implied chance; -110
-                  converts to 1.909 decimal, or 52.4%.
-                </p>
-                <p>
-                  <strong>Arbitrage</strong> exists when the implied
-                  probabilities on both sides of a bet add up to less than
-                  100% &mdash; meaning the two books disagree enough that you
-                  can stake both sides and lock in a profit no matter which
-                  one wins.
-                </p>
-                <div className="calculator-explainer-example">
-                  <span>Worked example</span>
-                  <p>
-                    Type +110 into Odds A, -110 into Odds B, and 100 into
-                    Stake above &mdash; the same numbers preloaded as
-                    placeholders &mdash; and switch to Calculate Arb:
-                  </p>
-                  <ul>
-                    <li>47.6% + 52.4% = 100.0% implied &rarr; no arbitrage here (a true arb needs the sum under 100%)</li>
-                    <li>Stake splits proportionally across both sides so the payout matches regardless of winner</li>
-                    <li>&quot;Book hold&quot; in the results shows how far over 100% the market is priced &mdash; the vig you&apos;re paying</li>
-                  </ul>
-                </div>
-                <p>
-                  <strong>Expected value (EV)</strong> is (chance you win ×
-                  amount won) − (chance you lose × amount staked). A bet is
-                  +EV when your estimate of the true win probability is
-                  higher than what the odds imply. The calculator above shows
-                  the payout on each side if it wins &mdash; pairing that with
-                  your own win-probability estimate is what turns it into a
-                  real EV calculation.
-                </p>
-                <div className="calculator-explainer-actions">
-                  <button
-                    className="primary tiny"
-                    onClick={() => {
-                      setCalcMode("ev");
-                      setCalcStake("");
-                      setCalcOddsA("");
-                      setCalcOddsB("");
-                    }}
-                  >
-                    Clear inputs
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section id="how-it-works" className="section how-it-works">
-          <div className="section-header">
-            <h2>How Unbounded works</h2>
-            <p>
-              Four steps from a mispriced line to a documented, tracked
-              result.
-            </p>
-          </div>
-          <div className="workflow-steps">
-            {HOW_IT_WORKS_STEPS.map((step, index) => (
-              <div key={step.title}>
-                <span>Step {index + 1}</span>
-                <strong>{step.title}</strong>
-                <p>{step.description}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="pricing" className="section pricing-section">
-          <div className="section-header">
-            <h2>Pricing plans</h2>
-            <p>
-              Choose Select, Premium, or Executive. Select starts at $1.99 per
-              day on this page, and annual payment is highlighted because it
-              saves 10% across the year.
-            </p>
-          </div>
-          <PricingTierCards />
-          <div className="pricing-waitlist">
-            <Image
-              src="/newsettlerbg.png"
-              alt=""
-              fill
-              sizes="100vw"
-              style={{ objectFit: "cover" }}
-              className="pricing-waitlist-bg"
-            />
-            <div className="pricing-waitlist-content">
-              <div className="pricing-waitlist-copy">
-                <h3>Stay updated</h3>
-                <p>Receive product updates, tier announcements, and betting workflow notes.</p>
-              </div>
-              {newsletterSubscribed ? (
-                <p className="newsletter-inline-success" role="status">
-                  You&apos;re subscribed. Watch your inbox for the next update.
-                </p>
+                ) : (
+                  <a className="primary header-primary pulse-on-hover" href="/auth">
+                    Log in
+                  </a>
+                )
               ) : (
-                <form className="newsletter-inline-form" onSubmit={handleNewsletterSubmit}>
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    autoComplete="email"
-                    required
-                  />
-                  <button className="primary pulse-on-hover" type="submit">
-                    {isNewsletterSubmitting ? "Subscribing..." : "Subscribe"}
-                  </button>
-                </form>
+                <div className="header-actions-placeholder" aria-hidden="true" />
               )}
             </div>
           </div>
-        </section>
-        <section id="workflow" className="section workflow">
-          <div className="workflow-card">
-            <div className="why-header">
-              <div>
-                <h2>Why Unbounded works</h2>
-                <p>
-                  Unbounded keeps the parts that usually get split across tabs
-                  in one professional workflow: scanning, sizing, sharing,
-                  tracking, and review.
+        </Container>
+      </header>
+      
+      {/* <Header /> */}
+      
+      <main>
+        <section className="section hero-section">
+          <Container>
+            <div className="hero-banner hero-banner-primary">
+              <div className="hero-banner-media">
+                <div
+                  className="hero-image-toggle"
+                  role="tablist"
+                  aria-label="Betting view"
+                >
+                  {HERO_IMAGES.map((image, index) => (
+                    <button
+                      key={image.label}
+                      type="button"
+                      className={`toggle-btn ${activeHeroIndex === index ? "active" : ""
+                        }`}
+                      aria-pressed={activeHeroIndex === index}
+                      onClick={() => setActiveHeroIndex(index)}
+                    >
+                      {image.label}
+                    </button>
+                  ))}
+                </div>
+                <Image
+                  src={heroImage.src}
+                  alt="Unbounded preview"
+                  width={1200}
+                  height={720}
+                  priority
+                />
+              </div>
+              <div className="hero-banner-cta">
+                <p className="eyebrow">Premium access</p>
+                <h2>Unlock sharper market insight.</h2>
+                <p className="lede">
+                  A focused workspace for odds, alerts, and edge tracking. Create
+                  an account or explore the pricing tiers to get started.
                 </p>
-              </div>
-              <div className="why-badges">
-                <span>17 sportsbooks integrated</span>
-                <span>Fast withdrawal notes</span>
-                <span>Profit tracking included</span>
-              </div>
-            </div>
-            <div className="why-comparison">
-              <div className="why-highlight">
-                <h3>Unbounded</h3>
-                <ul>
-                  <li>Scan arbitrage and +EV boards without jumping between tools</li>
-                  <li>Track profit, notes, and outcomes in one reviewable place</li>
-                  <li>Use a simple calculator and validator before saving bets</li>
-                  <li>Transparent tier pricing before signup</li>
-                  <li>Coverage designed around 17 integrated sportsbook workflows</li>
-                  <li>Fastest withdrawal methods documented by sportsbook as coverage expands</li>
-                </ul>
-              </div>
-              <div className="why-contrast">
-                <h3>Similar tools</h3>
-                <ul>
-                  <li>Separate scanners, calculators, and trackers</li>
-                  <li>Alerts without stake size or decision context</li>
-                  <li>Useful features held back behind unclear add-ons</li>
-                  <li>Little guidance after the bet is placed</li>
-                  <li>More manual exporting and tab switching</li>
-                </ul>
+                <div className="hero-banner-actions">
+                  <a
+                    className="primary header-primary pulse-on-hover"
+                    href="/auth"
+                  >
+                    Create account
+                  </a>
+                  <a className="ghost pulse-on-hover" href="#pricing">
+                    View pricing
+                  </a>
+                </div>
               </div>
             </div>
-            <div className="workflow-benefits">
-              <article>
-                <strong>Simple enough to use daily</strong>
-                <p>Boards, calculator, tracker, and education stay connected so the workflow feels like one tool.</p>
-              </article>
-              <article>
-                <strong>Built beyond top-tier users</strong>
-                <p>Select, Premium, and Executive users all get clear value, with features scaling by workflow depth.</p>
-              </article>
-              <article>
-                <strong>Continuous improvement</strong>
-                <p>Member feedback helps decide what gets added next across dashboards, tutorials, and discovery.</p>
-              </article>
+          </Container>
+        </section>
+
+        <section className="section hero-section">
+          <Container>
+            <div className="hero-banner hero-banner-secondary">
+              <div className="hero-banner-label">
+                <span>Features</span>
+              </div>
+              <div className="hero-banner-media">
+                <div
+                  className="hero-image-toggle"
+                  role="tablist"
+                  aria-label="Betting workflow"
+                >
+                  {SECONDARY_IMAGES.map((image, index) => (
+                    <button
+                      key={image.label}
+                      type="button"
+                      className={`toggle-btn ${activeSecondaryIndex === index ? "active" : ""
+                        }`}
+                      aria-pressed={activeSecondaryIndex === index}
+                      onClick={() => setActiveSecondaryIndex(index)}
+                    >
+                      {image.label}
+                    </button>
+                  ))}
+                </div>
+                <Image
+                  src={secondaryImage.src}
+                  alt="Unbounded workflow preview"
+                  width={1200}
+                  height={720}
+                />
+              </div>
             </div>
-          </div>
+          </Container>
+        </section>
+
+        <section className="section calculator-hero">
+          <Container>
+            <SectionHeader title="Calculate arbitrage and EV directly" />
+            <div className="section-header">
+              <h2></h2>
+            </div>
+            <div className="calculator-grid">
+              <div className="calculator-card">
+                <h3>Arb/EV Calculator</h3>
+                <div className="calculator-inputs">
+                  <label>
+                    Odds A (+American)
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="+110"
+                      value={calcOddsA}
+                      onChange={(e) => setCalcOddsA(e.target.value)}
+                      maxLength={10}
+                    />
+                  </label>
+                  <label>
+                    Odds B (-American)
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="-110"
+                      value={calcOddsB}
+                      onChange={(e) => setCalcOddsB(e.target.value)}
+                      maxLength={10}
+                    />
+                  </label>
+                  <label>
+                    Stake
+                    <input
+                      type="number"
+                      min="0"
+                      placeholder="100"
+                      value={calcStake}
+                      onChange={(e) => setCalcStake(e.target.value)}
+                    />
+                  </label>
+                  <div style={{
+                    display: "flex",
+                    gap: "10px"
+                  }}>
+                    <button
+                      className="primary small"
+                      onClick={() => setCalcMode("arb")}
+                    >
+                      Calculate Arb
+                    </button>
+                    <button
+                      className="primary small"
+                      onClick={() => setCalcMode("ev")}
+                    >
+                      Calculate EV
+                    </button>
+                  </div>
+                </div>
+                <div
+                  id="calc-results"
+                  className="calculator-results"
+                >
+                  {results && (
+                    <div className={results.type === "arb" ? "arb-results" : "ev-results"}>
+                      {results.type === "arb" && (
+                        <div className="result-row">
+                          <span>Arbitrage:</span>
+                          <span>{results.hasArbitrage ? "Yes" : "No"}</span>
+                        </div>
+                      )}
+                      {results.type === "arb" && (
+                        <div className="result-row">
+                          <span>Stake A:</span>
+                          <span id="arb-stake-a">{results.arbStakeA}</span>
+                        </div>
+                      )}
+                      {results.type === "arb" && (
+                        <div className="result-row">
+                          <span>Stake B:</span>
+                          <span id="arb-stake-b">{results.arbStakeB}</span>
+                        </div>
+                      )}
+                      {results.type === "arb" && (
+                        <div className="result-row">
+                          <span>Net profit:</span>
+                          <span id="arb-profit">{results.arbNetProfit}</span>
+                        </div>
+                      )}
+                      {results.type === "arb" && (
+                        <div className="result-row">
+                          <span>Book hold:</span>
+                          <span id="arb-hold">{results.holdPct}%</span>
+                        </div>
+                      )}
+                      {results.type === "ev" && (
+                        <div className="result-row">
+                          <span>If side A wins:</span>
+                          <span id="ev-profit-a">{results.evProfitA}</span>
+                        </div>
+                      )}
+                      {results.type === "ev" && (
+                        <div className="result-row">
+                          <span>If side B wins:</span>
+                          <span id="ev-profit-b">{results.evProfitB}</span>
+                        </div>
+                      )}
+                      {results.type === "ev" && (
+                        <div className="result-row">
+                          <span>Total stake lost:</span>
+                          <span id="ev-stake-lost">{results.evStakeLost}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {(!calcOddsA || !calcOddsB || !calcStake) && (
+                    <p className="calc-instruction">
+                      Enter valid odds and stake to see results.
+                    </p>
+                  )}
+                </div>
+              </div>
+              <div className="calculator-card">
+                <h3>How the math works</h3>
+                <div className="calculator-explainer">
+                  <p>
+                    <strong>Implied probability</strong> is what a price says the
+                    market thinks will happen: 1 ÷ decimal odds. American +110
+                    converts to 2.10 decimal, or a 47.6% implied chance; -110
+                    converts to 1.909 decimal, or 52.4%.
+                  </p>
+                  <p>
+                    <strong>Arbitrage</strong> exists when the implied
+                    probabilities on both sides of a bet add up to less than
+                    100% &mdash; meaning the two books disagree enough that you
+                    can stake both sides and lock in a profit no matter which
+                    one wins.
+                  </p>
+                  <div className="calculator-explainer-example">
+                    <span>Worked example</span>
+                    <p>
+                      Type +110 into Odds A, -110 into Odds B, and 100 into
+                      Stake above &mdash; the same numbers preloaded as
+                      placeholders &mdash; and switch to Calculate Arb:
+                    </p>
+                    <ul>
+                      <li>47.6% + 52.4% = 100.0% implied &rarr; no arbitrage here (a true arb needs the sum under 100%)</li>
+                      <li>Stake splits proportionally across both sides so the payout matches regardless of winner</li>
+                      <li>&quot;Book hold&quot; in the results shows how far over 100% the market is priced &mdash; the vig you&apos;re paying</li>
+                    </ul>
+                  </div>
+                  <p>
+                    <strong>Expected value (EV)</strong> is (chance you win ×
+                    amount won) − (chance you lose × amount staked). A bet is
+                    +EV when your estimate of the true win probability is
+                    higher than what the odds imply. The calculator above shows
+                    the payout on each side if it wins &mdash; pairing that with
+                    your own win-probability estimate is what turns it into a
+                    real EV calculation.
+                  </p>
+                  <div className="calculator-explainer-actions">
+                    <button
+                      className="primary tiny"
+                      onClick={() => {
+                        setCalcMode("ev");
+                        setCalcStake("");
+                        setCalcOddsA("");
+                        setCalcOddsB("");
+                      }}
+                    >
+                      Clear inputs
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Container>
+
+        </section>
+
+        <section id="how-it-works" className="section how-it-works">
+          <Container>
+            <SectionHeader title="How Unbounded works" description="Four steps from a mispriced line to a documented, tracked result." />
+            <div className="workflow-steps">
+              {HOW_IT_WORKS_STEPS.map((step, index) => (
+                <div key={step.title}>
+                  <span>Step {index + 1}</span>
+                  <strong>{step.title}</strong>
+                  <p>{step.description}</p>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </section>
+
+        <section id="pricing" className="section pricing-section">
+          <Container>
+            <SectionHeader title="Pricing plans" description="Choose Select, Premium, or Executive. Select starts at $1.99 per
+                day on this page, and annual payment is highlighted because it saves 10% across the year." />
+            <PricingTierCards />
+          </Container>
+        </section>
+        
+        <section className="section">
+          <Container>
+            <div className="pricing-waitlist">
+              <Image
+                src="/newsettlerbg.png"
+                alt=""
+                fill
+                sizes="100vw"
+                style={{ objectFit: "cover" }}
+                className="pricing-waitlist-bg"
+              />
+              <div className="pricing-waitlist-content">
+                <div className="pricing-waitlist-copy">
+                  <h3>Stay updated</h3>
+                  <p>Receive product updates, tier announcements, and betting workflow notes.</p>
+                </div>
+                {newsletterSubscribed ? (
+                  <p className="newsletter-inline-success" role="status">
+                    You&apos;re subscribed. Watch your inbox for the next update.
+                  </p>
+                ) : (
+                  <form className="newsletter-inline-form" onSubmit={handleNewsletterSubmit}>
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="Enter your email"
+                      autoComplete="email"
+                      required
+                    />
+                    <button className="primary pulse-on-hover" type="submit">
+                      {isNewsletterSubmitting ? "Subscribing..." : "Subscribe"}
+                    </button>
+                  </form>
+                )}
+              </div>
+            </div>
+          </Container>
+        </section>
+
+        <section id="workflow" className="section workflow">
+          <Container>
+            <div className="workflow-card">
+              <div className="why-header">
+                <div>
+                  <h2>Why Unbounded works</h2>
+                  <p>
+                    Unbounded keeps the parts that usually get split across tabs
+                    in one professional workflow: scanning, sizing, sharing,
+                    tracking, and review.
+                  </p>
+                </div>
+                <div className="why-badges">
+                  <span>17 sportsbooks integrated</span>
+                  <span>Fast withdrawal notes</span>
+                  <span>Profit tracking included</span>
+                </div>
+              </div>
+              <div className="why-comparison">
+                <div className="why-highlight">
+                  <h3>Unbounded</h3>
+                  <ul>
+                    <li>Scan arbitrage and +EV boards without jumping between tools</li>
+                    <li>Track profit, notes, and outcomes in one reviewable place</li>
+                    <li>Use a simple calculator and validator before saving bets</li>
+                    <li>Transparent tier pricing before signup</li>
+                    <li>Coverage designed around 17 integrated sportsbook workflows</li>
+                    <li>Fastest withdrawal methods documented by sportsbook as coverage expands</li>
+                  </ul>
+                </div>
+                <div className="why-contrast">
+                  <h3>Similar tools</h3>
+                  <ul>
+                    <li>Separate scanners, calculators, and trackers</li>
+                    <li>Alerts without stake size or decision context</li>
+                    <li>Useful features held back behind unclear add-ons</li>
+                    <li>Little guidance after the bet is placed</li>
+                    <li>More manual exporting and tab switching</li>
+                  </ul>
+                </div>
+              </div>
+              <div className="workflow-benefits">
+                <article>
+                  <strong>Simple enough to use daily</strong>
+                  <p>Boards, calculator, tracker, and education stay connected so the workflow feels like one tool.</p>
+                </article>
+                <article>
+                  <strong>Built beyond top-tier users</strong>
+                  <p>Select, Premium, and Executive users all get clear value, with features scaling by workflow depth.</p>
+                </article>
+                <article>
+                  <strong>Continuous improvement</strong>
+                  <p>Member feedback helps decide what gets added next across dashboards, tutorials, and discovery.</p>
+                </article>
+              </div>
+            </div>
+          </Container>
         </section>
 
         <section id="testimonials" className="section testimonials">
-          <div className="section-header testimonials-header">
-            <div>
-              <h2>Trusted by founders and operators building sharper workflows</h2>
-              <p>
-                Early users rely on Unbounded to cut delay, document decisions,
-                and move faster during live windows.
-              </p>
-            </div>
-          </div>
-          <div
-            className="testimonial-stage"
-            onMouseEnter={() => setIsTestimonialPaused(true)}
-            onMouseLeave={() => setIsTestimonialPaused(false)}
-          >
-            <button
-              type="button"
-              className="testimonial-arrow testimonial-arrow--prev"
-              onClick={() => showTestimonial(activeTestimonialIndex - 1)}
-              aria-label="Previous testimonial"
+          <Container>
+            <SectionHeader title="Trusted by founders and operators building sharper workflows"
+              description="Early users rely on Unbounded to cut delay, document decisions, and move faster during live windows." />
+
+            {/* <div
+              className="testimonial-stage"
+              onMouseEnter={() => setIsTestimonialPaused(true)}
+              onMouseLeave={() => setIsTestimonialPaused(false)}
             >
-              ‹
-            </button>
-            <div className="testimonial-card" key={activeTestimonial.quote}>
-              <div className="testimonial-quote">
-                <p>“{activeTestimonial.quote}”</p>
-              </div>
-              <div className="testimonial-meta">
-                <div className="testimonial-avatar" aria-hidden="true">
-                  <span>{activeTestimonial.name.charAt(0)}</span>
+              <button
+                type="button"
+                className="testimonial-arrow testimonial-arrow--prev"
+                onClick={() => showTestimonial(activeTestimonialIndex - 1)}
+                aria-label="Previous testimonial"
+              >
+                ‹
+              </button>
+              <div className="testimonial-card" key={activeTestimonial.quote}>
+                <div className="testimonial-quote">
+                  <p>“{activeTestimonial.quote}”</p>
                 </div>
-                <div>
-                  <strong>{activeTestimonial.name}</strong>
-                  <span>{activeTestimonial.role}</span>
+                <div className="testimonial-meta">
+                  <div className="testimonial-avatar" aria-hidden="true">
+                    <span>{activeTestimonial.name.charAt(0)}</span>
+                  </div>
+                  <div>
+                    <strong>{activeTestimonial.name}</strong>
+                    <span>{activeTestimonial.role}</span>
+                  </div>
+                </div>
+                <div className="testimonial-dots" role="tablist">
+                  {TESTIMONIALS.map((testimonial, index) => (
+                    <button
+                      key={testimonial.quote}
+                      type="button"
+                      className={`dot ${activeTestimonialIndex === index ? "active" : ""
+                        }`}
+                      aria-pressed={activeTestimonialIndex === index}
+                      onClick={() => setActiveTestimonialIndex(index)}
+                    />
+                  ))}
                 </div>
               </div>
-              <div className="testimonial-dots" role="tablist">
-                {TESTIMONIALS.map((testimonial, index) => (
-                  <button
-                    key={testimonial.quote}
-                    type="button"
-                    className={`dot ${activeTestimonialIndex === index ? "active" : ""
-                      }`}
-                    aria-pressed={activeTestimonialIndex === index}
-                    onClick={() => setActiveTestimonialIndex(index)}
-                  />
-                ))}
-              </div>
-            </div>
-            <button
-              type="button"
-              className="testimonial-arrow testimonial-arrow--next"
-              onClick={() => showTestimonial(activeTestimonialIndex + 1)}
-              aria-label="Next testimonial"
-            >
-              ›
-            </button>
-          </div>
+              <button
+                type="button"
+                className="testimonial-arrow testimonial-arrow--next"
+                onClick={() => showTestimonial(activeTestimonialIndex + 1)}
+                aria-label="Next testimonial"
+              >
+                ›
+              </button>
+            </div> */}
+
+            <CommonCarousel
+              data={TESTIMONIALS}
+              mobileSlides={1}
+              tabletSlides={1}
+              desktopSlides={2}
+              mobileSpaceBetween={16}
+              tabletSpaceBetween={20}
+              desktopSpaceBetween={24}
+              showArrows={false}
+              showDots={true}
+              autoPlay={true}
+              autoPlayDelay={5000}
+              renderItem={(testimonial) => (
+                <article className="testimonial-card">
+                  <div className="testimonial-quote">
+                    <p>“{testimonial.quote}”</p>
+                  </div>
+
+                  <div className="testimonial-meta">
+                    <div className="testimonial-avatar" aria-hidden="true">
+                      <span>{testimonial.name.charAt(0)}</span>
+                    </div>
+
+                    <div>
+                      <strong>{testimonial.name}</strong>
+                      <span>{testimonial.role}</span>
+                    </div>
+                  </div>
+                </article>
+              )}
+            />
+          </Container>
         </section>
 
         <section id="team-insights" className="section insights">
-          <div className="section-header">
-            <h2>Insights from inside Unbounded</h2>
-            <p>
-              Notes from the teams building and running the platform day to
-              day, not just the marketing copy.
-            </p>
-          </div>
-          <div className="insights-grid">
+          <Container>
+            <SectionHeader title="Insights from inside Unbounded"
+              description="Notes from the teams building and running the platform day to day, not just the marketing copy." />
+
+
+            {/* <div className="insights-grid">
             {COMPANY_INSIGHTS.map((insight) => (
               <article className="insight-card" key={insight.name}>
                 <p className="insight-quote">“{insight.quote}”</p>
@@ -833,133 +881,170 @@ export default function Home() {
                 </div>
               </article>
             ))}
-          </div>
+          </div> */}
+            <CommonCarousel
+              data={COMPANY_INSIGHTS}
+              mobileSlides={1}
+              tabletSlides={2}
+              desktopSlides={3}
+              mobileSpaceBetween={16}
+              tabletSpaceBetween={20}
+              desktopSpaceBetween={24}
+              showArrows={false}
+              showDots={true}
+              autoPlay={true}
+              autoPlayDelay={5000}
+              renderItem={(insight) => (
+                <article className="insight-card">
+                  <p className="insight-quote">
+                    “{insight.quote}”
+                  </p>
+
+                  <div className="insight-meta">
+                    <div className="insight-avatar" aria-hidden="true">
+                      <span>{insight.name.charAt(0)}</span>
+                    </div>
+
+                    <div>
+                      <strong>{insight.name}</strong>
+                      <span>{insight.role}</span>
+                    </div>
+                  </div>
+                </article>
+              )}
+            />
+          </Container>
         </section>
 
         <section id="founders-circle" className="section founders-circle-section">
-          <div className="founders-circle">
-            <div className="founders-circle-badge" aria-hidden="true">
-              <div className="founders-circle-badge-glow" />
-              <svg viewBox="0 0 120 120" width="100%" height="100%" fill="none">
-                <circle
-                  cx="60"
-                  cy="60"
-                  r="54"
-                  stroke="#f2c969"
-                  strokeWidth="2"
-                  strokeDasharray="6 7"
-                  className="founders-circle-badge-ring"
-                />
-                <circle cx="60" cy="60" r="44" fill="url(#foundersCircleGradient)" />
-                <circle cx="60" cy="60" r="44" stroke="rgba(8,27,47,0.4)" strokeWidth="1.5" />
-                <defs>
-                  <linearGradient
-                    id="foundersCircleGradient"
-                    x1="10"
-                    y1="10"
-                    x2="110"
-                    y2="110"
-                    gradientUnits="userSpaceOnUse"
-                  >
-                    <stop stopColor="#f5d488" />
-                    <stop offset="1" stopColor="#a5771f" />
-                  </linearGradient>
-                </defs>
-                <text
-                  x="60"
-                  y="74"
-                  textAnchor="middle"
-                  fontSize="42"
-                  fontWeight="700"
-                  fill="#081b2f"
-                >
-                  F
-                </text>
-              </svg>
-            </div>
-            <div className="founders-circle-copy">
-              <span className="founders-circle-eyebrow">Limited access · 300 seats</span>
-              <h2>Founders Circle Council</h2>
-              <p>
-                The Founders Circle Council is a small, invite-capped group of
-                Unbounded&apos;s earliest members. In exchange for feedback on
-                every new tool before it ships, the Council gets pricing and
-                perks that are never offered again once the seats are gone.
-                It&apos;s part advisory board, part standing discount &mdash;
-                and it disappears the moment seat 300 is claimed.
-              </p>
-              <ul className="founders-circle-benefits">
-                <li>Up to 50% off</li>
-                <li>First 300</li>
-                <li>More Future exclusive deals</li>
-              </ul>
-              <div className="founders-circle-progress">
-                <div
-                  className="founders-circle-progress-track"
-                  role="progressbar"
-                  aria-valuenow={FOUNDERS_CIRCLE_SEATS_CLAIMED}
-                  aria-valuemin={0}
-                  aria-valuemax={FOUNDERS_CIRCLE_SEATS_TOTAL}
-                  aria-label="Founder seats claimed"
-                >
-                  <div
-                    className="founders-circle-progress-fill"
-                    style={{
-                      width: `${(FOUNDERS_CIRCLE_SEATS_CLAIMED / FOUNDERS_CIRCLE_SEATS_TOTAL) * 100}%`
-                    }}
+          <Container>
+            <div className="founders-circle">
+              <div className="founders-circle-badge" aria-hidden="true">
+                <div className="founders-circle-badge-glow" />
+                <svg viewBox="0 0 120 120" width="100%" height="100%" fill="none">
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="54"
+                    stroke="#f2c969"
+                    strokeWidth="2"
+                    strokeDasharray="6 7"
+                    className="founders-circle-badge-ring"
                   />
-                </div>
-                <p>
-                  {FOUNDERS_CIRCLE_SEATS_CLAIMED} of {FOUNDERS_CIRCLE_SEATS_TOTAL} founder seats claimed
-                </p>
+                  <circle cx="60" cy="60" r="44" fill="url(#foundersCircleGradient)" />
+                  <circle cx="60" cy="60" r="44" stroke="rgba(8,27,47,0.4)" strokeWidth="1.5" />
+                  <defs>
+                    <linearGradient
+                      id="foundersCircleGradient"
+                      x1="10"
+                      y1="10"
+                      x2="110"
+                      y2="110"
+                      gradientUnits="userSpaceOnUse"
+                    >
+                      <stop stopColor="#f5d488" />
+                      <stop offset="1" stopColor="#a5771f" />
+                    </linearGradient>
+                  </defs>
+                  <text
+                    x="60"
+                    y="74"
+                    textAnchor="middle"
+                    fontSize="42"
+                    fontWeight="700"
+                    fill="#081b2f"
+                  >
+                    F
+                  </text>
+                </svg>
               </div>
-              {foundersCircleSubmitted ? (
-                <p className="founders-circle-success" role="status">
-                  You&apos;re on the list. We&apos;ll follow up by email if a
-                  founder seat opens up for you.
+              <div className="founders-circle-copy">
+                <span className="founders-circle-eyebrow">Limited access · 300 seats</span>
+                <h2>Founders Circle Council</h2>
+                <p>
+                  The Founders Circle Council is a small, invite-capped group of
+                  Unbounded&apos;s earliest members. In exchange for feedback on
+                  every new tool before it ships, the Council gets pricing and
+                  perks that are never offered again once the seats are gone.
+                  It&apos;s part advisory board, part standing discount &mdash;
+                  and it disappears the moment seat 300 is claimed.
                 </p>
-              ) : (
-                <form
-                  className="founders-circle-form"
-                  onSubmit={handleFoundersCircleSubmit}
-                >
-                  <div className="founders-circle-form-row">
-                    <input
-                      name="firstName"
-                      type="text"
-                      placeholder="First name"
-                      autoComplete="given-name"
-                      required
-                    />
-                    <input
-                      name="lastName"
-                      type="text"
-                      placeholder="Last name"
-                      autoComplete="family-name"
-                      required
+                <ul className="founders-circle-benefits">
+                  <li>Up to 50% off</li>
+                  <li>First 300</li>
+                  <li>More Future exclusive deals</li>
+                </ul>
+                <div className="founders-circle-progress">
+                  <div
+                    className="founders-circle-progress-track"
+                    role="progressbar"
+                    aria-valuenow={FOUNDERS_CIRCLE_SEATS_CLAIMED}
+                    aria-valuemin={0}
+                    aria-valuemax={FOUNDERS_CIRCLE_SEATS_TOTAL}
+                    aria-label="Founder seats claimed"
+                  >
+                    <div
+                      className="founders-circle-progress-fill"
+                      style={{
+                        width: `${(FOUNDERS_CIRCLE_SEATS_CLAIMED / FOUNDERS_CIRCLE_SEATS_TOTAL) * 100}%`
+                      }}
                     />
                   </div>
-                  <input
-                    name="email"
-                    type="email"
-                    placeholder="Email address"
-                    autoComplete="email"
-                    required
-                  />
-                  <button
-                    className="primary pulse-on-hover"
-                    type="submit"
-                    disabled={isFoundersCircleSubmitting}
+                  <p>
+                    {FOUNDERS_CIRCLE_SEATS_CLAIMED} of {FOUNDERS_CIRCLE_SEATS_TOTAL} founder seats claimed
+                  </p>
+                </div>
+                {foundersCircleSubmitted ? (
+                  <p className="founders-circle-success" role="status">
+                    You&apos;re on the list. We&apos;ll follow up by email if a
+                    founder seat opens up for you.
+                  </p>
+                ) : (
+                  <form
+                    className="founders-circle-form"
+                    onSubmit={handleFoundersCircleSubmit}
                   >
-                    {isFoundersCircleSubmitting
-                      ? "Submitting..."
-                      : "Apply for a founder seat"}
-                  </button>
-                </form>
-              )}
+                    <div className="founders-circle-form-row">
+                      <input
+                        name="firstName"
+                        type="text"
+                        placeholder="First name"
+                        autoComplete="given-name"
+                        required
+                      />
+                      <input
+                        name="lastName"
+                        type="text"
+                        placeholder="Last name"
+                        autoComplete="family-name"
+                        required
+                      />
+                    </div>
+                    <input
+                      name="email"
+                      type="email"
+                      placeholder="Email address"
+                      autoComplete="email"
+                      required
+                    />
+                    <button
+                      className="primary pulse-on-hover"
+                      type="submit"
+                      disabled={isFoundersCircleSubmitting}
+                    >
+                      {isFoundersCircleSubmitting
+                        ? "Submitting..."
+                        : "Apply for a founder seat"}
+                    </button>
+                  </form>
+                )}
+              </div>
             </div>
-          </div>
+          </Container>
         </section>
+
+        <HowCanWeHelp />
+
       </main>
     </div>
   );
