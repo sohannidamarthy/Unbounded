@@ -211,6 +211,21 @@
   font-size: 22px;
 }
 
+.formStatusSuccess,
+.formStatusError {
+  margin: 0 0 17px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.formStatusSuccess {
+  color: #7fd88f;
+}
+
+.formStatusError {
+  color: #f28b82;
+}
+
 /* ================= FORM FOOTER ================= */
 
 .formFooter {

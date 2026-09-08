@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import styles from "./HowCanWeHelp.module.css";
 import Container from "../container/Container";
 
@@ -64,6 +64,61 @@ const CONTACT_OPTIONS = [
 ];
 
 export default function HowCanWeHelp() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+
+  const handleContactSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
+    if (isSubmitting) {
+      return;
+    }
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const fullName = String(formData.get("fullName") || "").trim();
+    const email = String(formData.get("email") || "").trim();
+    const reason = String(formData.get("reason") || "").trim();
+    const message = String(formData.get("message") || "").trim();
+
+    if (!fullName || !email || !reason || !message) {
+      setStatus("error");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setStatus("idle");
+
+    const apiBase =
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+      "http://localhost:8000";
+
+    try {
+      const response = await fetch(`${apiBase}/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: fullName,
+          email,
+          reason,
+          message,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+
+      setStatus("success");
+      form.reset();
+    } catch (error) {
+      setStatus("error");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <section className={styles.contactSection}>
       <Container>
@@ -114,7 +169,7 @@ export default function HowCanWeHelp() {
           </div>
 
           {/* CONTACT FORM */}
-          <div className={styles.contactForm}>
+          <form className={styles.contactForm} onSubmit={handleContactSubmit} noValidate>
             <div className={styles.formRow}>
               <div className={styles.formField}>
                 <label className={styles.formLabel} htmlFor="fullName">
@@ -123,8 +178,10 @@ export default function HowCanWeHelp() {
                 <div className={styles.formInput}>
                   <input
                     id="fullName"
+                    name="fullName"
                     type="text"
                     placeholder="John Doe"
+                    required
                   />
                 </div>
               </div>
@@ -138,9 +195,11 @@ export default function HowCanWeHelp() {
                 <div className={styles.formInput}>
                   <input
                     id="email"
+                    name="email"
                     type="email"
                     className={styles.formInputText}
                     placeholder="john@example.com"
+                    required
                   />
                 </div>
               </div>
@@ -153,7 +212,7 @@ export default function HowCanWeHelp() {
               </label>
 
               <div className={styles.formSelect}>
-                <select id="reason" className={styles.formInputText} defaultValue="">
+                <select id="reason" name="reason" className={styles.formInputText} defaultValue="" required>
                   <option value="" disabled>Select a reason</option>
                   <option value="General Feedback">General Feedback</option>
                   <option value="Suggestion / Feature Request">Suggestion / Feature Request</option>
@@ -177,12 +236,25 @@ export default function HowCanWeHelp() {
               <div className={styles.formMessage}>
                 <textarea
                   id="message"
+                  name="message"
                   className={styles.formInputText}
                   placeholder="How can we help you today?"
                   rows={5}
+                  required
                 />
               </div>
             </div>
+
+            {status === "success" && (
+              <p className={styles.formStatusSuccess} role="status">
+                Thanks for reaching out! We&apos;ve received your message and will get back to you soon.
+              </p>
+            )}
+            {status === "error" && (
+              <p className={styles.formStatusError} role="alert">
+                Something went wrong. Please fill in all fields and try again.
+              </p>
+            )}
 
             {/* FORM FOOTER */}
             <div className={styles.formFooter}>
@@ -196,12 +268,12 @@ export default function HowCanWeHelp() {
                 Your information will only be used to respond to your request.
               </div>
 
-              <button type="submit" className={styles.sendButton}>
+              <button type="submit" className={styles.sendButton} disabled={isSubmitting}>
                 <span>➤</span>
-                Send Message
+                {isSubmitting ? "Sending…" : "Send Message"}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </Container>
     </section>
