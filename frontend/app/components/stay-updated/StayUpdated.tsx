@@ -95,7 +95,7 @@ export default function StayUpdated() {
             </div>
           </div>
           <div className={styles.stayUpdatedIMG}>
-            <Image src={Subscribe} width={473} height={356} />
+            <Image src={Subscribe} width={473} height={356} alt="Subscribe" />
           </div>
         </div>
       </Container>
