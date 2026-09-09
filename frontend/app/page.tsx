@@ -928,16 +928,22 @@ export default function Home() {
           </div> */}
             <CommonCarousel
               data={COMPANY_INSIGHTS}
-              mobileSlides={1}
-              tabletSlides={2}
-              desktopSlides={3}
+              effect="coverflow"
+              coverflowEffect={{
+                rotate: 12,
+                stretch: 0,
+                depth: 220,
+                modifier: 1.2,
+                slideShadows: false,
+              }}
               mobileSpaceBetween={16}
-              tabletSpaceBetween={20}
-              desktopSpaceBetween={24}
-              showArrows={false}
+              tabletSpaceBetween={24}
+              desktopSpaceBetween={32}
+              showArrows={true}
               showDots={true}
               autoPlay={true}
               autoPlayDelay={5000}
+              className="insights-carousel"
               renderItem={(insight) => (
                 <article className="insight-card">
                   <p className="insight-quote">

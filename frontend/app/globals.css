@@ -12185,7 +12185,76 @@ a {
   background: linear-gradient(140deg, #f2c969, #b58821) !important;
 }
 
+/* Coverflow variant (Insights from inside Unbounded) */
+.common-carousel--coverflow {
+  padding: 28px 0 12px;
+  overflow: hidden;
+}
 
+.common-carousel--coverflow .swiper {
+  overflow: visible;
+  padding: 24px 0;
+}
+
+.common-carousel--coverflow .swiper-slide {
+  width: 78%;
+  max-width: 320px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: opacity 0.35s ease;
+}
+
+.common-carousel--coverflow .swiper-slide .insight-card {
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+.common-carousel--coverflow .swiper-slide:not(.swiper-slide-active) {
+  opacity: 0.5;
+}
+
+.common-carousel--coverflow .swiper-slide-active {
+  opacity: 1;
+}
+
+.common-carousel--coverflow .swiper-slide-active .insight-card {
+  border-color: rgba(242, 201, 105, 0.65);
+  box-shadow: 0 26px 52px rgba(0, 0, 0, 0.48);
+}
+
+.common-carousel--coverflow .swiper-button-prev,
+.common-carousel--coverflow .swiper-button-next {
+  top: 50%;
+}
+
+@media (min-width: 768px) {
+  .common-carousel--coverflow .swiper-slide {
+    width: 58%;
+    max-width: 360px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .common-carousel--coverflow .swiper-slide {
+    width: 42%;
+    max-width: 440px;
+  }
+}
+
+@media (max-width: 767px) {
+  .common-carousel--coverflow .swiper-slide {
+    width: 84%;
+    max-width: 300px;
+  }
+
+  .common-carousel--coverflow .swiper-button-prev,
+  .common-carousel--coverflow .swiper-button-next {
+    display: none;
+  }
+}
 
 /* Header */
 .contact-header {

@@ -2,11 +2,20 @@
 
 import React, { ReactNode } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import { Navigation, Pagination, Autoplay, EffectCoverflow } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import "swiper/css/effect-coverflow";
+
+type CoverflowEffectOptions = {
+  rotate?: number;
+  stretch?: number;
+  depth?: number;
+  modifier?: number;
+  slideShadows?: boolean;
+};
 
 type CommonCarouselProps<T> = {
   data: T[];
@@ -28,6 +37,11 @@ type CommonCarouselProps<T> = {
 
   loop?: boolean;
   className?: string;
+
+  /** Visual effect for slide transitions. Defaults to Swiper's regular "slide" effect. */
+  effect?: "slide" | "coverflow";
+  /** Fine-tune the 3D coverflow look. Only used when effect="coverflow". */
+  coverflowEffect?: CoverflowEffectOptions;
 };
 
 export default function CommonCarousel<T>({
@@ -50,23 +64,35 @@ export default function CommonCarousel<T>({
 
   loop = true,
   className = "",
+
+  effect = "slide",
+  coverflowEffect,
 }: CommonCarouselProps<T>) {
   if (!data?.length) return null;
+
+  const isCoverflow = effect === "coverflow";
 
   const modules = [];
 
   if (showArrows) modules.push(Navigation);
   if (showDots) modules.push(Pagination);
   if (autoPlay) modules.push(Autoplay);
+  if (isCoverflow) modules.push(EffectCoverflow);
 
   const shouldLoop =
     loop && data.length > Math.max(desktopSlides, tabletSlides, mobileSlides);
 
   return (
-    <div className={`common-carousel ${className}`}>
+    <div
+      className={`common-carousel ${isCoverflow ? "common-carousel--coverflow" : ""
+        } ${className}`}
+    >
       <Swiper
         modules={modules}
-        slidesPerView={mobileSlides}
+        effect={effect}
+        grabCursor={isCoverflow}
+        centeredSlides={isCoverflow}
+        slidesPerView={isCoverflow ? "auto" : mobileSlides}
         spaceBetween={mobileSpaceBetween}
         loop={shouldLoop}
         watchOverflow={true}
@@ -74,27 +100,39 @@ export default function CommonCarousel<T>({
         pagination={
           showDots
             ? {
-                clickable: true,
-              }
+              clickable: true,
+            }
             : false
         }
         autoplay={
           autoPlay
             ? {
-                delay: autoPlayDelay,
-                disableOnInteraction: false,
-                pauseOnMouseEnter: true,
-              }
+              delay: autoPlayDelay,
+              disableOnInteraction: false,
+              pauseOnMouseEnter: true,
+            }
             : false
+        }
+        coverflowEffect={
+          isCoverflow
+            ? {
+              rotate: 18,
+              stretch: 0,
+              depth: 150,
+              modifier: 1,
+              slideShadows: false,
+              ...coverflowEffect,
+            }
+            : undefined
         }
         breakpoints={{
           768: {
-            slidesPerView: tabletSlides,
+            slidesPerView: isCoverflow ? "auto" : tabletSlides,
             spaceBetween: tabletSpaceBetween,
           },
 
           1200: {
-            slidesPerView: desktopSlides,
+            slidesPerView: isCoverflow ? "auto" : desktopSlides,
             spaceBetween: desktopSpaceBetween,
           },
         }}
