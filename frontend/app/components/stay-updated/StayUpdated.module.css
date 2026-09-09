@@ -1,0 +1,128 @@
+.stayUpdatedWrapper {  
+  padding:0 0 80px;
+}
+
+.stayUpdatedBox {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  background: linear-gradient(140deg, rgb(8 21 30), rgb(1 21 33));
+  border: 1px solid rgba(181, 136, 33, 0.55);
+  border-radius: 28px;
+  padding: 0 40px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+.stayUpdated {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.stayUpdatedIcon {
+  background: #101C2F;
+  min-width: 70px;
+  width: 70px;
+  height: 70px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stayUpdatedIcon svg {
+  width: 30px;
+  height: auto;
+}
+
+.stayUpdatedContent {
+  width: 100%;
+}
+
+.stayUpdatedContent h2 {
+  margin: 0;
+  padding: 0;
+  color: #E2B146;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: normal;
+}
+
+.stayUpdatedContent h2 span {
+  color: #fff;
+}
+
+.stayUpdatedContent p {
+  margin: 15px 0 25px;
+  padding: 0;
+  font-size: 16px;
+  line-height: normal;
+  color: #fff;
+  opacity: .7;
+  font-weight: 400;
+}
+
+.stayUpdatedForm {
+  border: 1px solid #1B2E3F;
+  background: #08141F;
+  border-radius: 10px;
+  max-width: 550px;
+  width: 100%;
+  height: 54px;
+  position: relative;
+  padding: 0 160px 0 50px;
+}
+
+.stayUpdatedForm input {
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  line-height: normal;
+  color: #fff;
+  height: 100%;
+  width: 100%;
+}
+
+.stayUpdatedForm button {
+  background: linear-gradient(135deg, #ffdc69, #eeb637);
+  border: 0;
+  width: 150px;
+  border-radius: 10px;
+  height: calc(100% - 8px);
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #08141F;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.stayUpdatedForm button:hover {
+  background: linear-gradient(135deg, #eeb637, #ffdc69);
+}
+
+.stayUpdatedForm form {
+  height: 100%;
+}
+
+.stayUpdatedForm i {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 15px;
+  display: flex;
+}
+
+
+.stayUpdatedIMG img {
+  max-width: 500px;
+  width: 100%;
+  height: auto;
+  vertical-align:top;
+}

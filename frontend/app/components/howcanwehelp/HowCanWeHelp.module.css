@@ -266,6 +266,10 @@
   font-weight: 700;
   cursor: pointer;
 }
+.sendButton:hover {
+  background: linear-gradient(135deg, #eeb637, #ffdc69);
+}
+
 
 /* ================= RESPONSIVE ================= */
 

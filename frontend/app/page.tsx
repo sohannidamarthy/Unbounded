@@ -8,6 +8,8 @@ import HowCanWeHelp from "./components/howcanwehelp/HowCanWeHelp";
 import Container from "./components/container/Container";
 import SectionHeader from "./components/SectionHeader";
 import Header from "./components/header/Header";
+import StayUpdated from "./components/stay-updated/StayUpdated";
+import FoundersCircle from "./components/founders-circle/FoundersCircle";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 const FOUNDERS_CIRCLE_SEATS_TOTAL = 300;
@@ -127,6 +129,7 @@ export default function Home() {
   const [calcOddsA, setCalcOddsA] = useState("");
   const [calcOddsB, setCalcOddsB] = useState("");
   const [calcMode, setCalcMode] = useState("ev");
+  const [showExample, setShowExample] = useState(false);
 
   const toDecimalOdds = (americanOdds: string) => {
     const value = Number(americanOdds);
@@ -377,9 +380,9 @@ export default function Home() {
           </div>
         </Container>
       </header>
-      
+
       {/* <Header /> */}
-      
+
       <main>
         <section className="section hero-section">
           <Container>
@@ -609,7 +612,7 @@ export default function Home() {
                     can stake both sides and lock in a profit no matter which
                     one wins.
                   </p>
-                  <div className="calculator-explainer-example">
+                  {/* <div className="calculator-explainer-example">
                     <span>Worked example</span>
                     <p>
                       Type +110 into Odds A, -110 into Odds B, and 100 into
@@ -621,6 +624,46 @@ export default function Home() {
                       <li>Stake splits proportionally across both sides so the payout matches regardless of winner</li>
                       <li>&quot;Book hold&quot; in the results shows how far over 100% the market is priced &mdash; the vig you&apos;re paying</li>
                     </ul>
+                  </div> */}
+                  <div className="calculator-explainer-example">
+                    <span
+                      className="worked-example-toggle"
+                      onClick={() => setShowExample(!showExample)}
+                    >
+                      Worked example
+                      <span className={`arrow ${showExample ? "open" : ""}`}>
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1.5 10.5C1.10218 10.5 0.720645 10.342 0.43934 10.0607C0.158036 9.77936 0 9.39782 0 9C0 8.60218 0.158036 8.22064 0.43934 7.93934C0.720645 7.65804 1.10218 7.5 1.5 7.5H16.5C16.8978 7.5 17.2794 7.65804 17.5607 7.93934C17.842 8.22064 18 8.60218 18 9C18 9.39782 17.842 9.77936 17.5607 10.0607C17.2794 10.342 16.8978 10.5 16.5 10.5H1.5Z" fill="#E2B146" />
+                          <path d="M7.5 1.5C7.5 1.10218 7.65804 0.720645 7.93934 0.43934C8.22064 0.158036 8.60218 0 9 0C9.39782 0 9.77936 0.158036 10.0607 0.43934C10.342 0.720645 10.5 1.10218 10.5 1.5V16.5C10.5 16.8978 10.342 17.2794 10.0607 17.5607C9.77936 17.842 9.39782 18 9 18C8.60218 18 8.22064 17.842 7.93934 17.5607C7.65804 17.2794 7.5 16.8978 7.5 16.5V1.5Z" fill="#E2B146" />
+                        </svg>
+
+                      </span>
+                    </span>
+
+                    {showExample && (
+                      <>
+                        <p>
+                          Type +110 into Odds A, -110 into Odds B, and 100 into
+                          Stake above &mdash; the same numbers preloaded as
+                          placeholders &mdash; and switch to Calculate Arb:
+                        </p>
+
+                        <ul>
+                          <li>
+                            47.6% + 52.4% = 100.0% implied &rarr; no arbitrage here
+                            (a true arb needs the sum under 100%)
+                          </li>
+                          <li>
+                            Stake splits proportionally across both sides so the payout
+                            matches regardless of winner
+                          </li>
+                          <li>
+                            &quot;Book hold&quot; in the results shows how far over 100%
+                            the market is priced &mdash; the vig you&apos;re paying
+                          </li>
+                        </ul>
+                      </>
+                    )}
                   </div>
                   <p>
                     <strong>Expected value (EV)</strong> is (chance you win ×
@@ -674,7 +717,8 @@ export default function Home() {
           </Container>
         </section>
         
-        <section className="section">
+        <StayUpdated />
+        {/* <section className="section">
           <Container>
             <div className="pricing-waitlist">
               <Image
@@ -711,7 +755,7 @@ export default function Home() {
               </div>
             </div>
           </Container>
-        </section>
+        </section> */}
 
         <section id="workflow" className="section workflow">
           <Container>
@@ -916,7 +960,7 @@ export default function Home() {
           </Container>
         </section>
 
-        <section id="founders-circle" className="section founders-circle-section">
+        {/* <section id="founders-circle" className="section founders-circle-section">
           <Container>
             <div className="founders-circle">
               <div className="founders-circle-badge" aria-hidden="true">
@@ -1041,8 +1085,9 @@ export default function Home() {
               </div>
             </div>
           </Container>
-        </section>
+        </section> */}
 
+        <FoundersCircle />
         <HowCanWeHelp />
 
       </main>
