@@ -4,7 +4,7 @@
   "private": true,
   "description": "",
   "engines": {
-    "node": ">=20.19.0 <21"
+    "node": ">=24.0.0 <25"
   },
   "scripts": {
     "dev": "poetry run uvicorn app.main:app --reload",
