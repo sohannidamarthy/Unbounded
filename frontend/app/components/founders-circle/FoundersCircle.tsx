@@ -28,8 +28,8 @@ export default function FoundersCircle() {
     const lastName = String(formData.get("lastName") || "").trim();
     const email = String(formData.get("email") || "").trim();
     const apiBase =
-      process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
-      "http://localhost:8000";
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+      console.log("apiBase Founder Circle==>", apiBase)
 
     try {
       const response = await fetch(`${apiBase}/founders-circle/signup`, {
