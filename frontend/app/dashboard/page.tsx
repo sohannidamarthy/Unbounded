@@ -478,7 +478,7 @@ export default function DashboardPage() {
 
   const liveTableRows: {
     start: string;
-    sport: Sport;
+    sport: string;
     league: string;
     match: string;
     betType: BetType;
@@ -487,7 +487,42 @@ export default function DashboardPage() {
     netProfit: string;
     payoutBoost: number;
     tags: LiveFilter[];
-  }[] = [];
+    legs: LiveArbLeg[];
+    isLiveData: boolean;
+  }[] = [...liveArbRows, ...liveEvRows].map((row) => {
+    const firstLeg = row.legs[0];
+    const odds = firstLeg
+      ? String(firstLeg.odds_american ?? decimalToAmerican(Number(firstLeg.odds_decimal)))
+      : "--";
+    const roiPercent = row.roi * 100;
+    const tags: LiveFilter[] = [];
+    if (row.isLive) {
+      tags.push("Live now");
+    }
+    if (roiPercent >= 5) {
+      tags.push("High payout");
+    }
+    if (roiPercent >= 3) {
+      tags.push("Trending");
+    }
+    if (tags.length === 0) {
+      tags.push("Trending");
+    }
+    return {
+      start: row.start,
+      sport: row.sport,
+      league: row.league,
+      match: row.match,
+      betType: row.betType,
+      odds,
+      edge: `${roiPercent.toFixed(1)}%`,
+      netProfit: row.netProfit,
+      payoutBoost: row.roi,
+      tags,
+      legs: row.legs,
+      isLiveData: row.isLiveData,
+    };
+  });
   const filteredLiveRows = liveTableRows.filter(
     (row) =>
       (activeSport === "All" || row.sport === activeSport) &&
@@ -926,6 +961,8 @@ export default function DashboardPage() {
                               match: row.match,
                               odds: row.odds,
                               betType: row.betType,
+                              legs: row.legs,
+                              isLiveData: row.isLiveData,
                             })
                           )
                         }
@@ -1030,6 +1067,8 @@ export default function DashboardPage() {
                                 match: row.match,
                                 odds: row.odds,
                                 betType: row.betType,
+                                legs: row.legs,
+                                isLiveData: row.isLiveData,
                               })
                             )
                           }
