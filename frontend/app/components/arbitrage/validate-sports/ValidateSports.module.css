@@ -1,0 +1,27 @@
+.ValidateSportsSection{ position:relative; gap:0; }
+.ValidateSportsSection ul{ display:flex; flex-wrap:wrap; gap:30px; list-style:none; justify-content:center;}
+.ValidateSportsSection:before{position: absolute; width: 300px; height: 300px; background: #EDC259; opacity: 0.5; filter: blur(250px);
+content:''; top:0; left:-150px; pointer-events:none; z-index:-0;}
+.ValidateSportsSection ul li{ width: calc(360px - 40px);}
+.ValidateSportsBox{ background:#10202D; border:1px solid #10202D; border-radius: 10px; padding:20px; display:grid; gap:10px;}
+.ValidateSportsBox:hover{ border-color:#E2B146;}
+.ValidateSportsHead{ display:flex; align-items:center; gap:15px;}
+.ValidateSportsHead h3{ font-weight: 500; font-size: 18px; line-height: 20px; color: #FFFFFF; display:-webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;}
+.ValidateSportsHead i{ color:#E2B146; width:20px;}
+.ValidateSportsHead i svg{ height:auto; width:100%;}
+.ValidateSportsBox p{ font-weight: 400; font-size: 14px; line-height: 18px; color:rgba(255,255,255,.5);
+display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient: vertical; overflow: hidden;}
+
+@media(max-width:1099px){
+    .ValidateSportsHead{ gap:10px;}
+    .ValidateSportsSection ul{ gap:20px;}
+    .ValidateSportsSection ul li{ width:calc(33.33% - 14px);}
+}
+@media(max-width:991px){
+    .ValidateSportsSection ul{ gap:20px;}
+    .ValidateSportsSection ul li{ width:calc(50% - 14px);}
+}
+@media(max-width:599px){
+    .ValidateSportsSection ul{ gap:20px;}
+    .ValidateSportsSection ul li{ width:100%;}
+}

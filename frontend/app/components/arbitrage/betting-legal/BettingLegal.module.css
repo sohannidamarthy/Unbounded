@@ -1,0 +1,25 @@
+.BettingLegalSection{ position:relative;}
+.BettingLegalSection:before{position: absolute; width: 300px; height: 300px; background: #EDC259; opacity: 0.5; filter: blur(250px);
+    content:''; bottom:0; right:0; pointer-events:none; z-index:-0;}
+
+.BettingLegalBox p{font-weight: 400; font-size: 16px; line-height: 24px; text-align: center; color: #FFFFFF; margin:0 0 25px; padding:0;}
+.BettingLegalBox ul{ margin:0; padding:0; list-style:none; display:flex; flex-wrap:wrap; justify-content:center; gap:18px;}
+.BettingLegalBox ul li{ background:#081927; border:1px solid #0B2235; border-radius:100px; position:relative; font-weight: 400; font-size: 16px; line-height: 24px; color: #FFFFFF; padding:7px 20px 7px 40px;}
+.BettingLegalBox ul li:before{ content:''; width:8px; height:8px; background:#E2B146; border-radius:100px;
+display:block; position:absolute; top:15px; left:22px;}
+.BettingLegalBox ul li:hover{ background:#E2B146; border:1px solid #E2B146; color:#081927;}
+.BettingLegalBox ul li:hover:before{ background:#081927;}
+
+
+
+@media(max-width:991px){
+    .BettingLegalBox ul{ gap:10px;}   
+    .BettingLegalBox ul li{ font-size:15px;}
+
+}
+@media(max-width:767px){
+    .BettingLegalBox ul{ gap:5px;}   
+    .BettingLegalBox ul li{ font-size:14px; padding:7px 15px 7px 30px;}
+    .BettingLegalBox ul li:before{ left:15px;}
+
+}

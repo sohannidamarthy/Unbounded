@@ -1,0 +1,19 @@
+.sectionHeading{ display: grid; gap:10px; margin:0 0 30px;}
+.sectionHeading h2{ margin:0; padding:0; font-weight: 700; font-size: 40px; line-height: normal; text-align: center; color: #fff;}
+.sectionHeading h2 span{color: #E2B146;}
+.sectionHeading p{ margin:0 auto; padding:0; font-weight: 400; font-size: 16px; line-height: normal; text-align: center; color:rgba(255,255,255,.5); max-width:1024px;}
+
+@media(max-width:1099px){
+    .sectionHeading p br{ display:none;}
+}
+
+@media(max-width:1024px){
+    .sectionHeading h2{ font-size:36px;}
+    .sectionHeading{ margin:0 0 20px;}
+}
+
+@media(max-width:767px){
+    .sectionHeading{ margin:0 0 15px;}
+    .sectionHeading h2{ font-size:30px;}
+    .sectionHeading p{ font-size:15px;}
+}

@@ -1,0 +1,31 @@
+.TrackYourSection{position:relative;}
+.TrackYourSection:before{position: absolute; width: 300px; height: 300px; background: #EDC259; opacity: 0.5; filter: blur(250px);
+    content:''; bottom:-150px; left:0; pointer-events:none; z-index:-0;}
+
+.TrackYourwrapper{ background:#04182A; border:1px solid #232A34; padding:40px; border-radius:20px; position:relative; z-index:1;}
+.TrackYourwrapper ul{ list-style:none; margin:0; padding:0; display:flex; flex-wrap:wrap; gap:30px;}
+.TrackYourwrapper ul li{ width:calc(33.33% - 20px);}
+.TrackYourBox{ background:rgba(255,255,255,.05); border-radius:10px; padding:20px; height: 100%; gap: 10px; display: grid;}
+.TrackYourBox i{ display:flex; width:30px;}
+.TrackYourBox i svg{ height:30px; width:30px;}
+.TrackYourBox h3{font-weight: 500; font-size: 18px; line-height: 24px; color: #FFFFFF;
+display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;}
+.TrackYourBox p{ font-weight: 400; font-size: 14px; line-height: 18px; color:rgba(255,255,255,.5);
+display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;overflow: hidden;}
+.TrackYourBoxHead{ display:flex; gap:15px; align-items:center;}
+
+@media(max-width:1099px){
+    .TrackYourwrapper{ padding:25px;}
+    .TrackYourwrapper ul{ gap:14px;}
+    .TrackYourwrapper ul li{ width:calc(33.33% - 10px);}
+}
+
+@media(max-width:991px){
+    .TrackYourwrapper{ padding:25px;}
+    .TrackYourwrapper ul{ gap:14px;}
+    .TrackYourwrapper ul li{ width:calc(50% - 10px);}
+}
+@media(max-width:767px){
+    .TrackYourwrapper{ padding:20px;}
+    .TrackYourwrapper ul li{ width:100%;}
+}

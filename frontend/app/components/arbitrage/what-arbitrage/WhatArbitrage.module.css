@@ -1,0 +1,9 @@
+.WhatArbitrageSection{display:block;}
+.WhatArbitrageCarousel{ border-top:1px solid rgba(255,255,255,.2); border-bottom:1px solid rgba(255,255,255,.2);}
+.featureItem{ display:flex; gap:10px; align-items:center; padding:22px 30px 22px 40px; position:relative;}
+.featureItem i{ display:flex; }
+.featureItem h3{ font-weight: 400; font-size: 16px; line-height: 24px; text-align: center; color: #FFFFFF; white-space:nowrap;}
+.featureItem:before{ content: ''; background: rgba(255, 255, 255, .2); width: 1px; height: calc(100% + 30px);position: absolute;
+right: -15px; top: -15px; transform: rotate(30deg);}
+.WhatArbitrageSection :global(.swiper-slide) { width: auto !important;}
+.featureItem:hover h3{ color:#E2B146;}

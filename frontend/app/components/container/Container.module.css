@@ -4,3 +4,8 @@
   margin: 0 auto;
   padding:0 20px;
 }
+
+.fullWidth{
+  padding:0 20px;
+  width:100%;
+}

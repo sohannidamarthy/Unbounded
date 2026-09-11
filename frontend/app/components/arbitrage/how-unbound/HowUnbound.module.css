@@ -1,0 +1,30 @@
+.HowUnboundSection{ position:relative;}
+/* .HowUnboundSection:before{position: absolute; width: 300px; height: 300px; background: #EDC259; opacity: 0.5; filter: blur(250px);
+    content:''; bottom:0; right:0; pointer-events:none; z-index:-0;} */
+.HowUnboundWrapper ul{ display:flex; flex-wrap:wrap; gap:30px; row-gap:60px; list-style:none; justify-content:center; margin:80px 0 0;}
+.HowUnboundWrapper ul li{ width: calc(33.33% - 20px);}
+.HowUnboundBox{ background:#10202D; border:1px solid #10202D; border-radius: 10px; padding:0 20px 25px; display:grid; gap:10px; text-align:center;}
+.HowUnboundBox i{ color:#E2B146; background:#091A28; border:1px solid rgba(255,255,255,.04); width:80px; height:80px; display:flex; align-items:center; justify-content:center; border-radius:100px; margin:-40px auto 10px;}
+.HowUnboundBox i svg{ height:30px; width:auto;}
+.HowUnboundBox h3{ font-weight: 500; font-size: 18px; line-height: 20px; color: #FFFFFF;
+display:-webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;}
+.HowUnboundBox p{ font-weight: 400; font-size: 14px; line-height: 18px; color:rgba(255,255,255,.5);
+display:-webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;}
+.HowUnboundBox:hover{ border-color:#E2B146;}
+.HowUnboundBox:hover i{border-color:#E2B146;}
+
+
+@media(max-width:1099px){
+    .HowUnboundBox i{ width:60px; height:60px; margin:-30px auto 0px;}
+}
+
+@media(max-width:991px){
+    .HowUnboundWrapper ul li{ width: calc(50% - 20px);}
+    .HowUnboundWrapper ul{ gap:20px; row-gap:40px;}
+    .HowUnboundBox{padding:0 10px 15px;}
+}
+
+@media(max-width:599px){
+    .HowUnboundWrapper ul li{ width:100%;}
+    .HowUnboundWrapper ul{ gap:40px; }
+}

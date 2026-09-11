@@ -631,10 +631,7 @@ export default function Home() {
                     </ul>
                   </div> */}
                   <div className="calculator-explainer-example">
-                    <span
-                      className="worked-example-toggle"
-                      onClick={() => setShowExample(!showExample)}
-                    >
+                    <span className="worked-example-toggle" onClick={() => setShowExample(!showExample)}>
                       Worked example
                       <span className={`arrow ${showExample ? "open" : ""}`}></span>
                     </span>
@@ -664,6 +661,7 @@ export default function Home() {
                       </>
                     )}
                   </div>
+                  
                   <p>
                     <strong>Expected value (EV)</strong> is (chance you win ×
                     amount won) − (chance you lose × amount staked). A bet is
@@ -673,6 +671,7 @@ export default function Home() {
                     your own win-probability estimate is what turns it into a
                     real EV calculation.
                   </p>
+                  
                   <div className="calculator-explainer-actions">
                     <button
                       className="primary tiny"

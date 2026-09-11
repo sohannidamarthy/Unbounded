@@ -11,14 +11,6 @@
   gap: clamp(28px, 4vw, 56px);
   max-width: 1140px;
   margin: 0 auto;
-  /*padding: clamp(32px, 4vw, 56px);
-   border-radius: 32px;
-  border: 1px solid rgba(242, 201, 105, 0.62);
-  background:
-    radial-gradient(circle at 10% 10%, rgba(242, 201, 105, 0.18), transparent 45%),
-    linear-gradient(145deg, rgba(242, 201, 105, 0.14), rgba(165, 31, 45, 0.08)),
-    rgba(6, 24, 42, 0.9);
-  box-shadow: 0 28px 56px rgba(0, 0, 0, 0.4); */
 }
 
 .foundersCircleBadge {
@@ -257,9 +249,29 @@
 
 
 
-@media (max-width: 640px) {
-  .foundersCircle {
-    display: grid;
-    padding: 22px;
-  }
+@media(max-width:991px){
+  .foundersCircleBadge{display:none;}
+  .foundersCircle{display:block;}
+  .foundersCircleSection{ padding:50px 0;}
+  .foundersCircleCopy h2,
+  .foundersCircleCopy p{ max-width:100%;}
+  .foundersCircleEyebrow{ letter-spacing: 0.25em; justify-content:center;}
+  .foundersCircleProgress{ width:100%;}
+  .foundersCircleBenefitsBox{text-align:left; border-radius:10px; padding:10px; gap:10px; font-size:14px;}
 }
+
+@media (max-width: 640px) {
+  .foundersCircleBenefits{ display:flex; flex-wrap:wrap;}
+  .foundersCircleBenefits li{ width:calc(50% - 10px);}
+  .foundersCircleBenefits li:last-child{ width:100%;}
+}
+
+
+@media (max-width: 439px) {
+  .foundersCircleBenefits li i{ width:30px; height:30px; min-width:30px;}
+  .foundersCircleBenefits li i svg{ width:20px;}
+}
+@media (max-width: 399px) {
+  .foundersCircleBenefitsBox { font-size:13px;}
+}
+

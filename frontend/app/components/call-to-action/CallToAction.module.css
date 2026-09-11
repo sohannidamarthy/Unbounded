@@ -1,0 +1,12 @@
+.CallToAction{ position:relative;}
+.CallToActionBox{ background:#000c14; border:1px solid #232A34; padding:70px 20px; border-radius:20px; position:relative; overflow:hidden;}
+.CallToActionBox:before{ background: url(/simplify-bg.png) no-repeat 0 0 / auto 316px; content: ''; width: 790px; height:316px; display: block; position: absolute;bottom: 0; left: 50%;transform: translateX(-50%); pointer-events:none;}
+.CallToActionBox a{ margin:0 auto; width:fit-content;}
+
+@media(max-width:1024px){
+    .CallToActionBox{ padding:50px 20px;}
+}
+
+@media(max-width:767px){
+    .CallToActionBox{ padding:30px 20px;}
+}

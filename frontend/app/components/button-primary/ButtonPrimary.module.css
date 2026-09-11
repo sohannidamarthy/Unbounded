@@ -1,0 +1,12 @@
+.ButtonPrimary{ border-radius: 100px; display:flex; align-items:center; gap:10px; padding:11px 30px; font-weight:600; font-size: 16px; line-height:20px; border-width:1px; border-style:solid; cursor:pointer; }
+.ButtonPrimary i{display:flex;}
+
+.primary {background: linear-gradient(180deg, #FAD467 0%, #D9A745 100%); border: 1px solid #ECB344; color: #041524; border-color:#ECB344;}
+.primary:hover{ background:#061625; color:#fff;}
+.secondary { background:transparent; color: #fff; border-color:rgba(236,179,68,.5);}
+.secondary:hover{ background:#ECB344; color:#061625;}
+.primaryWhite{ background:#fff; }
+
+@media(max-width:767px){
+    .ButtonPrimary{ padding:11px 20px; font-size:15px;}
+}

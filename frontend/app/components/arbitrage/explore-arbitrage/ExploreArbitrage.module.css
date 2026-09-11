@@ -1,0 +1,29 @@
+.ExploreArbitrageSection{ position:relative;}
+.ExploreArbitrageSection ul { display:flex; flex-wrap:wrap; list-style:none; margin:0; padding:0; gap:30px; justify-content:center;}
+.ExploreArbitrageSection ul li{ width:calc(33.33% - 20px);}
+.ExploreArbitrageBox{background: #091A28; border: 1px solid #142430; border-radius: 10px; padding:20px; height:100%;}
+.ExploreArbitrageBox h3{font-weight: 500; font-size: 20px; line-height: 24px; color: #FFFFFF; margin:0; padding:0;
+display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;}
+.ExploreArbitrageBox p{ font-weight: 400; font-size: 14px; line-height: 20px; color:rgba(255,255,255,.5); margin:0; padding:0;
+display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;}
+.ExploreArbitrageBox i{ color:#E2B146; display:flex; width:30px;}
+.ExploreArbitrageBox i svg{width:30px; height:30px;}
+.ExploreArbitrageHead{ display:flex; gap:15px; align-items:center; margin:0 0 10px;}
+
+
+@media(max-width:1099px){
+    .ExploreArbitrageSection ul li{ width:calc(33.33% - 10px);}
+    .ExploreArbitrageSection ul { gap:15px;}
+}
+
+@media(max-width:1024px){
+    .ExploreArbitrageSection ul li{ width:calc(50% - 10px);}
+    .ExploreArbitrageSection ul { gap:15px;}
+}
+
+@media(max-width:767px){
+    .ExploreArbitrageSection ul li{ width:100%;}
+    .ExploreArbitrageSection ul { gap:15px;}
+    .ExploreArbitrageBox h3{ font-size:18px;}
+
+}
