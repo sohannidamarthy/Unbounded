@@ -16,7 +16,7 @@ const steps = [
     icon: <CheckImplied />,
   },
   {
-    title: "Calculate Arbitrage",
+    title: "Calculate Arbitrage Percentage",
     description: "Review the arbitrage percentage to assess the potential betting edge.",
     icon: <CalculateArbitrage />,
   },

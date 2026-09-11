@@ -115,7 +115,7 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
       <CallToAction
         highlight="Bring Your Arbitrage Betting "
         title=" Into One Place"
-        description="Unbound helps you evaluate sportsbook pricing differences and keep a clear record of your <br /> arbitrage betting activity."
+        description="Unbound helps you evaluate sportsbook pricing differences and keep a clear record of your  arbitrage betting activity."
         buttonText="Try Unbound"
         buttonIcon={<UserSearchIcon />}
         buttonLink="/arbitrage-bets"

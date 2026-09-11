@@ -32,7 +32,7 @@ const SportsBets = [
   },
   {
     icon: <ReviewWithout />,
-    "title": "Review Without Rechecking",
+    "title": "Review Without Reconstructing",
     "description": "Avoid searching through notes to remember what you placed."
   },
   {

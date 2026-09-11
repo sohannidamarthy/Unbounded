@@ -1,6 +1,6 @@
 .SportsBettingWrapper ul{ display:flex; flex-wrap:wrap; gap:30px; list-style:none; justify-content:center;}
 .SportsBettingWrapper ul li{ width:calc(33.33% - 20px);}
-.SportsBettingBox{ background:#10202D; border:1px solid #10202D; border-radius: 10px; padding:20px; display:grid; gap:18px;}
+.SportsBettingBox{ background:#10202D; border:1px solid #10202D; border-radius: 10px; padding:20px; display:grid; gap:10px;}
 .SportsBettingBox:hover{ border-color:#E2B146;}
 .SportsBettingHead{ display:flex; align-items:center; gap:15px;}
 .SportsBettingHead h3{ font-weight: 500; font-size: 18px; line-height: 20px; color: #FFFFFF; display:-webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;}

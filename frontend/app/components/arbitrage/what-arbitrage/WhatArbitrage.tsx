@@ -11,7 +11,8 @@ const features = [
   "Identify pricing differences",
   "Find potential arbitrage opportunities",
   "Calculate required stake amounts",
-  "Track potential returns",
+  "Cover all relevant outcomes",
+  "Evaluate potential returns before betting",
 ];
 
 export default function WhatArbitrage() {

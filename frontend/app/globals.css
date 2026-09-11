@@ -10811,6 +10811,7 @@ a {
     width: 42%;
     max-width: 440px;
   }
+  .section { padding: 0 0 60px;}
 }
 
 @media (max-width: 1024px) {
@@ -10842,6 +10843,7 @@ a {
     gap: 5px;
     margin-top: 5px;
   }
+  .section { padding: 0 0 50px;}
 }
 
 
@@ -11408,6 +11410,7 @@ a {
   }
   .footer-column {padding: 0 20px;}
   .footer-brand {padding-right: 10px;}
+  .section { padding: 0 0 40px;}
 }
 
 
