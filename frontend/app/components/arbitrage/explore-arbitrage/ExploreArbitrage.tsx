@@ -35,30 +35,28 @@ const BettingStrategies = [
 
 export default function ExploreArbitrage() {
   return (
-    <section className={`section ${styles.ExploreArbitrageSection}`}>
-      <Container fullWidth>
-        <div className={styles.ExploreArbitrageWrapper}>
-          <SectionHeading
-            highlight="Explore Arbitrage "
-            title=" Betting Strategies"
-            description="Arbitrage betting can take several forms depending on the number of outcomes, sportsbook prices, and timing of the wager. Understanding these approaches can help bettors recognize potential opportunities and choose the right odds for each position."
-          />
-        </div>
-        <ul>
-          {BettingStrategies.map((feature, index) => (
-            <li key={index}>
-              <div className={styles.ExploreArbitrageBox}>
-                <div className={styles.ExploreArbitrageHead}>
-                  <i>{feature.icon}</i>
-                  <h3>{feature.title}</h3>
-                </div>
-                <p>{feature.description}</p>
+    <Container sectionClassName={styles.ExploreArbitrageSection} fullWidth>
+      <div className={styles.ExploreArbitrageWrapper}>
+        <SectionHeading
+          highlight="Explore Arbitrage "
+          title=" Betting Strategies"
+          description="Arbitrage betting can take several forms depending on the number of outcomes, sportsbook prices, and timing of the wager. Understanding these approaches can help bettors recognize potential opportunities and choose the right odds for each position."
+        />
+      </div>
+      <ul>
+        {BettingStrategies.map((feature, index) => (
+          <li key={index}>
+            <div className={styles.ExploreArbitrageBox}>
+              <div className={styles.ExploreArbitrageHead}>
+                <i>{feature.icon}</i>
+                <h3>{feature.title}</h3>
               </div>
-            </li>
-          ))}
-        </ul>
-      </Container>
+              <p>{feature.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Container>
 
-    </section >
   );
 }

@@ -1,0 +1,25 @@
+.smarterArbitrage{position:relative;}
+.smarterArbitrageBox{display:grid; gap:30px; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items:center;}
+.smarterArbitrageContent{ display:grid; gap:25px;}
+.smarterArbitrageContent h1{ margin:0; padding:0; font-weight: 700; font-size: 48px; line-height: normal; color: #fff;}
+.smarterArbitrageContent h1 span{ color:#E2B146;}
+.smarterArbitrageContent p{margin:0;padding:0;font-weight: 400; font-size: 16px; line-height: normal; color: #FFFFFF;}
+.buttonGroup{ display:flex; gap:15px;}
+
+.smarterArbitrageMedia{ border-radius:20px; border:1px solid #E2B146; background:#041524; padding:20px;display: flex;}
+.smarterArbitrageMedia img{ width:100%; height:auto; border-radius:20px; vertical-align:top;}
+
+@media(max-width:1099px){
+    .smarterArbitrageContent h1{ font-size:40px;}
+    .smarterArbitrageContent p{ font-size: 15px;}
+}
+@media(max-width:1024px){
+    .smarterArbitrageBox{display: flex; flex-direction: column-reverse; text-align: center;}
+    .buttonGroup{ display:flex; gap:15px; justify-content:center;}
+}
+@media(max-width:767px){
+    .smarterArbitrageContent{ display:grid; gap:15px;}
+    .smarterArbitrageMedia{ padding:10px;}
+    .smarterArbitrageContent h1{ font-size:32px;}
+    .buttonGroup{ flex-wrap:wrap;}
+}

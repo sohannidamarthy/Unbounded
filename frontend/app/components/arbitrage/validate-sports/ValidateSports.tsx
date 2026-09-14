@@ -44,28 +44,25 @@ const steps = [
 
 export default function ValidateSports() {
   return (
-    <section className={`section ${styles.ValidateSportsSection}`}>
-      <Container fullWidth>
-        <SectionHeading
-          highlight="Validate Your Sports "
-          title=" Betting Opportunities"
-          description="Use Unbound&apos;s Arbitrage betting calculator to evaluate potential arbitrage opportunities before placing bets. Enter the available sportsbook odds and review key calculations to understand the strength and potential outcomes of each  opportunity. This helps bettors validate pricing differences, determine appropriate stake allocation, and assess potential  returns before committing funds."
-        />
-        <ul>
-          {steps.map((feature, index) => (
-            <li key={index}>
-              <div className={styles.ValidateSportsBox}>
-                <div className={styles.ValidateSportsHead}>
-                  <i>{feature.icon}</i>
-                  <h3>{feature.title}</h3>
-                </div>
-                <p>{feature.description}</p>
+    <Container sectionClassName={styles.ValidateSportsSection} fullWidth>
+      <SectionHeading
+        highlight="Validate Your Sports "
+        title=" Betting Opportunities"
+        description="Use Unbound&apos;s Arbitrage betting calculator to evaluate potential arbitrage opportunities before placing bets. Enter the available sportsbook odds and review key calculations to understand the strength and potential outcomes of each  opportunity. This helps bettors validate pricing differences, determine appropriate stake allocation, and assess potential  returns before committing funds."
+      />
+      <ul>
+        {steps.map((feature, index) => (
+          <li key={index}>
+            <div className={styles.ValidateSportsBox}>
+              <div className={styles.ValidateSportsHead}>
+                <i>{feature.icon}</i>
+                <h3>{feature.title}</h3>
               </div>
-            </li>
-          ))}
-        </ul>
-      </Container>
-
-    </section >
+              <p>{feature.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Container>
   );
 }

@@ -14,10 +14,9 @@ export default function HeroSection() {
       <div className={styles.smarterArbitrageBox}>
         <div className={styles.smarterArbitrageContent}>
           <h1 className={styles.title}>
-            <span>Smarter Arbitrage</span> Betting
-            Starts with <span className={styles.highlight}>Unbound.</span>
+            Unlock sharper market <span> insight.</span>
           </h1>
-          <p>Find and evaluate arbitrage betting opportunities across sports with Unbound. Scan sportsbook odds for pricing differences, validate potential arbitrage positions with built-in calculations, and understand your potential returns before placing your bets. <br /> <br /> Unbound brings opportunity discovery, bet validation, position tracking, and results management into one streamlined sports betting workflow.</p>
+          <p>A focused workspace for odds, alerts, and edge tracking. Create an account or explore the pricing tiers to get started.</p>
 
           {/* Action Buttons */}
           <div className={styles.buttonGroup}>

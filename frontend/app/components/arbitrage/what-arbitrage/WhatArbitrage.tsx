@@ -19,14 +19,12 @@ export default function WhatArbitrage() {
   const carouselFeatures = [...features, ...features, ...features];
 
   return (
-    <section className={`section ${styles.WhatArbitrageSection}`}>
-      <Container>
-        <SectionHeading
-          highlight="What is Arbitrage "
-          title=" Betting?"
-          description="Arbitrage betting is a sports betting strategy that takes advantage of different odds offered by multiple sportsbooks for the same event. By placing calculated bets on all relevant outcomes, bettors can potentially create a position where the combined odds provide a favorable return, regardless of which outcome wins."
-        />
-      </Container>
+    <Container sectionClassName={styles.WhatArbitrageSection} fullWidth noFullWidthPadding>
+      <SectionHeading
+        highlight="What is Arbitrage "
+        title=" Betting?"
+        description="Arbitrage betting is a sports betting strategy that takes advantage of different odds offered by multiple sportsbooks for the same event. By placing calculated bets on all relevant outcomes, bettors can potentially create a position where the combined odds provide a favorable return, regardless of which outcome wins."
+      />
 
       <div className={styles.WhatArbitrageCarousel}>
         <Swiper
@@ -65,6 +63,6 @@ export default function WhatArbitrage() {
           ))}
         </Swiper>
       </div>
-    </section>
+    </Container>
   );
 }

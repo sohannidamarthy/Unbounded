@@ -22,25 +22,23 @@ const countries = [
 
 export default function BettingLegal() {
   return (
-    <section className={`section ${styles.BettingLegalSection}`}>
-      <Container>
-        <SectionHeading
-          highlight="Is Arbitrage Betting "
-          title=" Legal?"
-          description=" Arbitrage betting is generally not prohibited as a betting strategy. However, its legality depends on the gambling laws and licensed betting options available in the bettor’s jurisdiction. Regulations can also differ between states, provinces, or territories."
-        />
+    <Container sectionClassName={styles.BettingLegalSection}>
+      <SectionHeading
+        highlight="Is Arbitrage Betting "
+        title=" Legal?"
+        description=" Arbitrage betting is generally not prohibited as a betting strategy. However, its legality depends on the gambling laws and licensed betting options available in the bettor’s jurisdiction. Regulations can also differ between states, provinces, or territories."
+      />
 
-        <div className={styles.BettingLegalBox}>
-          <p>Countries and markets where sports betting is generally regulated include:</p>
-          <ul>
-            {countries.map((country, index) => (
-              <li className={styles.countryItem} key={index}>
-                {country}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Container>
-    </section>
+      <div className={styles.BettingLegalBox}>
+        <p>Countries and markets where sports betting is generally regulated include:</p>
+        <ul>
+          {countries.map((country, index) => (
+            <li className={styles.countryItem} key={index}>
+              {country}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Container>
   );
 }

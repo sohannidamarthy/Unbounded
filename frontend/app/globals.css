@@ -5249,7 +5249,7 @@ a {
 .hero-banner-media {
   border-radius: 28px;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 7;
   max-width: 100%;
   width: 100%;
   justify-self: stretch;
@@ -5541,12 +5541,6 @@ a {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-}
-
-.section {
-  padding: 0 0 90px;
-  display: grid;
-  gap: 24px;
 }
 
 .pricing-section {
@@ -6703,146 +6697,7 @@ a {
   letter-spacing: 0.12em;
 }
 
-.site-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  border-top: 1px solid rgba(181, 136, 33, 0.2);
-  color: rgba(247, 243, 234, 0.72);
-  font-size: 14px;
-}
 
-.site-footer strong {
-  display: block;
-  color: var(--bull-gold);
-  font-size: 18px;
-}
-
-.footer-top {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 2fr);
-  gap: 40px;
-  align-items: start;
-}
-
-.footer-brand {
-  display: grid;
-  gap: 8px;
-  align-content: start;
-  padding-right: 30px;
-}
-
-.footer-logo {
-  display: flex;
-  gap: 20px;
-}
-
-.footer-logo img {
-  border-radius: 12px;
-}
-
-.footer-logo h3 {
-  margin: 0;
-  padding: 0;
-  line-height: normal;
-  color: rgba(242, 201, 105, 0.85);
-  font-size: 16px;
-  display: block;
-  text-transform: uppercase;
-}
-
-.footer-logo h3 span {
-  color: rgba(247, 243, 234, 0.62);
-  line-height: normal;
-  font-size: 14px;
-  font-weight: normal;
-  display: block;
-  text-transform: none;
-  margin-top: 8px;
-}
-
-.footer-columns {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding: 50px 0;
-}
-
-.footer-column {
-  display: grid;
-  gap: 15px;
-  align-content: start;
-}
-
-.footer-column {
-  position: relative;
-  padding: 0 30px;
-}
-
-.footer-column:before {
-  content: '';
-  background: linear-gradient(180deg, #0A1826 0%, #27333E 50%, #0A1826 100%);
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 100%;
-}
-
-.footer-column h4 {
-
-  margin: 0;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: rgba(242, 201, 105, 0.85);
-}
-
-.footer-column a {
-  color: rgba(247, 243, 234, 0.78);
-  transition: color 0.2s ease, transform 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  justify-content: space-between;
-}
-
-
-.footer-column a:hover {
-  color: var(--bull-gold);
-  transform: translateX(3px);
-}
-
-/* Legacy single-row footer (still used by some marketing pages) */
-.footer-links {
-  display: flex;
-  gap: 18px;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
-
-.footer-links a {
-  color: rgba(247, 243, 234, 0.78);
-}
-
-.footer-links a:hover {
-  color: var(--bull-gold);
-}
-
-.footer-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  flex-wrap: wrap;
-  padding: 15px 0;
-  border-top: 1px solid rgba(181, 136, 33, 0.14);
-}
-
-.footer-copyright {
-  color: rgba(247, 243, 234, 0.5);
-  font-size: 12px;
-  white-space: nowrap;
-}
 
 .footer-legal {
   max-width: 840px;
@@ -8692,6 +8547,8 @@ a {
 .site-header {
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
+  width: 100%; max-width: clamp(1160px, calc(92vw + 40px), 1560px); margin:0 auto;
+  padding-left:20px; padding-right:20px;
 }
 
 .brand,
@@ -8723,10 +8580,6 @@ a {
 
 .dashboard-page .dashboard-page-header .brand {
   width: max-content;
-}
-
-.marketing-page .site-header {
-  margin-bottom: 24px;
 }
 
 .seo-page-main {
@@ -10243,10 +10096,10 @@ a {
    Visible on the home page before login. Uses the same local
    American↔decimal conversion and arb/EV math as the dashboard
    calculator, so no API call is needed. */
-.calculator-hero {
+body .calculator-hero {
   /* padding: clamp(24px, 4vw, 48px) 0; */
   background: linear-gradient(135deg, rgba(7, 22, 38, 0.9), rgba(10, 32, 52, 0.85));
-  padding-top: 30px;
+  padding:90px 0;
 }
 
 .calculator-grid {
@@ -10423,6 +10276,7 @@ a {
 }
 
 /* ---- How It Works section ---- */
+body .how-it-works{  padding:90px 0;}
 .how-it-works .section-header h2 {
   color: var(--bull-gold);
 }
@@ -10434,42 +10288,6 @@ a {
 .how-it-works {
   padding-top: 30px;
 }
-
-/* ---- Footer socials ---- */
-.footer-socials {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-top: 14px;
-}
-
-.footer-social-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 1px solid rgba(181, 136, 33, 0.35);
-  color: rgba(247, 243, 234, 0.75);
-  transition: color 0.2s ease, border-color 0.2s ease;
-}
-
-.footer-social-link:hover {
-  color: var(--bull-gold);
-  border-color: rgba(242, 201, 105, 0.7);
-}
-
-.footer-social-link svg {
-  width: 16px;
-  height: 16px;
-}
-
-
-
-
-
 
 .common-carousel {
   width: 100%;
@@ -10542,13 +10360,13 @@ a {
 
 /* Coverflow variant (Insights from inside Unbounded) */
 .common-carousel--coverflow {
-  padding: 28px 0 12px;
+  padding:0;
   overflow: hidden;
 }
 
 .common-carousel--coverflow .swiper {
   overflow: visible;
-  padding: 24px 0;
+  padding:0;
 }
 
 .common-carousel--coverflow .swiper-slide {
@@ -10586,8 +10404,8 @@ a {
 }
 
 
-
 /* Header */
+header .conaerin
 .contact-header {
   margin-bottom: 30px;
 }
@@ -10806,6 +10624,13 @@ a {
 
 /* Media started  */
 
+@media (max-width: 1299px) {
+    body .how-it-works,
+    body .calculator-hero{
+        padding:70px 0 ;
+    }
+}
+
 @media (min-width: 1200px) {
   .common-carousel--coverflow .swiper-slide {
     width: 42%;
@@ -10831,21 +10656,14 @@ a {
     min-width: 0;
   }
 
-  .footer-logo img {
-    display: none;
-  }
-
+ 
   .footer-columns {
     padding: 35px 0;
   }
-
-  .footer-socials {
-    gap: 5px;
-    margin-top: 5px;
-  }
   .section { padding: 0 0 50px;}
+  body .how-it-works,
+  body .calculator-hero{ padding:50px 0 ;}
 }
-
 
 @media (max-width: 900px) {
   .dashboard-arb-row {
@@ -10865,9 +10683,9 @@ a {
   .dashboard-arb-sport {
     grid-column: auto;
   }
-  .site main {
+  /* .site main {
     gap: 40px;
-  }
+  } */
 
   .dashboard-page-header {
     display: grid;
@@ -10934,9 +10752,9 @@ a {
     margin-top: 8px;
   }
 
-  .hero-banner-secondary {
+  /* .hero-banner-secondary {
     margin-top: 36px;
-  }
+  } */
 
   .hero-banner-label,
   .hero-banner-secondary .hero-banner-media {
@@ -11154,7 +10972,7 @@ a {
     grid-template-areas:
       "brand actions"
       "nav nav";
-    align-items: center;
+    align-items: center;    
   }
 
   .brand {
@@ -11317,6 +11135,7 @@ a {
     grid-area: actions;
     justify-self: end;
   }
+  .calculator-grid {grid-template-columns: 1fr;}
 }
 
 
@@ -11368,49 +11187,27 @@ a {
     grid-template-columns: 1fr;
   }
   .footer-legal{ gap:10px;}
-  .footer-bottom{ display: grid; justify-content:center; text-align:center; gap:10px;}
 }
 
 
 @media (max-width: 767px) {
-  .common-carousel .swiper-pagination {
-    margin-top: 10px;
-  }
-
-  .contact-form {
-    padding: 20px;
-  }
-
-  .contact-content {
-    grid-template-columns: 1fr;
-    max-width: 100%;
-  }
-
-  .contact-header h1 {
-    font-size: 28px;
-  }
-
-  .form-footer {
-    flex-direction: column;
-  }
-
-  .common-carousel--coverflow .swiper-slide {
-    width: 84%;
-    max-width: 300px;
-  }
-
+  .common-carousel .swiper-pagination {margin-top: 10px;}
+  .contact-form {padding: 20px;}
+  .contact-content {grid-template-columns: 1fr;max-width: 100%;}
+  .contact-header h1 {font-size: 28px;}
+  .form-footer {flex-direction: column;}
+  .common-carousel--coverflow .swiper-slide { width: 84%; max-width: 300px;}
   .common-carousel--coverflow .swiper-button-prev,
-  .common-carousel--coverflow .swiper-button-next {
-    display: none;
-  }
-
-  .common-carousel--coverflow .swiper-slide {
-    width: 58%;
-    max-width: 360px;
-  }
+  .common-carousel--coverflow .swiper-button-next {display: none;}
+  .common-carousel--coverflow .swiper-slide {width: 58%;max-width: 360px;}
   .footer-column {padding: 0 20px;}
   .footer-brand {padding-right: 10px;}
   .section { padding: 0 0 40px;}
+  body .how-it-works,
+  body .calculator-hero{ padding:40px 0 ;}
+  .hero-banner-cta h2{ font-size:32px;}
+  .hero-banner-actions{ flex-wrap:wrap;}
+  .primary, .ghost{ padding:12px 16px;}
 }
 
 
@@ -11672,9 +11469,9 @@ a {
     /* gap: 24px; */
   }
 
-  .site main {
+  /* .site main {
     gap: 32px;
-  }
+  } */
 
   .site-header {
     gap: 12px;
@@ -11747,12 +11544,6 @@ a {
   .hero-banner-label::before,
   .hero-banner-label::after {
     display: none;
-  }
-
-  .hero-image-toggle {
-    top: 12px;
-    left: 12px;
-    max-width: calc(100% - 24px);
   }
 
   .hero-banner-primary .toggle-btn,

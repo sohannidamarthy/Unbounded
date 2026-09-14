@@ -1,16 +1,18 @@
 import Image from 'next/image';
 import FooterLinkColumn from './FooterLinkColumn';
 import FooterSocialLinks from './FooterSocialLinks';
-import Container from './container/Container';
+import Container from '../container/Container';
 import { footerColumns } from './footerData';
+import styles from './SiteFooter.module.css';
+
 
 export default function SiteFooter() {
   return (
-    <footer className="site-footer">
-      <Container>
-        <div className="footer-columns">
-          <div className="footer-brand">
-            <div className='footer-logo'>
+    <footer className={styles.siteFooter}>
+      <Container className={styles.footerContainer}>
+        <div className={styles.footerColumns}>
+          <div className={styles.footerBrand}>
+            <div className={styles.footerLogo}>
               <Image
                 src="/unbounded.jpeg"
                 alt="Unbounded logo"
@@ -29,12 +31,12 @@ export default function SiteFooter() {
             <FooterLinkColumn key={column.title} title={column.title} links={column.links} />
           ))}
         </div>
-        <div className="footer-bottom">
-          <p className="footer-legal">
+        <div className={styles.footerBottom}>
+          <p className={styles.footerLegal}>
             21+ only. Unbounded is an education, tracking, and workflow tool; it does not place bets or guarantee
             profit.
           </p>
-          <span className="footer-copyright">© {new Date().getFullYear()} Unbounded</span>
+          <span className={styles.footerCopyright}>© {new Date().getFullYear()} Unbounded</span>
         </div>
       </Container>
     </footer>

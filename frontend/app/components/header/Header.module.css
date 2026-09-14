@@ -1,45 +1,15 @@
-.siteHeader {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
+.siteHeader {width: 100%; display: flex; align-items: center; justify-content: space-between; }
+.headerContainer{width: 100%; max-width: clamp(1160px, calc(92vw + 40px), 1560px); margin: 0 auto; padding: 0 20px;}
+.brandHomeLink {display: flex; align-items: center; }
+.brandHomeLink img{grid-row: 1; border-radius: 16px; border: 2px solid var(--bull-navy); background: var(--bull-cream); box-shadow: 0 8px 18px rgba(5, 15, 26, 0.35);}
+.brand span {display: inline-flex; align-items: center; width: max-content; justify-self: start; text-decoration: none;color: var(--bull-gold); font-size:20px;}
+.brandHomeLink img {display: block; }
+.brandText {margin-left: 10px; font-size: 24px; font-weight: 600; color: #071826; }
 
-.brand {
-  display: flex;
-  align-items: center;
-}
 
-.brandHomeLink {
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-}
 
-.brandHomeLink img {
-  display: block;
-}
-
-.brandText {
-  margin-left: 10px;
-  font-size: 24px;
-  font-weight: 600;
-  color: #071826;
-}
-
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
-
-.navLinks a {
-  text-decoration: none;
-  color: #071826;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.navLinks a:hover {
-  color: #8f9dad;
-}
+.navLinks {    display: flex; gap: 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
+color: #f5efe6; flex-wrap: nowrap; white-space: nowrap; justify-content: center;justify-self: center;}
+.navLinks a {position: relative; display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 999px; 
+  border: 1px solid rgba(181, 136, 33, 0.35); transition: border-color 0.2s ease, background 0.2s ease;}
+.navLinks a:hover {color: #8f9dad;}

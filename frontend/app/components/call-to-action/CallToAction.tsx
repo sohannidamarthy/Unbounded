@@ -22,24 +22,22 @@ const CallToAction = ({
   buttonLink,
 }: CallToActionProps) => {
   return (
-    <section className={`section ${styles.CallToAction}`}>
-      <Container>
-        <div className={styles.CallToActionBox}>
-          <SectionHeading
-            highlight={highlight}
-            title={title}
-            description={description}
-          />
+    <Container sectionClassName={styles.CallToAction}>
+      <div className={styles.CallToActionBox}>
+        <SectionHeading
+          highlight={highlight}
+          title={title}
+          description={description}
+        />
 
-          <ButtonPrimary
-            href={buttonLink}
-            icon={buttonIcon}
-          >
-            {buttonText}
-          </ButtonPrimary>
-        </div>
-      </Container>
-    </section>
+        <ButtonPrimary
+          href={buttonLink}
+          icon={buttonIcon}
+        >
+          {buttonText}
+        </ButtonPrimary>
+      </div>
+    </Container>
   );
 };
 

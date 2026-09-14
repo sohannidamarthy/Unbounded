@@ -1,24 +1,45 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ComponentPropsWithoutRef } from "react";
 import styles from "./Container.module.css";
 
-type ContainerProps = PropsWithChildren<{
-  className?: string;
-  fullWidth?: boolean;
-}>;
+type ContainerProps = PropsWithChildren<
+  Omit<ComponentPropsWithoutRef<"section">, "className"> & {
+    className?: string;
+    sectionClassName?: string;
+    containerClassName?: string;
+    fullWidth?: boolean;
+    noFullWidthPadding?: boolean;
+  }
+>;
 
 const Container = ({
   children,
+  id,
   className = "",
+  sectionClassName = "",
+  containerClassName = "",
   fullWidth = false,
+  noFullWidthPadding = false,
+  ...sectionProps
 }: ContainerProps) => {
-  if (fullWidth) {
-    return <div className={`${styles.fullWidth} ${className}`}>{children}</div>;
-  }
-
   return (
-    <div className={styles.container}>
-      {children}
-    </div>
+    <section
+      id={id}
+      {...sectionProps}
+      className={`${styles.section} ${sectionClassName}`}
+    >
+      {fullWidth ? (
+        <div
+          className={`${styles.fullWidth} ${noFullWidthPadding ? styles.noFullWidthPadding : ""
+            } ${className}`}
+        >
+          {children}
+        </div>
+      ) : (
+        <div className={`${styles.container} ${containerClassName}`}>
+          {children}
+        </div>
+      )}
+    </section>
   );
 };
 

@@ -120,162 +120,160 @@ export default function HowCanWeHelp() {
   };
 
   return (
-    <section className={styles.contactSection}>
-      <Container>
-        <div className={styles.contactSectionHead}>
-          <h2 className={styles.contactTitle}>
-            How Can We <span>Help?</span>
-          </h2>
-          <p className={styles.contactDescription}>
-            Have a question, suggestion, or feedback? We&apos;d love to hear from you. Send us a message and our team will get back to you.
-          </p>
-        </div>
-        <div className={styles.contactBox}>
-          <div className={styles.contactLeft}>
-            <h3 className={styles.listenTitle}>We&apos;re Here to Listen</h3>
-            <div className={styles.listenLine} />
-            <div className={styles.contactOptions}>
-              {CONTACT_OPTIONS.map((item) => {
-                const Icon = item.icon;
+    <Container sectionClassName={styles.contactSection}>
+      <div className={styles.contactSectionHead}>
+        <h2 className={styles.contactTitle}>
+          How Can We <span>Help?</span>
+        </h2>
+        <p className={styles.contactDescription}>
+          Have a question, suggestion, or feedback? We&apos;d love to hear from you. Send us a message and our team will get back to you.
+        </p>
+      </div>
+      <div className={styles.contactBox}>
+        <div className={styles.contactLeft}>
+          <h3 className={styles.listenTitle}>We&apos;re Here to Listen</h3>
+          <div className={styles.listenLine} />
+          <div className={styles.contactOptions}>
+            {CONTACT_OPTIONS.map((item) => {
+              const Icon = item.icon;
 
-                return (
-                  <div
-                    className={styles.contactOption}
-                    key={item.title}
-                  >
-                    <div className={styles.contactOptionIcon}>
-                      <Icon />
-                    </div>
-
-                    <div className={styles.contactOptionContent}>
-                      <h4 className={styles.contactOptionTitle}>
-                        {item.title}
-                      </h4>
-
-                      <p className={styles.contactOptionDescription}>
-                        {item.description}
-                      </p>
-                    </div>
-
-                    <div className={styles.contactOptionArrow}>
-                      <svg width="14" height="23" viewBox="0 0 14 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.69533 23L14 11.5L2.69533 0L4.47035e-08 2.7419L8.60935 11.5L4.47035e-08 20.2581L2.69533 23Z" fill="#DAA946" />
-                      </svg>
-                    </div>
+              return (
+                <div
+                  className={styles.contactOption}
+                  key={item.title}
+                >
+                  <div className={styles.contactOptionIcon}>
+                    <Icon />
                   </div>
-                );
-              })}
-            </div>
+
+                  <div className={styles.contactOptionContent}>
+                    <h4 className={styles.contactOptionTitle}>
+                      {item.title}
+                    </h4>
+
+                    <p className={styles.contactOptionDescription}>
+                      {item.description}
+                    </p>
+                  </div>
+
+                  <div className={styles.contactOptionArrow}>
+                    <svg width="14" height="23" viewBox="0 0 14 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2.69533 23L14 11.5L2.69533 0L4.47035e-08 2.7419L8.60935 11.5L4.47035e-08 20.2581L2.69533 23Z" fill="#DAA946" />
+                    </svg>
+                  </div>
+                </div>
+              );
+            })}
           </div>
+        </div>
 
-          {/* CONTACT FORM */}
-          <form className={styles.contactForm} onSubmit={handleContactSubmit} noValidate>
-            <div className={styles.formRow}>
-              <div className={styles.formField}>
-                <label className={styles.formLabel} htmlFor="fullName">
-                  Full Name
-                </label>
-                <div className={styles.formInput}>
-                  <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* EMAIL */}
-              <div className={styles.formField}>
-                <label className={styles.formLabel} htmlFor="email">
-                  Email Address
-                </label>
-
-                <div className={styles.formInput}>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className={styles.formInputText}
-                    placeholder="john@example.com"
-                    required
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* REASON */}
-            <div className={`${styles.formField} ${styles.formFieldFull}`}>
-              <label className={styles.formLabel} htmlFor="reason">
-                Reason for Contact
+        {/* CONTACT FORM */}
+        <form className={styles.contactForm} onSubmit={handleContactSubmit} noValidate>
+          <div className={styles.formRow}>
+            <div className={styles.formField}>
+              <label className={styles.formLabel} htmlFor="fullName">
+                Full Name
               </label>
-
-              <div className={styles.formSelect}>
-                <select id="reason" name="reason" className={styles.formInputText} defaultValue="" required>
-                  <option value="" disabled>Select a reason</option>
-                  <option value="General Feedback">General Feedback</option>
-                  <option value="Suggestion / Feature Request">Suggestion / Feature Request</option>
-                  <option value="Website / Technical Issue">Website / Technical Issue</option>
-                  <option value="UI/UX Feedback">UI/UX Feedback</option>
-                  <option value="Request a New Sport / League">Request a New Sport / League</option>
-                  <option value="Privacy / Data Concern">Privacy / Data Concern</option>
-                  <option value="Partnership / Business Inquiry">Partnership / Business Inquiry</option>
-                  <option value="Advertising / Media Inquiry">Advertising / Media Inquiry</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-            </div>
-
-            {/* MESSAGE */}
-            <div className={`${styles.formField} ${styles.formFieldFull}`}>
-              <label className={styles.formLabel} htmlFor="message">
-                Message
-              </label>
-
-              <div className={styles.formMessage}>
-                <textarea
-                  id="message"
-                  name="message"
-                  className={styles.formInputText}
-                  placeholder="How can we help you today?"
-                  rows={5}
+              <div className={styles.formInput}>
+                <input
+                  id="fullName"
+                  name="fullName"
+                  type="text"
+                  placeholder="John Doe"
                   required
                 />
               </div>
             </div>
 
-            {status === "success" && (
-              <p className={styles.formStatusSuccess} role="status">
-                Thanks for reaching out! We&apos;ve received your message and will get back to you soon.
-              </p>
-            )}
-            {status === "error" && (
-              <p className={styles.formStatusError} role="alert">
-                Something went wrong. Please fill in all fields and try again.
-              </p>
-            )}
+            {/* EMAIL */}
+            <div className={styles.formField}>
+              <label className={styles.formLabel} htmlFor="email">
+                Email Address
+              </label>
 
-            {/* FORM FOOTER */}
-            <div className={styles.formFooter}>
-              <div className={styles.privacyText}>
-                <span>
-                  <svg width="18" height="18" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M11 22C9.13333 22 7.41667 21.575 5.85 20.725C4.28333 19.875 3 18.7417 2 17.325V20H0V14H6V16H3.525C4.325 17.2 5.37917 18.1667 6.6875 18.9C7.99583 19.6333 9.43333 20 11 20C12.25 20 13.4208 19.7625 14.5125 19.2875C15.6042 18.8125 16.5542 18.1708 17.3625 17.3625C18.1708 16.5542 18.8125 15.6042 19.2875 14.5125C19.7625 13.4208 20 12.25 20 11H22C22 12.5167 21.7125 13.9417 21.1375 15.275C20.5625 16.6083 19.775 17.775 18.775 18.775C17.775 19.775 16.6083 20.5625 15.275 21.1375C13.9417 21.7125 12.5167 22 11 22ZM0 11C0 9.48333 0.2875 8.05833 0.8625 6.725C1.4375 5.39167 2.225 4.225 3.225 3.225C4.225 2.225 5.39167 1.4375 6.725 0.8625C8.05833 0.2875 9.48333 0 11 0C12.8667 0 14.5833 0.425 16.15 1.275C17.7167 2.125 19 3.25833 20 4.675V2H22V8H16V6H18.475C17.675 4.8 16.6208 3.83333 15.3125 3.1C14.0042 2.36667 12.5667 2 11 2C9.75 2 8.57917 2.2375 7.4875 2.7125C6.39583 3.1875 5.44583 3.82917 4.6375 4.6375C3.82917 5.44583 3.1875 6.39583 2.7125 7.4875C2.2375 8.57917 2 9.75 2 11H0ZM11.8875 16.6375C12.1292 16.3958 12.25 16.1 12.25 15.75C12.25 15.4 12.1292 15.1 11.8875 14.85C11.6458 14.6 11.35 14.475 11 14.475C10.65 14.475 10.3542 14.5958 10.1125 14.8375C9.87083 15.0792 9.75 15.375 9.75 15.725C9.75 16.075 9.87083 16.375 10.1125 16.625C10.3542 16.875 10.65 17 11 17C11.35 17 11.6458 16.8792 11.8875 16.6375ZM10.1 13.2H11.925C11.925 12.6 11.9958 12.15 12.1375 11.85C12.2792 11.55 12.5667 11.1833 13 10.75C13.5833 10.1667 13.9708 9.69583 14.1625 9.3375C14.3542 8.97917 14.45 8.55 14.45 8.05C14.45 7.11667 14.1167 6.375 13.45 5.825C12.7833 5.275 11.9667 5 11 5C10.1667 5 9.45 5.21667 8.85 5.65C8.25 6.08333 7.81667 6.7 7.55 7.5L9.2 8.2C9.31667 7.76667 9.5375 7.40833 9.8625 7.125C10.1875 6.84167 10.5667 6.7 11 6.7C11.45 6.7 11.8292 6.82917 12.1375 7.0875C12.4458 7.34583 12.6 7.69167 12.6 8.125C12.6 8.40833 12.5333 8.69167 12.4 8.975C12.2667 9.25833 11.9833 9.59167 11.55 9.975C11 10.4583 10.6208 10.9292 10.4125 11.3875C10.2042 11.8458 10.1 12.45 10.1 13.2Z" fill="currentColor" />
-                  </svg>
-
-                </span>
-                Your information will only be used to respond to your request.
+              <div className={styles.formInput}>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  className={styles.formInputText}
+                  placeholder="john@example.com"
+                  required
+                />
               </div>
-
-              <button type="submit" className={styles.sendButton} disabled={isSubmitting}>
-                <span>➤</span>
-                {isSubmitting ? "Sending…" : "Send Message"}
-              </button>
             </div>
-          </form>
-        </div>
-      </Container>
-    </section>
+          </div>
+
+          {/* REASON */}
+          <div className={`${styles.formField} ${styles.formFieldFull}`}>
+            <label className={styles.formLabel} htmlFor="reason">
+              Reason for Contact
+            </label>
+
+            <div className={styles.formSelect}>
+              <select id="reason" name="reason" className={styles.formInputText} defaultValue="" required>
+                <option value="" disabled>Select a reason</option>
+                <option value="General Feedback">General Feedback</option>
+                <option value="Suggestion / Feature Request">Suggestion / Feature Request</option>
+                <option value="Website / Technical Issue">Website / Technical Issue</option>
+                <option value="UI/UX Feedback">UI/UX Feedback</option>
+                <option value="Request a New Sport / League">Request a New Sport / League</option>
+                <option value="Privacy / Data Concern">Privacy / Data Concern</option>
+                <option value="Partnership / Business Inquiry">Partnership / Business Inquiry</option>
+                <option value="Advertising / Media Inquiry">Advertising / Media Inquiry</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          {/* MESSAGE */}
+          <div className={`${styles.formField} ${styles.formFieldFull}`}>
+            <label className={styles.formLabel} htmlFor="message">
+              Message
+            </label>
+
+            <div className={styles.formMessage}>
+              <textarea
+                id="message"
+                name="message"
+                className={styles.formInputText}
+                placeholder="How can we help you today?"
+                rows={5}
+                required
+              />
+            </div>
+          </div>
+
+          {status === "success" && (
+            <p className={styles.formStatusSuccess} role="status">
+              Thanks for reaching out! We&apos;ve received your message and will get back to you soon.
+            </p>
+          )}
+          {status === "error" && (
+            <p className={styles.formStatusError} role="alert">
+              Something went wrong. Please fill in all fields and try again.
+            </p>
+          )}
+
+          {/* FORM FOOTER */}
+          <div className={styles.formFooter}>
+            <div className={styles.privacyText}>
+              <span>
+                <svg width="18" height="18" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11 22C9.13333 22 7.41667 21.575 5.85 20.725C4.28333 19.875 3 18.7417 2 17.325V20H0V14H6V16H3.525C4.325 17.2 5.37917 18.1667 6.6875 18.9C7.99583 19.6333 9.43333 20 11 20C12.25 20 13.4208 19.7625 14.5125 19.2875C15.6042 18.8125 16.5542 18.1708 17.3625 17.3625C18.1708 16.5542 18.8125 15.6042 19.2875 14.5125C19.7625 13.4208 20 12.25 20 11H22C22 12.5167 21.7125 13.9417 21.1375 15.275C20.5625 16.6083 19.775 17.775 18.775 18.775C17.775 19.775 16.6083 20.5625 15.275 21.1375C13.9417 21.7125 12.5167 22 11 22ZM0 11C0 9.48333 0.2875 8.05833 0.8625 6.725C1.4375 5.39167 2.225 4.225 3.225 3.225C4.225 2.225 5.39167 1.4375 6.725 0.8625C8.05833 0.2875 9.48333 0 11 0C12.8667 0 14.5833 0.425 16.15 1.275C17.7167 2.125 19 3.25833 20 4.675V2H22V8H16V6H18.475C17.675 4.8 16.6208 3.83333 15.3125 3.1C14.0042 2.36667 12.5667 2 11 2C9.75 2 8.57917 2.2375 7.4875 2.7125C6.39583 3.1875 5.44583 3.82917 4.6375 4.6375C3.82917 5.44583 3.1875 6.39583 2.7125 7.4875C2.2375 8.57917 2 9.75 2 11H0ZM11.8875 16.6375C12.1292 16.3958 12.25 16.1 12.25 15.75C12.25 15.4 12.1292 15.1 11.8875 14.85C11.6458 14.6 11.35 14.475 11 14.475C10.65 14.475 10.3542 14.5958 10.1125 14.8375C9.87083 15.0792 9.75 15.375 9.75 15.725C9.75 16.075 9.87083 16.375 10.1125 16.625C10.3542 16.875 10.65 17 11 17C11.35 17 11.6458 16.8792 11.8875 16.6375ZM10.1 13.2H11.925C11.925 12.6 11.9958 12.15 12.1375 11.85C12.2792 11.55 12.5667 11.1833 13 10.75C13.5833 10.1667 13.9708 9.69583 14.1625 9.3375C14.3542 8.97917 14.45 8.55 14.45 8.05C14.45 7.11667 14.1167 6.375 13.45 5.825C12.7833 5.275 11.9667 5 11 5C10.1667 5 9.45 5.21667 8.85 5.65C8.25 6.08333 7.81667 6.7 7.55 7.5L9.2 8.2C9.31667 7.76667 9.5375 7.40833 9.8625 7.125C10.1875 6.84167 10.5667 6.7 11 6.7C11.45 6.7 11.8292 6.82917 12.1375 7.0875C12.4458 7.34583 12.6 7.69167 12.6 8.125C12.6 8.40833 12.5333 8.69167 12.4 8.975C12.2667 9.25833 11.9833 9.59167 11.55 9.975C11 10.4583 10.6208 10.9292 10.4125 11.3875C10.2042 11.8458 10.1 12.45 10.1 13.2Z" fill="currentColor" />
+                </svg>
+
+              </span>
+              Your information will only be used to respond to your request.
+            </div>
+
+            <button type="submit" className={styles.sendButton} disabled={isSubmitting}>
+              <span>➤</span>
+              {isSubmitting ? "Sending…" : "Send Message"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </Container>
   );
 }

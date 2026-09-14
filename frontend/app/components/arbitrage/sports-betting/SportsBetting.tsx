@@ -34,29 +34,27 @@ const features = [
 
 export default function SportsBetting() {
   return (
-    <section className={`section ${styles.SportsBettingSection}`}>
-      <Container>
-        <div className={styles.SportsBettingWrapper}>
-          <SectionHeading
-            highlight="Find the Edge"
-            title=" in Sports Betting"
-            description="Find and evaluate arbitrage betting opportunities across sports with Unbound."
-          />
-          <ul>
-            {features.map((feature, index) => (
-              <li key={index}>
-                <div className={styles.SportsBettingBox}>
-                  <div className={styles.SportsBettingHead}>
-                    <i>{feature.icon}</i>
-                    <h3>{feature.title}</h3>
-                  </div>
-                  <p>{feature.description}</p>
+    <Container sectionClassName={styles.SportsBettingSection}>
+      <div className={styles.SportsBettingWrapper}>
+        <SectionHeading
+          highlight="Find the Edge"
+          title=" in Sports Betting"
+          description="Find and evaluate arbitrage betting opportunities across sports with Unbound."
+        />
+        <ul>
+          {features.map((feature, index) => (
+            <li key={index}>
+              <div className={styles.SportsBettingBox}>
+                <div className={styles.SportsBettingHead}>
+                  <i>{feature.icon}</i>
+                  <h3>{feature.title}</h3>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Container>
-    </section>
+                <p>{feature.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Container>
   );
 }

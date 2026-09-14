@@ -44,27 +44,25 @@ const SportsBets = [
 
 export default function LogOrganize() {
   return (
-    <section className={`section ${styles.LogOrganizeSection}`}>
-      <Container fullWidth>
-        <div className={styles.LogOrganizeWrapper}>
-          <SectionHeading
-            highlight="Log and Organize "
-            title=" Your Sports Bets"
-            description="Unbound helps you manage the opportunities you actually bet on, not just the ones you discover. Record the key details of every arbitrage position and keep your betting activity organized in one place."
-          />
-        </div>
-        <ul>
-          {SportsBets.map((feature, index) => (
-            <li key={index}>
-              <div className={styles.LogOrganizeBox}>
-                <i>{feature.icon}</i>
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </Container>
-    </section >
+    <Container sectionClassName={styles.LogOrganizeSection} fullWidth>
+      <div className={styles.LogOrganizeWrapper}>
+        <SectionHeading
+          highlight="Log and Organize "
+          title=" Your Sports Bets"
+          description="Unbound helps you manage the opportunities you actually bet on, not just the ones you discover. Record the key details of every arbitrage position and keep your betting activity organized in one place."
+        />
+      </div>
+      <ul>
+        {SportsBets.map((feature, index) => (
+          <li key={index}>
+            <div className={styles.LogOrganizeBox}>
+              <i>{feature.icon}</i>
+              <h3>{feature.title}</h3>
+              <p>{feature.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </Container>
   );
 }

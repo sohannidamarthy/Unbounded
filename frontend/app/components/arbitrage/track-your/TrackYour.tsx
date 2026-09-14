@@ -39,29 +39,27 @@ const SportsBets = [
 
 export default function TrackYour() {
   return (
-    <section className={`section ${styles.TrackYourSection}`}>
-      <Container>
-        <div className={styles.TrackYourwrapper}>
-          <SectionHeading
-            highlight="Track Your Sports "
-            title=" Betting P&L"
-            description="Unbound helps you keep track of your betting performance after each arbitrage opportunity."
-          />
-          <ul>
-            {SportsBets.map((feature, index) => (
-              <li key={index}>
-                <div className={styles.TrackYourBox}>
-                  <div className={styles.TrackYourBoxHead}>
-                    <i>{feature.icon}</i>
-                    <h3>{feature.title}</h3>
-                  </div>
-                  <p>{feature.description}</p>
+    <Container sectionClassName={styles.TrackYourSection}>
+      <div className={styles.TrackYourwrapper}>
+        <SectionHeading
+          highlight="Track Your Sports "
+          title=" Betting P&L"
+          description="Unbound helps you keep track of your betting performance after each arbitrage opportunity."
+        />
+        <ul>
+          {SportsBets.map((feature, index) => (
+            <li key={index}>
+              <div className={styles.TrackYourBox}>
+                <div className={styles.TrackYourBoxHead}>
+                  <i>{feature.icon}</i>
+                  <h3>{feature.title}</h3>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Container>
-    </section>
+                <p>{feature.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Container>
   );
 }

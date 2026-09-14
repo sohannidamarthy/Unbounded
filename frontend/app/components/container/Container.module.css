@@ -1,11 +1,15 @@
-.container {
-  width: 100%;
-  max-width: clamp(1160px, calc(92vw + 40px), 1560px);
-  margin: 0 auto;
-  padding:0 20px;
+.section { padding: 0 0 90px; display: grid; gap: 24px;}
+.container { width: 100%; max-width: clamp(1160px, calc(92vw + 40px), 1560px); margin:0 auto; padding:0 20px;}
+.fullWidth { padding:0 20px; width:100%;}
+.noFullWidthPadding{ padding-left:0; padding-right:0;}
+
+@media (max-width: 1299px) {
+  .section {padding: 0 0 70px;  }
+}
+@media (max-width: 1024px) {
+  .section {padding: 0 0 50px;  }
 }
 
-.fullWidth{
-  padding:0 20px;
-  width:100%;
+@media (max-width: 767px) {
+  .section {padding: 0 0 40px;  }
 }

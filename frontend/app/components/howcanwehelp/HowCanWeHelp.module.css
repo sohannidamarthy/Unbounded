@@ -1,7 +1,7 @@
-.contactSection {
+body .contactSection {
   /* background: radial-gradient(35.06% 94.47% at 69.73% -6.05%,#123e5e 0%, #011422 100%); */
   background: radial-gradient(35.06% 94.47% at 69.73% -6.05%, #0a223a 0%, #011422 100%);
-  padding: 80px 0;
+  padding: 90px 0;
 }
 
 .contactBox {
@@ -273,6 +273,10 @@
 
 /* ================= RESPONSIVE ================= */
 
+@media(max-width:1299px){
+  body .contactSection { padding: 70px 0;}
+}
+
 @media (max-width: 1100px) {
   .contactSection {grid-template-columns: 1fr; }
   .contactForm {width: 100%;}
@@ -282,6 +286,8 @@
   .contactForm{ padding:20px;}
   .contactOption{ padding:14px;}
   .contactOptionArrow{ display:none;}
+  body .contactSection { padding: 50px 0;}
+
 }
 @media(max-width:991px){
   .contactBox{ gap:20px ;}
@@ -289,6 +295,13 @@
   .contactOptionIcon{ width:48px; height:48px; border-radius:8px;}
   .contactOptionIcon svg{ width:26px;}
   .contactOptionDescription{ line-height:normal;}
+}
+@media(max-width:991px) and (min-width:768px) {
+  .contactOption{ padding:10px; gap:8px ;}
+  .contactOptionIcon{ width:30px; height:30px; border-radius:4px;}
+  .contactOptionIcon svg{ width:20px;}
+  .listenLine {height: 2px; margin: 10px 0 15px;}
+  
 }
 
 
@@ -302,6 +315,7 @@
   .sendButton {width: 100%;}
   .contactOption{ display:flex;}
   .contactOptionDescription{ max-width:100%;}
+  body .contactSection { padding: 40px 0;}
 }
 
 @media (max-width: 480px) {

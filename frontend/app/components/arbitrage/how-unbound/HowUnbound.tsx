@@ -39,27 +39,25 @@ const howUnbound = [
 
 export default function HowUnbound() {
   return (
-    <section className={`section ${styles.HowUnboundSection}`}>
-      <Container>
-        <div className={styles.HowUnboundWrapper}>
-          <SectionHeading
-            highlight="How Unbound"
-            title=" Works"
-            description="Unbound streamlines the sports arbitrage betting workflow by helping bettors discover, evaluate, validate, and track potential opportunities."
-          />
-          <ul>
-            {howUnbound.map((feature, index) => (
-              <li key={index}>
-                <div className={styles.HowUnboundBox}>
-                  <i>{feature.icon}</i>
-                  <h3>{feature.title}</h3>
-                  <p>{feature.description}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </Container>
-    </section >
+    <Container sectionClassName={styles.HowUnboundSection}>
+      <div className={styles.HowUnboundWrapper}>
+        <SectionHeading
+          highlight="How Unbound"
+          title=" Works"
+          description="Unbound streamlines the sports arbitrage betting workflow by helping bettors discover, evaluate, validate, and track potential opportunities."
+        />
+        <ul>
+          {howUnbound.map((feature, index) => (
+            <li key={index}>
+              <div className={styles.HowUnboundBox}>
+                <i>{feature.icon}</i>
+                <h3>{feature.title}</h3>
+                <p>{feature.description}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Container>
   );
 }

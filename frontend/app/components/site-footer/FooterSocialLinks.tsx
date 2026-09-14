@@ -6,8 +6,9 @@ import {
   RedditIcon,
   TikTokIcon,
   XIcon,
-} from './SocialIcons';
+} from '../SocialIcons';
 import { footerSocialLinks, type FooterSocialLink } from './footerData';
+import styles from './SiteFooter.module.css';
 
 const ICONS: Record<FooterSocialLink['icon'], () => JSX.Element> = {
   instagram: InstagramIcon,
@@ -21,11 +22,11 @@ const ICONS: Record<FooterSocialLink['icon'], () => JSX.Element> = {
 
 export default function FooterSocialLinks() {
   return (
-    <div className="footer-socials">
+    <div className={styles.footerSocials}>
       {footerSocialLinks.map(({ href, label, icon }) => {
         const Icon = ICONS[icon];
         return (
-          <a key={label} className="footer-social-link" href={href} aria-label={label}>
+          <a key={label} className={styles.footerSocialLink} href={href} aria-label={label}>
             <Icon />
           </a>
         );

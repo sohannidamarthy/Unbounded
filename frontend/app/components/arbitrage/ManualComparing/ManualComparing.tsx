@@ -58,34 +58,32 @@ const comparisonData = [
 
 export default function ManualComparing() {
   return (
-    <section className={`section ${styles.ManualComparingSection}`}>
-      <Container>
-        <div className={styles.ManualComparingWrapper}>
-          <SectionHeading
-            highlight="Manual Comparing vs Unbound&rsquo;s"
-            title=" Arbitrage Betting Tool"
+    <Container sectionClassName={styles.ManualComparingSection}>
+      <div className={styles.ManualComparingWrapper}>
+        <SectionHeading
+          highlight="Manual Comparing vs Unbound&rsquo;s"
+          title=" Arbitrage Betting Tool"
           description="Unbound streamlines the sports arbitrage betting workflow by helping bettors discover, evaluate,  validate, and track potential opportunities."
-          />
-          <div className={styles.HowUnboundTable}>
-            <table>
-              <thead>
-                <th>Comparison</th>
-                <th>Manual Comparing</th>
-                <th>Unbound&rsquo;s Arbitrage Betting Tool</th>
-              </thead>
-              <tbody>
-                {comparisonData.map((row, index) => (
-                  <tr key={index}>
-                    <td>{row.comparison}</td>
-                    <td><div className={styles.tdBox}>{row.cancelIcon}{row.manual}</div></td>
-                    <td><div className={styles.tdBox}>{row.checkIcon}{row.unbound}</div></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        />
+        <div className={styles.HowUnboundTable}>
+          <table>
+            <thead>
+              <th>Comparison</th>
+              <th>Manual Comparing</th>
+              <th>Unbound&rsquo;s Arbitrage Betting Tool</th>
+            </thead>
+            <tbody>
+              {comparisonData.map((row, index) => (
+                <tr key={index}>
+                  <td>{row.comparison}</td>
+                  <td><div className={styles.tdBox}>{row.cancelIcon}{row.manual}</div></td>
+                  <td><div className={styles.tdBox}>{row.checkIcon}{row.unbound}</div></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </Container>
-    </section >
+      </div>
+    </Container>
   );
 }
