@@ -382,8 +382,8 @@ export const SEO_PAGES: Record<string, SeoPageDefinition> = {
   },
   "/positive-ev": {
     path: "/positive-ev",
-    title: "Positive EV Betting Explained",
-    description: "Learn how positive EV betting works, how value is identified, and how expected value shapes better decision-making.",
+    title: "Positive EV Betting Calculator & Tool",
+    description: "Find and evaluate positive EV betting opportunities across sportsbooks. Compare odds to true probability, calculate expected value, and track your positive EV bets in one workflow with Unbound.",
     eyebrow: "Positive EV Education",
     heroTitle: "Positive EV Betting Explained",
     heroDescription:

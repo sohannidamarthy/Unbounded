@@ -1,39 +1,71 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Image from 'next/image';
 import styles from './HeroSection.module.css';
 import Container from '../../container/Container';
-import SmartArbitrage from '../../../../public/SmartArbitrage.jpg'
 import ButtonPrimary from '../../button-primary/ButtonPrimary';
 
-import { UserSearchIcon, OfferIcon } from "../../icon/icons";
+type HeroButton = {
+  label: string;
+  href?: string;
+  icon?: ReactNode;
+};
 
+type HeroSectionProps = {
+  titleLead: string;
+  titleMiddle: string;
+  titleHighlight: string;
+  description: string;
+  primaryButton: HeroButton;
+  secondaryButton?: HeroButton;
+  image: { src: string; alt: string };
+};
 
-export default function HeroSection() {
+export default function HeroSection({
+  titleLead,
+  titleMiddle,
+  titleHighlight,
+  description,
+  primaryButton,
+  secondaryButton,
+  image,
+}: HeroSectionProps) {
   return (
     <Container sectionClassName={styles.smarterArbitrage}>
       <div className={styles.smarterArbitrageBox}>
         <div className={styles.smarterArbitrageContent}>
           <h1 className={styles.title}>
-            <span>Smarter Arbitrage</span> Betting
-            Starts with <span className={styles.highlight}>Unbound.</span>
+            <span>{titleLead}</span>{titleMiddle}<span className={styles.highlight}>{titleHighlight}</span>
           </h1>
-          <p>Find and evaluate arbitrage betting opportunities across sports with Unbound. Scan sportsbook odds for pricing differences, validate potential arbitrage positions with built-in calculations, and understand your potential returns before placing your bets. <br /> <br /> Unbound brings opportunity discovery, bet validation, position tracking, and results management into one streamlined sports betting workflow.</p>
+          <p>
+            {description.split('\n\n').map((paragraph, index, all) => (
+              <React.Fragment key={index}>
+                {paragraph}
+                {index < all.length - 1 && (
+                  <>
+                    <br /> <br />
+                  </>
+                )}
+              </React.Fragment>
+            ))}
+          </p>
 
           {/* Action Buttons */}
           <div className={styles.buttonGroup}>
-            <ButtonPrimary href='/arbitrage-bets' icon={<UserSearchIcon />}>
-              Open arbitrage board
+            <ButtonPrimary href={primaryButton.href} icon={primaryButton.icon}>
+              {primaryButton.label}
             </ButtonPrimary>
-            <ButtonPrimary variant="secondary" icon={<OfferIcon />}>
-              Join newsletter
-            </ButtonPrimary>
+            {secondaryButton && (
+              <ButtonPrimary variant="secondary" href={secondaryButton.href} icon={secondaryButton.icon}>
+                {secondaryButton.label}
+              </ButtonPrimary>
+            )}
           </div>
         </div>
 
         <div className={styles.smarterArbitrageMedia}>
           <Image
-            src={SmartArbitrage}
-            alt="Unbound Dashboard Preview"
+            src={image.src}
+            alt={image.alt}
             width={600}
             height={436}
             className={styles.cardImage}

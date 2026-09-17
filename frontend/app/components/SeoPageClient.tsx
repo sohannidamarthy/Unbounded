@@ -15,8 +15,66 @@ import ExploreArbitrage from "./arbitrage/explore-arbitrage/ExploreArbitrage";
 import BettingLegal from "./arbitrage/betting-legal/BettingLegal";
 import FaqSection from "./arbitrage/faq/FaqSection";
 import CallToAction from "./call-to-action/CallToAction";
-import { UserSearchIcon } from "./icon/icons";
+import { OfferIcon, UserSearchIcon } from "./icon/icons";
 import HeroSection from "./arbitrage/hero-section/HeroSection";
+import type { SeoRichPageContent } from "../data/seoRichPage.types";
+import arbitrageData from "../data/arbitrageData.json";
+import positiveEvData from "../data/positiveEvData.json";
+
+const RICH_PAGE_CONTENT: Record<string, SeoRichPageContent> = {
+  "/arbitrage": arbitrageData,
+  "/positive-ev": positiveEvData,
+};
+
+function SeoRichPage({ content }: { content: SeoRichPageContent }) {
+  return (
+    <>
+      <HeroSection
+        titleLead={content.hero.titleLead}
+        titleMiddle={content.hero.titleMiddle}
+        titleHighlight={content.hero.titleHighlight}
+        description={content.hero.description}
+        primaryButton={{ ...content.hero.primaryButton, icon: <UserSearchIcon /> }}
+        secondaryButton={content.hero.secondaryButton ? { ...content.hero.secondaryButton, icon: <OfferIcon /> } : undefined}
+        image={content.hero.image}
+      />
+      <SportsBetting {...content.findTheEdge} />
+      <WhatArbitrage {...content.whatIs} />
+      <CallToAction
+        highlight={content.ctaBanner.highlight}
+        title={content.ctaBanner.title}
+        description={content.ctaBanner.description}
+        buttonText={content.ctaBanner.buttonText}
+        buttonIcon={<UserSearchIcon />}
+        buttonLink={content.ctaBanner.buttonLink}
+      />
+      <ValidateSports {...content.validateOpportunities} />
+      <HowUnbound {...content.howUnboundWorks} />
+      <ManualComparing {...content.comparisonTable} />
+      <CallToAction
+        highlight={content.opportunitiesCta.highlight}
+        title={content.opportunitiesCta.title}
+        description={content.opportunitiesCta.description}
+        buttonText={content.opportunitiesCta.buttonText}
+        buttonIcon={<UserSearchIcon />}
+        buttonLink={content.opportunitiesCta.buttonLink}
+      />
+      <LogOrganize {...content.logAndOrganize} />
+      <TrackYour {...content.trackPAndL} />
+      <ExploreArbitrage {...content.exploreStrategies} />
+      <CallToAction
+        highlight={content.finalCtaBanner.highlight}
+        title={content.finalCtaBanner.title}
+        description={content.finalCtaBanner.description}
+        buttonText={content.finalCtaBanner.buttonText}
+        buttonIcon={<UserSearchIcon />}
+        buttonLink={content.finalCtaBanner.buttonLink}
+      />
+      <BettingLegal {...content.legality} />
+      <FaqSection {...content.faq} />
+    </>
+  );
+}
 
 type SeoPageClientProps = {
   page: SeoPageDefinition;
@@ -85,46 +143,9 @@ export function SeoPageClient({ page }: SeoPageClientProps) {
     }
   };
 
-  if (page.path === "/arbitrage") {
-    return (
-      <>
-        <HeroSection />
-        <SportsBetting />
-        <WhatArbitrage />
-        <CallToAction
-          highlight="Simplify Your Arbitrage "
-          title=" Betting Workflow"
-          description="Bring sportsbook comparison, opportunity discovery, calculations, and bet tracking together with Unbound."
-          buttonText="Get Started with Unbound"
-          buttonIcon={<UserSearchIcon />}
-          buttonLink="/arbitrage-bets"
-        />
-        <ValidateSports />
-        <HowUnbound />
-        <ManualComparing />
-        <CallToAction
-          highlight="Turn Sports book Differences "
-          title=" into Opportunities"
-          description="Unbound gives you the tools to compare odds, validate arbitrage positions, and track your sports betting results."
-          buttonText="Get Started"
-          buttonIcon={<UserSearchIcon />}
-          buttonLink="/arbitrage-bets"
-        />
-        <LogOrganize />
-        <TrackYour />
-        <ExploreArbitrage />
-        <CallToAction
-          highlight="Bring Your Arbitrage Betting "
-          title=" Into One Place"
-          description="Unbound helps you evaluate sportsbook pricing differences and keep a clear record of your  arbitrage betting activity."
-          buttonText="Try Unbound"
-          buttonIcon={<UserSearchIcon />}
-          buttonLink="/arbitrage-bets"
-        />
-        <BettingLegal />
-        <FaqSection />
-      </>
-    );
+  const richContent = RICH_PAGE_CONTENT[page.path];
+  if (richContent) {
+    return <SeoRichPage content={richContent} />;
   }
 
   return (

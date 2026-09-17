@@ -3,55 +3,39 @@ import styles from './TrackYour.module.css';
 import Container from '../../container/Container';
 import SectionHeading from '../../section-heading/SectionHeading';
 import { MaintainHistorical, MeasureIndividual, ReviewBet, ReviewWhat, SkipThe, TrackRunning } from '../../icon/icons';
+import type { FeatureCard } from '../../../data/seoRichPage.types';
 
-const SportsBets = [
-  {
-    "icon": <TrackRunning />,
-    "title": "Track Running P&L",
-    "description": "Monitor your overall profit and loss as results are recorded."
-  },
-  {
-    "icon": <ReviewBet />,
-    "title": "Review Bet Results",
-    "description": "See how individual logged bets performed after settlement."
-  },
-  {
-    "icon": <MeasureIndividual />,
-    "title": "Measure Individual Performance",
-    "description": "Understand the outcome and performance of each betting position."
-  },
-  {
-    "icon": <MaintainHistorical />,
-    "title": "Maintain Historical Records",
-    "description": "Keep a clear history of your completed sports bets."
-  },
-  {
-    "icon": <ReviewWhat />,
-    "title": "Review What Worked",
-    "description": "Look back at previous results to identify useful patterns."
-  },
-  {
-    "icon": <SkipThe />,
-    "title": "Skip the Spreadsheet",
-    "description": "Track your betting performance without maintaining separate spreadsheets."
-  }
+const icons = [
+  <TrackRunning key="0" />,
+  <ReviewBet key="1" />,
+  <MeasureIndividual key="2" />,
+  <MaintainHistorical key="3" />,
+  <ReviewWhat key="4" />,
+  <SkipThe key="5" />,
 ];
 
-export default function TrackYour() {
+type TrackYourProps = {
+  highlight: string;
+  title: string;
+  description: string;
+  cards: FeatureCard[];
+};
+
+export default function TrackYour({ highlight, title, description, cards }: TrackYourProps) {
   return (
     <Container sectionClassName={styles.TrackYourSection}>
       <div className={styles.TrackYourwrapper}>
         <SectionHeading
-          highlight="Track Your Sports "
-          title=" Betting P&L"
-          description="Unbound helps you keep track of your betting performance after each arbitrage opportunity."
+          highlight={highlight}
+          title={title}
+          description={description}
         />
         <ul>
-          {SportsBets.map((feature, index) => (
+          {cards.map((feature, index) => (
             <li key={index}>
               <div className={styles.TrackYourBox}>
                 <div className={styles.TrackYourBoxHead}>
-                  <i>{feature.icon}</i>
+                  <i>{icons[index % icons.length]}</i>
                   <h3>{feature.title}</h3>
                 </div>
                 <p>{feature.description}</p>

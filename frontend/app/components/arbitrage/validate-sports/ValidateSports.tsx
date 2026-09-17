@@ -3,59 +3,39 @@ import styles from './ValidateSports.module.css';
 import Container from '../../container/Container';
 import { EnterBetting, CheckImplied, PlanStake, CalculateArbitrage, ReviewPotential, EstimatePotential, EvaluatePositive } from "../../icon/icons";
 import SectionHeading from '../../section-heading/SectionHeading';
+import type { FeatureCard } from '../../../data/seoRichPage.types';
 
-const steps = [
-  {
-    title: "Enter Betting Odds",
-    description: "Add available decimal or American odds to evaluate the opportunity.",
-    icon: <EnterBetting />,
-  },
-  {
-    title: "Check Implied Probability",
-    description: "Understand the probability represented by available sportsbook odds.",
-    icon: <CheckImplied />,
-  },
-  {
-    title: "Calculate Arbitrage Percentage",
-    description: "Review the arbitrage percentage to assess the potential betting edge.",
-    icon: <CalculateArbitrage />,
-  },
-  {
-    title: "Plan Stake Allocation",
-    description: "Determine how to distribute stakes across the relevant outcomes.",
-    icon: <PlanStake />,
-  },
-  {
-    title: "Review Potential Payout",
-    description: "See the potential payout based on the calculated stake amounts.",
-    icon: <ReviewPotential />,
-  },
-  {
-    title: "Estimate Potential Return",
-    description: "Understand the potential return associated with the arbitrage position.",
-    icon: <EstimatePotential />,
-  },
-  {
-    title: "Evaluate Positive EV",
-    description: "Review positive EV opportunities alongside potential arbitrage positions.",
-    icon: <EvaluatePositive />,
-  },
+const icons = [
+  <EnterBetting key="0" />,
+  <CheckImplied key="1" />,
+  <CalculateArbitrage key="2" />,
+  <PlanStake key="3" />,
+  <ReviewPotential key="4" />,
+  <EstimatePotential key="5" />,
+  <EvaluatePositive key="6" />,
 ];
 
-export default function ValidateSports() {
+type ValidateSportsProps = {
+  highlight: string;
+  title: string;
+  description: string;
+  cards: FeatureCard[];
+};
+
+export default function ValidateSports({ highlight, title, description, cards }: ValidateSportsProps) {
   return (
     <Container sectionClassName={styles.ValidateSportsSection} fullWidth>
       <SectionHeading
-        highlight="Validate Your Sports "
-        title=" Betting Opportunities"
-        description="Use Unbound&apos;s Arbitrage betting calculator to evaluate potential arbitrage opportunities before placing bets. Enter the available sportsbook odds and review key calculations to understand the strength and potential outcomes of each  opportunity. This helps bettors validate pricing differences, determine appropriate stake allocation, and assess potential  returns before committing funds."
+        highlight={highlight}
+        title={title}
+        description={description}
       />
       <ul>
-        {steps.map((feature, index) => (
+        {cards.map((feature, index) => (
           <li key={index}>
             <div className={styles.ValidateSportsBox}>
               <div className={styles.ValidateSportsHead}>
-                <i>{feature.icon}</i>
+                <i>{icons[index % icons.length]}</i>
                 <h3>{feature.title}</h3>
               </div>
               <p>{feature.description}</p>

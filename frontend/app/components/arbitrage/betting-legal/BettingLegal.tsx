@@ -3,34 +3,25 @@ import styles from './BettingLegal.module.css';
 import Container from '../../container/Container';
 import SectionHeading from '../../section-heading/SectionHeading';
 
-const countries = [
-  "United Kingdom",
-  "United States",
-  "Canada",
-  "Australia",
-  "New Zealand",
-  "Ireland",
-  "Germany",
-  "France",
-  "Spain",
-  "Italy",
-  "Netherlands",
-  "Sweden",
-  "Denmark",
-  "South Africa",
-];
+type BettingLegalProps = {
+  highlight: string;
+  title: string;
+  description: string;
+  marketsIntro: string;
+  countries: string[];
+};
 
-export default function BettingLegal() {
+export default function BettingLegal({ highlight, title, description, marketsIntro, countries }: BettingLegalProps) {
   return (
     <Container sectionClassName={styles.BettingLegalSection}>
       <SectionHeading
-        highlight="Is Arbitrage Betting "
-        title=" Legal?"
-        description=" Arbitrage betting is generally not prohibited as a betting strategy. However, its legality depends on the gambling laws and licensed betting options available in the bettor’s jurisdiction. Regulations can also differ between states, provinces, or territories."
+        highlight={highlight}
+        title={title}
+        description={description}
       />
 
       <div className={styles.BettingLegalBox}>
-        <p>Countries and markets where sports betting is generally regulated include:</p>
+        <p>{marketsIntro}</p>
         <ul>
           {countries.map((country, index) => (
             <li className={styles.countryItem} key={index}>

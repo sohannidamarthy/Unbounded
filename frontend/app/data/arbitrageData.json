@@ -1,0 +1,156 @@
+{
+  "hero": {
+    "titleLead": "Smarter Arbitrage",
+    "titleMiddle": " Betting Starts with ",
+    "titleHighlight": "Unbound.",
+    "description": "Find and evaluate arbitrage betting opportunities across sports with Unbound. Scan sportsbook odds for pricing differences, validate potential arbitrage positions with built-in calculations, and understand your potential returns before placing your bets.\n\nUnbound brings opportunity discovery, bet validation, position tracking, and results management into one streamlined sports betting workflow.",
+    "primaryButton": { "label": "Open arbitrage board", "href": "/arbitrage-bets" },
+    "secondaryButton": { "label": "Join newsletter" },
+    "image": { "src": "/SmartArbitrage.jpg", "alt": "Unbound Dashboard Preview" }
+  },
+  "findTheEdge": {
+    "highlight": "Find the Edge",
+    "title": " in Sports Betting",
+    "description": "Find and evaluate arbitrage betting opportunities across sports with Unbound.",
+    "cards": [
+      { "title": "Compare Sportsbook Lines", "description": "Compare lines across sportsbooks to spot potential differences quickly." },
+      { "title": "Spot Pricing Discrepancies", "description": "Identify pricing differences that may create arbitrage opportunities." },
+      { "title": "Find Arbitrage Opportunities", "description": "Discover potential arbitrage setups across available sportsbook markets." },
+      { "title": "Reduce Manual Checking", "description": "Cut down repetitive sportsbook monitoring and manual odds comparison." },
+      { "title": "Act While Odds Are Available", "description": "Evaluate opportunities quickly before changing odds remove the edge." }
+    ]
+  },
+  "whatIs": {
+    "highlight": "What is Arbitrage ",
+    "title": " Betting?",
+    "description": "Arbitrage betting is a sports betting strategy that takes advantage of different odds offered by multiple sportsbooks for the same event. By placing calculated bets on all relevant outcomes, bettors can potentially create a position where the combined odds provide a favorable return, regardless of which outcome wins.",
+    "tickerItems": [
+      "Compare odds across sportsbooks",
+      "Identify pricing differences",
+      "Find potential arbitrage opportunities",
+      "Calculate required stake amounts",
+      "Cover all relevant outcomes",
+      "Evaluate potential returns before betting"
+    ]
+  },
+  "ctaBanner": {
+    "highlight": "Simplify Your Arbitrage ",
+    "title": " Betting Workflow",
+    "description": "Bring sportsbook comparison, opportunity discovery, calculations, and bet tracking together with Unbound.",
+    "buttonText": "Get Started with Unbound",
+    "buttonLink": "/arbitrage-bets"
+  },
+  "validateOpportunities": {
+    "highlight": "Validate Your Sports ",
+    "title": " Betting Opportunities",
+    "description": "Use Unbound's Arbitrage betting calculator to evaluate potential arbitrage opportunities before placing bets. Enter the available sportsbook odds and review key calculations to understand the strength and potential outcomes of each opportunity. This helps bettors validate pricing differences, determine appropriate stake allocation, and assess potential returns before committing funds.",
+    "cards": [
+      { "title": "Enter Betting Odds", "description": "Add available decimal or American odds to evaluate the opportunity." },
+      { "title": "Check Implied Probability", "description": "Understand the probability represented by available sportsbook odds." },
+      { "title": "Calculate Arbitrage Percentage", "description": "Review the arbitrage percentage to assess the potential betting edge." },
+      { "title": "Plan Stake Allocation", "description": "Determine how to distribute stakes across the relevant outcomes." },
+      { "title": "Review Potential Payout", "description": "See the potential payout based on the calculated stake amounts." },
+      { "title": "Estimate Potential Return", "description": "Understand the potential return associated with the arbitrage position." },
+      { "title": "Evaluate Positive EV", "description": "Review positive EV opportunities alongside potential arbitrage positions." }
+    ]
+  },
+  "howUnboundWorks": {
+    "highlight": "How Unbound",
+    "title": " Works",
+    "description": "Unbound streamlines the sports arbitrage betting workflow by helping bettors discover, evaluate, validate, and track potential opportunities.",
+    "cards": [
+      { "title": "Scan the Boards", "description": "Monitor sportsbook boards to find potential arbitrage opportunities across changing odds." },
+      { "title": "Compare the Odds", "description": "Review different sportsbook prices for the same sporting event or market." },
+      { "title": "Calculate the Edge", "description": "Use the calculator to assess implied probability, arbitrage percentage, stake allocation, and potential returns." },
+      { "title": "Validate the Opportunity", "description": "Confirm the available odds and calculations before deciding to place the bets." },
+      { "title": "Log the Bet", "description": "Record validated arbitrage bets and keep your betting activity organized." },
+      { "title": "Track Results", "description": "Monitor completed bets and running P&L to understand your overall betting performance." }
+    ]
+  },
+  "comparisonTable": {
+    "highlight": "Manual Comparing vs Unbound’s",
+    "title": " Arbitrage Betting Tool",
+    "description": "",
+    "manualColumnLabel": "Manual Comparing",
+    "unboundColumnLabel": "Unbound’s Arbitrage Betting Tool",
+    "rows": [
+      { "comparison": "Compare Lines", "manual": "Check multiple sportsbooks individually", "unbound": "Compare sportsbook lines in one workflow" },
+      { "comparison": "Pick the Odds", "manual": "Manually find and pick the odds", "unbound": "Quickly identify relevant odds and pricing differences" },
+      { "comparison": "Spot Opportunities", "manual": "Search manually for arbitrage gambling opportunities", "unbound": "Identify potential arbitrage opportunities more efficiently" },
+      { "comparison": "Calculate the Edge", "manual": "Use separate calculators or manual calculations", "unbound": "Evaluate opportunities using built-in calculations" },
+      { "comparison": "Monitor Changes", "manual": "Recheck sportsbooks as odds change", "unbound": "Keep relevant opportunities easier to review" },
+      { "comparison": "Betting Tools", "manual": "Switch between multiple betting tools", "unbound": "Bring opportunity discovery and evaluation together" },
+      { "comparison": "Track Bets", "manual": "Maintain separate records or spreadsheets", "unbound": "Log bets and track running P&L" }
+    ]
+  },
+  "opportunitiesCta": {
+    "highlight": "Turn Sports book Differences ",
+    "title": " into Opportunities",
+    "description": "Unbound gives you the tools to compare odds, validate arbitrage positions, and track your sports betting results.",
+    "buttonText": "Get Started",
+    "buttonLink": "/arbitrage-bets"
+  },
+  "logAndOrganize": {
+    "highlight": "Log and Organize ",
+    "title": " Your Sports Bets",
+    "description": "Unbound helps you manage the opportunities you actually bet on, not just the ones you discover. Record the key details of every arbitrage position and keep your betting activity organized in one place.",
+    "cards": [
+      { "title": "Record the Sportsbook", "description": "Keep track of where each bet was placed." },
+      { "title": "Pick the Odds", "description": "Document the exact odds used for each position." },
+      { "title": "Enter Your Stake", "description": "Record the amount wagered on each bet." },
+      { "title": "Document Each Position", "description": "Keep every side of an arbitrage bet clearly organized." },
+      { "title": "Maintain Betting History", "description": "Build a complete record of your past sports bets." },
+      { "title": "Review Without Reconstructing", "description": "Avoid searching through notes to remember what you placed." },
+      { "title": "Track Everything in One Place", "description": "Keep your sportsbook, odds, stakes, and positions together." }
+    ]
+  },
+  "trackPAndL": {
+    "highlight": "Track Your Sports ",
+    "title": " Betting P&L",
+    "description": "Unbound helps you keep track of your betting performance after each arbitrage opportunity.",
+    "cards": [
+      { "title": "Track Running P&L", "description": "Monitor your overall profit and loss as results are recorded." },
+      { "title": "Review Bet Results", "description": "See how individual logged bets performed after settlement." },
+      { "title": "Measure Individual Performance", "description": "Understand the outcome and performance of each betting position." },
+      { "title": "Maintain Historical Records", "description": "Keep a clear history of your completed sports bets." },
+      { "title": "Review What Worked", "description": "Look back at previous results to identify useful patterns." },
+      { "title": "Skip the Spreadsheet", "description": "Track your betting performance without maintaining separate spreadsheets." }
+    ]
+  },
+  "exploreStrategies": {
+    "highlight": "Explore Arbitrage ",
+    "title": " Betting Strategies",
+    "description": "Arbitrage betting can take several forms depending on the number of outcomes, sportsbook prices, and timing of the wager. Understanding these approaches can help bettors recognize potential opportunities and choose the right odds for each position.",
+    "cards": [
+      { "title": "2-Way Arbitrage Betting", "description": "Two-way arbitrage covers markets with two possible outcomes, such as moneyline bets in certain sports or over/under markets. Bettors compare prices across sportsbooks and look for odds that can cover both outcomes." },
+      { "title": "3-Way Arbitrage Betting", "description": "Three-way arbitrage applies to markets with three possible outcomes, commonly including soccer match results: home win, draw, or away win. Different sportsbook prices are compared to identify potential pricing discrepancies across all three outcomes." },
+      { "title": "Cross-Sportsbook Arbitrage", "description": "Cross-sportsbook arbitrage involves comparing odds offered by multiple sportsbooks for the same event and market. Differences in pricing can create potential arbitrage opportunities when the combined implied probabilities meet the required conditions." },
+      { "title": "Live Sports Arbitrage", "description": "Live arbitrage involves evaluating changing odds while a sporting event is in progress. Since prices can move quickly, opportunities may appear and disappear within a short period." },
+      { "title": "Pre-Match Arbitrage", "description": "Pre-match arbitrage focuses on opportunities available before an event begins. Bettors have more time to compare sportsbook lines, calculate positions, and evaluate the available prices." }
+    ]
+  },
+  "finalCtaBanner": {
+    "highlight": "Bring Your Arbitrage Betting ",
+    "title": " Into One Place",
+    "description": "Unbound helps you evaluate sportsbook pricing differences and keep a clear record of your arbitrage betting activity.",
+    "buttonText": "Try Unbound",
+    "buttonLink": "/arbitrage-bets"
+  },
+  "legality": {
+    "highlight": "Is Arbitrage Betting ",
+    "title": " Legal?",
+    "description": "Arbitrage betting is generally not prohibited as a betting strategy. However, its legality depends on the gambling laws and licensed betting options available in the bettor’s jurisdiction. Regulations can also differ between states, provinces, or territories.",
+    "marketsIntro": "Countries and markets where sports betting is generally regulated include:",
+    "countries": ["United Kingdom", "United States", "Canada", "Australia", "New Zealand", "Ireland", "Germany", "France", "Spain", "Italy", "Netherlands", "Sweden", "Denmark", "South Africa"]
+  },
+  "faq": {
+    "description": "Find answers to common questions about arbitrage betting, sportsbook odds, opportunities, calculations, legality, and how Unbound can help streamline your betting workflow.",
+    "items": [
+      { "question": "How does Arbitrage Betting work?", "answer": "Bettors compare sportsbook odds, identify suitable price differences, calculate their stake allocation, and place bets across the relevant outcomes." },
+      { "question": "Is Arbitrage betting profitable?", "answer": "Arbitrage opportunities can potentially produce a positive return when the required odds and stake calculations remain valid. However, odds can change, bets can be rejected, and sportsbooks may impose limits." },
+      { "question": "Is Arbitrage betting legal?", "answer": "The legality of sports betting depends on your location and local gambling regulations. Always use licensed sportsbooks permitted in your jurisdiction." },
+      { "question": "Can Unbound help me find arbitrage opportunities?", "answer": "Unbound helps users scan sportsbook boards, compare odds, identify potential arbitrage opportunities, and evaluate positions before betting." },
+      { "question": "How is Unbound different from an odds sports arbitrage scanner?", "answer": "A basic odds sports arbitrage scanner primarily helps identify pricing differences. Unbound extends the workflow by helping users calculate opportunities, document actual bets, and track their results." }
+    ]
+  }
+}

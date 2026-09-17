@@ -3,36 +3,14 @@
 import React, { useState } from "react";
 import styles from "./FaqSection.module.css";
 import Container from "../../container/Container";
+import type { FaqItem } from "../../../data/seoRichPage.types";
 
-const faqs = [
-  {
-    question: " How does Arbitrage Betting work?",
-    answer:
-      "Bettors compare sportsbook odds, identify suitable price differences, calculate their stake allocation, and place bets across the relevant outcomes.",
-  },
-  {
-    question: "Is Arbitrage betting profitable?",
-    answer:
-      "Arbitrage opportunities can potentially produce a positive return when the required odds and stake calculations remain valid. However, odds can change, bets can be rejected, and sportsbooks may impose limits.",
-  },
-  {
-    question: "Is Arbitrage betting legal?",
-    answer:
-      "The legality of sports betting depends on your location and local gambling regulations. Always use licensed sportsbooks permitted in your jurisdiction.",
-  },
-  {
-    question: "Can Unbound help me find arbitrage opportunities?",
-    answer:
-      "Unbound helps users scan sportsbook boards, compare odds, identify potential arbitrage opportunities, and evaluate positions before betting.",
-  },
-  {
-    question: "How is Unbound different from an odds sports arbitrage scanner?",
-    answer:
-      "A basic odds sports arbitrage scanner primarily helps identify pricing differences. Unbound extends the workflow by helping users calculate opportunities, document actual bets, and track their results.",
-  },
-];
+type FaqSectionProps = {
+  description: string;
+  items: FaqItem[];
+};
 
-export default function FaqSection() {
+export default function FaqSection({ description, items: faqs }: FaqSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleAccordion = (index: number) => {
@@ -47,11 +25,7 @@ export default function FaqSection() {
             Frequently Asked <br /> <span>Questions?</span>
           </h3>
 
-          <p>
-            Find answers to common questions about arbitrage betting,
-            sportsbook odds, opportunities, calculations, legality, and
-            how Unbound can help streamline your betting workflow.
-          </p>
+          <p>{description}</p>
         </div>
         <div className={styles.accordion}>
           {faqs.map((faq, index) => {

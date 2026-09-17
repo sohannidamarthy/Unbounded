@@ -1,0 +1,155 @@
+{
+  "hero": {
+    "titleLead": "Smarter Positive EV",
+    "titleMiddle": " Betting Starts with ",
+    "titleHighlight": "Unbound.",
+    "description": "Find and evaluate positive EV betting opportunities across sportsbooks. Compare posted odds against a fair, no-vig line, and understand your true edge before you place a bet.\n\nUnbound brings odds comparison, fair-value calculation, bet tracking, and results management into one streamlined positive EV workflow.",
+    "primaryButton": { "label": "Explore Positive EV", "href": "/ev-bets" },
+    "secondaryButton": { "label": "View Pricing", "href": "/pricing" },
+    "image": { "src": "/blurred2.jpg", "alt": "Sportsbook odds overlaid with fair-value and EV percentage indicators" }
+  },
+  "findTheEdge": {
+    "highlight": "Find the Edge",
+    "title": " in Positive EV Betting",
+    "description": "Find and evaluate positive EV betting opportunities across sports with Unbound.",
+    "cards": [
+      { "title": "Compare Sportsbook Lines", "description": "Compare odds across sportsbooks to spot the ones priced above fair value." },
+      { "title": "Calculate the Fair Line", "description": "Remove the vig from sharp market odds to see what a bet is really worth." },
+      { "title": "Spot Positive EV Odds", "description": "Identify prices that pay out more than their true win probability justifies." },
+      { "title": "Reduce Manual Checking", "description": "Cut down repetitive odds comparison and no-vig calculations across markets." },
+      { "title": "Act While Odds Are Available", "description": "Positive EV opportunities move fast — act before the market corrects." },
+      { "title": "Quantify Your Edge", "description": "See the exact EV percentage behind every position, not just a hunch." }
+    ]
+  },
+  "whatIs": {
+    "highlight": "What is Positive EV ",
+    "title": "Betting?",
+    "description": "Positive EV (expected value) betting is a sports betting strategy that targets odds priced higher than a bet's true win probability. By comparing a sportsbook's price against a fair, no-vig line — often derived from sharp market odds — bettors can identify positions that pay out more than they should over the long run. A single positive EV bet can still lose; the edge shows up in the average return across many bets placed at a real, quantifiable advantage.",
+    "tickerItems": [
+      "Compare odds to a fair line",
+      "Remove the vig to find true probability",
+      "Identify positive EV opportunities",
+      "Calculate expected value per bet",
+      "Estimate long-run edge"
+    ]
+  },
+  "ctaBanner": {
+    "highlight": "Simplify Your Positive EV ",
+    "title": " Betting Workflow",
+    "description": "Bring odds comparison, fair-value calculation, EV scoring, and bet tracking together with Unbound.",
+    "buttonText": "Get Started with Unbound",
+    "buttonLink": "/ev-bets"
+  },
+  "validateOpportunities": {
+    "highlight": "Validate Your Positive EV ",
+    "title": " Opportunities",
+    "description": "Use Unbound's Positive EV calculator to evaluate potential bets before placing them. Enter the available odds and a fair-value reference to understand true probability, expected value, and how confident you should be in a position before committing funds.",
+    "cards": [
+      { "title": "Enter Betting Odds", "description": "Add odds in decimal or American format to evaluate the opportunity." },
+      { "title": "Check Implied Probability", "description": "Understand the probability represented by the available sportsbook price." },
+      { "title": "Set a Fair-Value Line", "description": "Use a sharp market or no-vig reference to establish the true probability." },
+      { "title": "Calculate Expected Value", "description": "See the EV percentage of the position based on price versus fair value." },
+      { "title": "Plan Stake Allocation", "description": "Determine how to size the bet relative to your bankroll and edge." },
+      { "title": "Review Potential Payout", "description": "See the potential payout for the calculated stake amount." }
+    ]
+  },
+  "howUnboundWorks": {
+    "highlight": "How Unbound",
+    "title": " Works",
+    "description": "Unbound streamlines the positive EV betting workflow by helping bettors discover, evaluate, validate, and track potential opportunities.",
+    "cards": [
+      { "title": "Scan the Boards", "description": "Monitor sportsbook boards to find lines priced above fair value." },
+      { "title": "Compare to Fair Value", "description": "Check sportsbook odds against a no-vig or sharp-market reference line." },
+      { "title": "Calculate the Edge", "description": "Use the calculator to assess implied probability, EV percentage, and stake sizing." },
+      { "title": "Validate the Opportunity", "description": "Confirm the price and fair-value inputs before deciding to place the bet." },
+      { "title": "Log the Bet", "description": "Record validated positive EV bets and keep your betting activity organized." },
+      { "title": "Track Results", "description": "Monitor completed bets and running EV to understand your actual performance." }
+    ]
+  },
+  "comparisonTable": {
+    "highlight": "Manual Comparing vs Unbound’s",
+    "title": " Positive EV Tool",
+    "description": "",
+    "manualColumnLabel": "Manual Comparing",
+    "unboundColumnLabel": "Unbound’s Positive EV Tool",
+    "rows": [
+      { "comparison": "Compare Lines", "manual": "Check multiple sportsbooks individually", "unbound": "Compare sportsbook lines in one workflow" },
+      { "comparison": "Find Fair Value", "manual": "Manually calculate no-vig lines by hand", "unbound": "Reference fair value alongside live odds" },
+      { "comparison": "Spot Opportunities", "manual": "Search manually for +EV pricing", "unbound": "Quickly identify positive EV odds" },
+      { "comparison": "Calculate the Edge", "manual": "Use separate calculators or spreadsheets", "unbound": "Evaluate EV and stake sizing in one place" },
+      { "comparison": "Monitor Changes", "manual": "Recheck sportsbooks as odds change", "unbound": "Keep relevant opportunities easier to review" },
+      { "comparison": "Betting Tools", "manual": "Switch between multiple betting tools", "unbound": "Bring evaluation and tracking tools together" },
+      { "comparison": "Track Bets", "manual": "Maintain separate records or spreadsheets", "unbound": "Log bets and track running P&L" }
+    ]
+  },
+  "opportunitiesCta": {
+    "highlight": "Turn Sportsbook Pricing ",
+    "title": "into Opportunities",
+    "description": "Unbound gives you the tools to compare odds, validate positive EV positions, and organize your sports betting.",
+    "buttonText": "Get Started",
+    "buttonLink": "/ev-bets"
+  },
+  "logAndOrganize": {
+    "highlight": "Log and Organize ",
+    "title": "Your Positive EV Bets",
+    "description": "Unbound helps you manage the positions you actually bet on, not just the ones you discover. Record the key details of every positive EV bet and keep your betting activity organized.",
+    "cards": [
+      { "title": "Record the Sportsbook", "description": "Keep track of where each bet was placed." },
+      { "title": "Pick the Odds", "description": "Document the exact odds used for each position." },
+      { "title": "Enter Your Stake", "description": "Record the amount wagered for each bet." },
+      { "title": "Document the Edge", "description": "Log the calculated EV percentage for every position placed." },
+      { "title": "Maintain Betting History", "description": "Build a complete record of your positive EV bets over time." },
+      { "title": "Track Everything in One Place", "description": "Keep your sportsbook, odds, and positions together." }
+    ]
+  },
+  "trackPAndL": {
+    "highlight": "Track Your Positive EV ",
+    "title": " Betting P&L",
+    "description": "Unbound helps you keep track of your positive EV betting performance after each bet resolves.",
+    "cards": [
+      { "title": "Track Running P&L", "description": "Monitor your overall profit and loss as results come in." },
+      { "title": "Review Bet Results", "description": "See how each logged positive EV bet performed." },
+      { "title": "Measure Realized vs Expected Value", "description": "Compare your actual results against the EV you calculated going in." },
+      { "title": "Maintain Historical Records", "description": "Keep a clear history of your positive EV bets." },
+      { "title": "Review What Worked", "description": "Look back at past results to identify useful patterns." },
+      { "title": "Skip the Spreadsheet", "description": "Track your betting performance without separate spreadsheets." }
+    ]
+  },
+  "exploreStrategies": {
+    "highlight": "Explore Positive EV ",
+    "title": " Betting Strategies",
+    "description": "Positive EV betting can be applied across markets, bet types, and pricing sources. Understanding these approaches can help bettors recognize potential opportunities and size positions appropriately.",
+    "cards": [
+      { "title": "Sharp-Market Referencing", "description": "Use pricing from sharp, low-margin books as a fair-value benchmark." },
+      { "title": "No-Vig Line Calculation", "description": "Strip the bookmaker's margin from two-way markets to find true probability." },
+      { "title": "Closing Line Value (CLV)", "description": "Compare your bet price against the closing line to gauge long-term edge." },
+      { "title": "Prop and Alt-Line Hunting", "description": "Look for mispriced player props and alternate lines away from main markets." },
+      { "title": "Live Positive EV", "description": "Identify pricing that lags behind fast-moving in-game situations." },
+      { "title": "Pre-Match Positive EV", "description": "Find value in early-released lines before markets fully sharpen." }
+    ]
+  },
+  "finalCtaBanner": {
+    "highlight": "Bring Your Positive EV Betting ",
+    "title": "Into One Place",
+    "description": "Unbound helps you evaluate sportsbook pricing, calculate expected value, and keep a clear record of your positive EV betting activity.",
+    "buttonText": "Try Unbound",
+    "buttonLink": "/ev-bets"
+  },
+  "legality": {
+    "highlight": "Is Positive EV Betting ",
+    "title": "Legal?",
+    "description": "Positive EV betting is generally not prohibited as a betting strategy; however, its legality depends on the gambling laws and licensed betting available in a bettor's jurisdiction. Regulations can differ between states, provinces, or territories.",
+    "marketsIntro": "Countries and markets where sports betting is generally regulated include:",
+    "countries": ["United Kingdom", "United States", "Canada", "Australia", "New Zealand", "Ireland", "Germany", "France", "Spain", "Italy", "Netherlands", "Sweden", "Denmark", "South Africa"]
+  },
+  "faq": {
+    "description": "Find answers to common questions about positive EV betting, fair-value pricing, expected value calculations, legality, and how Unbound can help streamline your betting workflow.",
+    "items": [
+      { "question": "How does positive EV betting work?", "answer": "Positive EV betting compares a sportsbook's odds against a fair, no-vig reference price. When a sportsbook's odds imply a lower win probability than the fair line suggests, the bet is considered positive EV — priced to pay out more than the underlying risk justifies over time." },
+      { "question": "Is positive EV betting profitable?", "answer": "Positive EV opportunities can produce a favorable return when the required stake calculations and fair-value assumptions are correct. However, odds can change fast, and results vary bet to bet, so any single wager can still lose despite a real long-run edge." },
+      { "question": "Is positive EV betting legal?", "answer": "Positive EV betting is generally not prohibited as a betting strategy, though its legality depends on the gambling laws and licensed betting available in a bettor's jurisdiction. Regulations can differ between states, provinces, or territories." },
+      { "question": "Can Unbound help me find positive EV opportunities?", "answer": "Yes, Unbound helps you compare sportsbook odds against fair-value pricing, calculate expected value, and track the positions you bet on — all in one workflow." },
+      { "question": "How is Unbound different from a +EV betting scanner?", "answer": "Unbound goes beyond scanning for pricing gaps — it also helps you validate the opportunity with a built-in calculator, log the bets you place, and track your running results over time." }
+    ]
+  }
+}

@@ -3,60 +3,40 @@ import styles from './LogOrganize.module.css';
 import Container from '../../container/Container';
 import { DocumentEach, EnterStake, MaintainBetting, PickOdds, RecordSportsbook, ReviewWithout, TrackEverything } from "../../icon/icons";
 import SectionHeading from '../../section-heading/SectionHeading';
+import type { FeatureCard } from '../../../data/seoRichPage.types';
 
-const SportsBets = [
-  {
-    icon: <RecordSportsbook />,
-    "title": "Record the Sportsbook",
-    "description": "Keep track of where each bet was placed."
-  },
-  {
-    icon: <PickOdds />,
-    "title": "Pick the Odds",
-    "description": "Document the exact odds used for each position."
-  },
-  {
-    icon: <EnterStake />,
-    "title": "Enter Your Stake",
-    "description": "Record the amount wagered on each bet."
-  },
-  {
-    icon: <DocumentEach />,
-    "title": "Document Each Position",
-    "description": "Keep every side of an arbitrage bet clearly organized."
-  },
-  {
-    icon: <MaintainBetting />,
-    "title": "Maintain Betting History",
-    "description": "Build a complete record of your past sports bets."
-  },
-  {
-    icon: <ReviewWithout />,
-    "title": "Review Without Reconstructing",
-    "description": "Avoid searching through notes to remember what you placed."
-  },
-  {
-    icon: <TrackEverything />,
-    "title": "Track Everything in One Place",
-    "description": "Keep your sportsbook, odds, stakes, and positions together."
-  }
+const icons = [
+  <RecordSportsbook key="0" />,
+  <PickOdds key="1" />,
+  <EnterStake key="2" />,
+  <DocumentEach key="3" />,
+  <MaintainBetting key="4" />,
+  <ReviewWithout key="5" />,
+  <TrackEverything key="6" />,
 ];
 
-export default function LogOrganize() {
+type LogOrganizeProps = {
+  highlight: string;
+  title: string;
+  description: string;
+  cards: FeatureCard[];
+};
+
+export default function LogOrganize({ highlight, title, description, cards }: LogOrganizeProps) {
   return (
     <Container sectionClassName={styles.LogOrganizeSection} fullWidth>
       <div className={styles.LogOrganizeWrapper}>
         <SectionHeading
-          highlight="Log and Organize "
-          title=" Your Sports Bets"
-          description="Unbound helps you manage the opportunities you actually bet on, not just the ones you discover. Record the key details of every arbitrage position and keep your betting activity organized in one place."
+          highlight={highlight}
+          title={title}
+          description={description}
         />
       </div>
       <ul>
-        {SportsBets.map((feature, index) => (
+        {cards.map((feature, index) => (
           <li key={index}>
             <div className={styles.LogOrganizeBox}>
-              <i>{feature.icon}</i>
+              <i>{icons[index % icons.length]}</i>
               <h3>{feature.title}</h3>
               <p>{feature.description}</p>
             </div>

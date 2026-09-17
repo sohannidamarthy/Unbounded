@@ -6,24 +6,22 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
 
-const features = [
-  "Compare odds across sportsbooks",
-  "Identify pricing differences",
-  "Find potential arbitrage opportunities",
-  "Calculate required stake amounts",
-  "Cover all relevant outcomes",
-  "Evaluate potential returns before betting",
-];
+type WhatArbitrageProps = {
+  highlight: string;
+  title: string;
+  description: string;
+  tickerItems: string[];
+};
 
-export default function WhatArbitrage() {
-  const carouselFeatures = [...features, ...features, ...features];
+export default function WhatArbitrage({ highlight, title, description, tickerItems }: WhatArbitrageProps) {
+  const carouselFeatures = [...tickerItems, ...tickerItems, ...tickerItems];
 
   return (
     <Container sectionClassName={styles.WhatArbitrageSection} fullWidth noFullWidthPadding>
       <SectionHeading
-        highlight="What is Arbitrage "
-        title=" Betting?"
-        description="Arbitrage betting is a sports betting strategy that takes advantage of different odds offered by multiple sportsbooks for the same event. By placing calculated bets on all relevant outcomes, bettors can potentially create a position where the combined odds provide a favorable return, regardless of which outcome wins."
+        highlight={highlight}
+        title={title}
+        description={description}
       />
 
       <div className={styles.WhatArbitrageCarousel}>
