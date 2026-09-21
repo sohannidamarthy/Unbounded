@@ -10148,186 +10148,12 @@ a {
 }
 
 /* ---- Pre-login calculator ----
-   Visible on the home page before login. Uses the same local
-   American↔decimal conversion and arb/EV math as the dashboard
-   calculator, so no API call is needed. */
+   Section background only; the calculator itself is styled in
+   components/home-calculator/HomeCalculator.module.css. */
 body .calculator-hero {
   /* padding: clamp(24px, 4vw, 48px) 0; */
   background: linear-gradient(135deg, rgba(7, 22, 38, 0.9), rgba(10, 32, 52, 0.85));
   padding:90px 0;
-}
-
-.calculator-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(24px, 4vw, 48px);
-  /* max-width: min(1200px, 92vw); */
-  margin: 0 auto;
-}
-
-.calculator-hero .section-header {
-  margin-bottom: 30px;
-}
-
-.calculator-card {
-  background: rgba(9, 25, 39, 0.7);
-  border: 1px solid rgba(181, 136, 33, 0.2);
-  border-radius: 20px;
-  padding: 24px;
-  color: #f7f1e8;
-}
-
-.calculator-card h3 {
-  margin: 0 0 20px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: #f7f1e8;
-}
-
-.calculator-inputs {
-  display: grid;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.calculator-inputs label {
-  display: grid;
-  gap: 4px;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(247, 241, 232, 0.6);
-}
-
-.calculator-inputs input {
-  height: 44px;
-  border: 1px solid rgba(247, 241, 232, 0.18);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #f7f1e8;
-  font: inherit;
-  padding: 0 12px;
-  width: 100%;
-  outline: none;
-}
-
-.calculator-inputs input:focus {
-  border-color: rgba(181, 136, 33, 0.5);
-}
-
-.calculator-inputs input::placeholder {
-  color: rgba(247, 241, 232, 0.4);
-}
-
-.calculator-results {
-  margin-top: 20px;
-}
-
-.calc-instruction {
-  margin-top: 12px;
-  font-size: 13px;
-  color: rgba(247, 241, 232, 0.5);
-}
-
-.arb-results,
-.ev-results {
-  margin-top: 16px;
-}
-
-.result-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 8px;
-  font-size: 14px;
-  margin: 6px 0;
-}
-
-.result-row span:first-child {
-  color: rgba(247, 241, 232, 0.6);
-}
-
-.result-row span:last-child {
-  color: #f7f1e8;
-  font-weight: 500;
-}
-
-.calculator-features {
-  margin-top: 16px;
-  padding-left: 16px;
-  border-left: 1px solid rgba(181, 136, 33, 0.2);
-}
-
-.calculator-features li {
-  margin: 8px 0;
-  font-size: 13px;
-  color: rgba(247, 241, 232, 0.7);
-}
-
-.tiny {
-  padding: 6px 12px;
-  font-size: 12px;
-}
-
-.calculator-hero .section-header h2 {
-  color: var(--bull-gold);
-}
-
-/* ---- Calculator explainer ----
-   Replaces the old two-bullet "How it works" fragment with real formulas
-   and a worked example tied to the calculator's own placeholder odds. */
-.calculator-explainer {
-  display: grid;
-  gap: 14px;
-  font-size: 14px;
-  line-height: 1.55;
-  color: rgba(247, 241, 232, 0.85);
-}
-
-.calculator-explainer strong {
-  color: #f2c969;
-}
-
-.calculator-explainer-example {
-  display: grid;
-  gap: 6px;
-  padding: 14px;
-  border-radius: 14px;
-  background: rgba(6, 24, 42, 0.6);
-  border: 1px solid rgba(181, 136, 33, 0.25);
-}
-
-.calculator-explainer-example span {
-  font-size: 12px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--bull-gold);
-  display: flex;
-  gap: 10px;
-  justify-content: space-between;
-  cursor: pointer;
-}
-
-.calculator-explainer-example span.arrow {
-  background: url(/plus.svg) no-repeat 0 0;
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-
-.calculator-explainer-example span.open {
-  background: url(/minus.svg) no-repeat 0 0;
-}
-
-
-.calculator-explainer-example ul {
-  margin: 4px 0 0;
-  padding-left: 18px;
-  display: grid;
-  gap: 4px;
-}
-
-.calculator-explainer-actions {
-  margin-top: 4px;
 }
 
 /* ---- How It Works section ---- */
@@ -11172,7 +10998,6 @@ cursor: pointer; transition: color 0.2s ease, transform 0.2s ease;  background: 
     overflow-x: auto;
     white-space: nowrap;
   }
-  .calculator-grid {grid-template-columns: 1fr;}
 }
 
 @media (max-width: 860px) {
