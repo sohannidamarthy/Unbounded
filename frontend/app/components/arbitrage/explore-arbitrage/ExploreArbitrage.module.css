@@ -9,7 +9,8 @@ display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overf
 .ExploreArbitrageBox i{ color:#E2B146; display:flex; width:30px;}
 .ExploreArbitrageBox i svg{width:30px; height:30px;}
 .ExploreArbitrageHead{ display:flex; gap:15px; align-items:center; margin:0 0 10px;}
-
+.ExploreArbitrageBox:hover{ border-color:#E2B146; }
+.ExploreArbitrageBox:hover h3{ color:#E2B146;}
 
 @media(max-width:1099px){
     .ExploreArbitrageSection ul li{ width:calc(33.33% - 10px);}

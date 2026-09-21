@@ -141,7 +141,7 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
             )}
           </div>
           
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
 
           <button
             className={`hamburger ${menuOpen ? `menuOpen active` : ""}`}

@@ -9,7 +9,9 @@
 .accordionQuestion button{ width:100%; background:transparent; border:0; display: flex; justify-content:space-between; gap:15px; padding:20px; color:#fff; cursor:pointer; text-align:left;}
 .accordionQuestion button .icon { width:18px; height:18px;}
 
+.accordionQuestion:hover,
 .accordionQuestion.active{ border:1px solid #E2B146;}
+.accordionQuestion:hover button,
 .accordionQuestion.active button{ color: #E2B146;}
 
 .answer {display: none;}
