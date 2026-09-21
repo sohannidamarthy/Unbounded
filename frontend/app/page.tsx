@@ -17,8 +17,8 @@ const TOKEN_STORAGE_KEY = "unbounded.access_token";
 const FOUNDERS_CIRCLE_SEATS_TOTAL = 300;
 const FOUNDERS_CIRCLE_SEATS_CLAIMED = 214;
 const HERO_IMAGES = [
-  { src: "/blurred.jpg", label: "Arbitrage betting" },
-  { src: "/blurred2.jpg", label: "EV betting" }
+  { src: "/arbitrage-control-board.png", label: "Arbitrage betting" },
+  { src: "/positive-ev-decision-board.png", label: "EV betting" }
 ];
 const SECONDARY_IMAGES = [
   { src: "/blurred3.jpg", label: "Track bets" },
