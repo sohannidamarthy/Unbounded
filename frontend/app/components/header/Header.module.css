@@ -1,11 +1,10 @@
-.siteHeader {width: 100%; display: flex; align-items: center; justify-content: space-between; }
-.headerContainer{width: 100%; max-width: clamp(1160px, calc(92vw + 40px), 1560px); margin: 0 auto; padding: 0 20px;}
+.siteHeader {width: 100%;}
+.headerContainer{ display:grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); justify-content: space-between; align-items: center; width: 100%;  margin: 0 auto; padding:35px 20px; max-width: clamp(1160px, calc(92vw + 40px), 1560px);}
 .brandHomeLink {display: flex; align-items: center; }
 .brandHomeLink img{grid-row: 1; border-radius: 16px; border: 2px solid var(--bull-navy); background: var(--bull-cream); box-shadow: 0 8px 18px rgba(5, 15, 26, 0.35);}
 .brand span {display: inline-flex; align-items: center; width: max-content; justify-self: start; text-decoration: none;color: var(--bull-gold); font-size:20px;}
 .brandHomeLink img {display: block; }
-.brandText {margin-left: 10px; font-size: 24px; font-weight: 600; color: #071826; }
-
+.brandText { font-size: 24px; font-weight: 600; color: #071826; }
 
 
 .navLinks {    display: flex; gap: 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
@@ -13,3 +12,32 @@ color: #f5efe6; flex-wrap: nowrap; white-space: nowrap; justify-content: center;
 .navLinks a {position: relative; display: inline-flex; align-items: center; padding: 5px 10px; border-radius: 999px; 
   border: 1px solid rgba(181, 136, 33, 0.35); transition: border-color 0.2s ease, background 0.2s ease;}
 .navLinks a:hover {color: #8f9dad;}
+
+.hamburger {display: none; width: 42px; height: 42px; padding: 8px; border: 0; background: transparent; cursor: pointer; flex-direction: column; justify-content: center; align-items: center; gap: 5px; background:#fff; border-radius:6px; }
+.hamburger span {display: block; width: 24px; height: 2px; background: #021a33; transition: transform 0.25s ease, opacity 0.25s ease; }
+.navClose{display: none;}
+.brand{display:flex; gap:15px; align-items:center;}
+.brand img{ grid-row: 1; border-radius: 16px; border: 2px solid var(--bull-navy);  background: var(--bull-cream); box-shadow: 0 8px 18px rgba(5, 15, 26, 0.35);}
+.headerActions{ margin-left:auto;}
+
+@media (max-width: 991px) {  
+  .menuOpen:before{ position:fixed; top:0; left:0; background:rgba(0, 0, 0, 0.7); content:''; width:100%; height:100%; z-index:10;}
+  .siteHeader{display:flex; padding:20px;}
+  .hamburger {display: flex;}
+  .headerContainer{ display:flex; gap:10px; padding:20px;}
+  .navLinks { opacity:0; pointer-events:none; position:fixed; top:0; left:0; transform: translateX(-310px); gap: 0; padding:0; background: #071725; border-right: 1px solid #cc9c4038; box-shadow:0 10px 25px rgba(0, 0, 0, 0.08); z-index: 100; height: 100vh; transition:ease-in-out .4s; display:flex; flex-direction: column; width:310px;}
+  .menuOpen .navLinks{ opacity:1; pointer-events:auto; transform: translateX(0px); justify-content:flex-start;}
+  .navLinks a { border: 0; padding: 15px; line-height: 15px; border-bottom: 1px solid rgba(255, 255, 255, .1); border-radius: 0;}  
+  .navLinks a:hover{ background:#ecb3440f;}
+
+  .headerActions{ margin-left:auto; }
+  .navClose{ display:flex; justify-content:space-between ; gap:10px; padding:15px;border-bottom:1px solid rgba(255,255,255,.1);
+  position:sticky; top:0; background:#051724; z-index:1;}
+  .navClose span{ opacity:.5; }
+  .navClose button{ background:transparent; border:0; color:#fff; cursor:pointer;}
+}
+
+
+@media(max-width:399px){
+  .brandText {display: none;}
+}

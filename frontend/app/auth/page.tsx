@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { getSportsbookMeta, SportsbookLogo } from "../components/sportsbookMeta";
 import Container from "../components/container/Container";
+import Header from "../components/header/Header";
 
 type AuthMode = "login" | "signup";
 type MessageTone = "success" | "error" | "info";
@@ -589,6 +590,8 @@ export default function AuthPage() {
   const [tutorialIndex, setTutorialIndex] = useState(0);
   const [didSkipPreferences, setDidSkipPreferences] = useState(false);
   const todayIso = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const [menuOpen, setMenuOpen] = useState(false);
+
 
   if (!signupTabIdRef.current) {
     signupTabIdRef.current = `${Date.now()}-${Math.random()
@@ -1198,11 +1201,23 @@ export default function AuthPage() {
   const isSignupStepTwo = mode === "signup" && signupStep === 2;
   const isSignupStepThree = mode === "signup" && signupStep === 3;
 
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.classList.add('menuOpen');
+    } else {
+      document.body.classList.remove('menuOpen');
+    }
+
+    return () => {
+      document.body.classList.remove('menuOpen');
+    };
+  }, [menuOpen]);
+
   return (
     <div className="site auth-page">
       <header>
         <Container>
-          <div className="site-header">
+          <div className="siteHeader">
             <div className="brand">
               <Image
                 src="/unbounded.jpeg"
@@ -1215,16 +1230,54 @@ export default function AuthPage() {
                 <span>Unbounded</span>
               </a>
             </div>
-            <nav className="nav-links">
+            <nav className="navLinks">
+              <div className="navClose">
+                <span>Menu items</span>
+
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  type="button"
+                  aria-label="Close menu"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 14 14"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M1.4 14L0 12.6L5.6 7L0 1.4L1.4 0L7 5.6L12.6 0L14 1.4L8.4 7L14 12.6L12.6 14L7 8.4L1.4 14Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </button>
+              </div>
               <a href="/">Home</a>
               <a href="/arbitrage">Arbitrage</a>
               <a href="/positive-ev">Value Bets</a>
               <a href="/billing">Pricing</a>
               <a href="/tutorials">Tutorials</a>
             </nav>
+            
+            <button
+              className={`hamburger ${menuOpen ? `menuOpen active` : ""}`}
+              type="button"
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(!menuOpen)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
           </div>
         </Container>
       </header>
+
+      {/* <Header hiddenLinks={["pricing"]} /> */}
+
+
       <main>
         <div className="auth-shell">
           <section className="auth-panel">
@@ -1507,24 +1560,24 @@ export default function AuthPage() {
                   </div>
                   <label className="field">
                     <span>Password {signupForm.password ? null : (
-                        <div className="auth-requirements">
-                          <button
-                            type="button"
-                            className="auth-requirements-trigger"
-                            aria-label="Password requirements"
-                          >
-                            i
-                          </button>
-                          <div className="auth-requirements-popover">
-                            <strong>Password requirements</strong>
-                            <ul>
-                              {PASSWORD_REQUIREMENTS.map((requirement) => (
-                                <li key={requirement}>{requirement}</li>
-                              ))}
-                            </ul>
-                          </div>
+                      <div className="auth-requirements">
+                        <button
+                          type="button"
+                          className="auth-requirements-trigger"
+                          aria-label="Password requirements"
+                        >
+                          i
+                        </button>
+                        <div className="auth-requirements-popover">
+                          <strong>Password requirements</strong>
+                          <ul>
+                            {PASSWORD_REQUIREMENTS.map((requirement) => (
+                              <li key={requirement}>{requirement}</li>
+                            ))}
+                          </ul>
                         </div>
-                      )}</span>
+                      </div>
+                    )}</span>
                     <div className="field-input field-input--with-info">
                       <input
                         type={showPassword ? "text" : "password"}
@@ -1537,7 +1590,7 @@ export default function AuthPage() {
                           updateSignupField("password", event.target.value)
                         }
                       />
-                      
+
                       <button
                         type="button"
                         className="password-toggle"
@@ -1823,78 +1876,78 @@ export default function AuthPage() {
                   </label>
                 </>
               ) : (
-                <div className="auth-tutorial-stage full-width">                  
-                    <div className="auth-tutorial-frame">
-                      <div className="auth-tutorial-card">
-                        <span className="auth-tutorial-eyebrow">
-                          {activeTutorial.eyebrow}
-                        </span>
-                        <h2>{activeTutorial.title}</h2>
-                        <p>{activeTutorial.description}</p>
+                <div className="auth-tutorial-stage full-width">
+                  <div className="auth-tutorial-frame">
+                    <div className="auth-tutorial-card">
+                      <span className="auth-tutorial-eyebrow">
+                        {activeTutorial.eyebrow}
+                      </span>
+                      <h2>{activeTutorial.title}</h2>
+                      <p>{activeTutorial.description}</p>
 
-                        <div className="auth-tutorial-meta">
-                          <span>{activeTutorial.duration}</span>
-                          <span>{signupForm.experienceLevel || "General track"}</span>
-                        </div>
-
-                        <ul className="auth-tutorial-points">
-                          {activeTutorial.points.map((point) => (
-                            <li key={point}>{point}</li>
-                          ))}
-                        </ul>
+                      <div className="auth-tutorial-meta">
+                        <span>{activeTutorial.duration}</span>
+                        <span>{signupForm.experienceLevel || "General track"}</span>
                       </div>
+
+                      <ul className="auth-tutorial-points">
+                        {activeTutorial.points.map((point) => (
+                          <li key={point}>{point}</li>
+                        ))}
+                      </ul>
                     </div>
+                  </div>
 
-                    <div className="auth-tutorial-footer">
-                      <div className="auth-tutorial-nav">
-                        <button
-                          type="button"
-                          className="auth-tutorial-arrow"
-                          onClick={() =>
-                            setTutorialIndex((current) =>
-                              current === 0 ? recommendedTutorials.length - 1 : current - 1
-                            )
-                          }
-                          aria-label="Previous tutorial"
-                        >
-                          ←
-                        </button>
+                  <div className="auth-tutorial-footer">
+                    <div className="auth-tutorial-nav">
+                      <button
+                        type="button"
+                        className="auth-tutorial-arrow"
+                        onClick={() =>
+                          setTutorialIndex((current) =>
+                            current === 0 ? recommendedTutorials.length - 1 : current - 1
+                          )
+                        }
+                        aria-label="Previous tutorial"
+                      >
+                        ←
+                      </button>
 
-                        <div className="auth-tutorial-dots" aria-label="Tutorial selection">
-                          {recommendedTutorials.map((tutorial, index) => (
-                            <button
-                              key={tutorial.title}
-                              type="button"
-                              className={`auth-tutorial-dot ${index === tutorialIndex ? "active" : ""}`}
-                              onClick={() => setTutorialIndex(index)}
-                              aria-label={`Show tutorial ${index + 1}`}
-                            />
-                          ))}
-                        </div>
-
-                        <button
-                          type="button"
-                          className="auth-tutorial-arrow"
-                          onClick={() =>
-                            setTutorialIndex((current) =>
-                              current === recommendedTutorials.length - 1 ? 0 : current + 1
-                            )
-                          }
-                          aria-label="Next tutorial"
-                        >
-                          →
-                        </button>
+                      <div className="auth-tutorial-dots" aria-label="Tutorial selection">
+                        {recommendedTutorials.map((tutorial, index) => (
+                          <button
+                            key={tutorial.title}
+                            type="button"
+                            className={`auth-tutorial-dot ${index === tutorialIndex ? "active" : ""}`}
+                            onClick={() => setTutorialIndex(index)}
+                            aria-label={`Show tutorial ${index + 1}`}
+                          />
+                        ))}
                       </div>
 
                       <button
                         type="button"
-                        className="auth-link-chip"
-                        onClick={() => void completeSignup(true)}
-                        disabled={isSubmitting}
+                        className="auth-tutorial-arrow"
+                        onClick={() =>
+                          setTutorialIndex((current) =>
+                            current === recommendedTutorials.length - 1 ? 0 : current + 1
+                          )
+                        }
+                        aria-label="Next tutorial"
                       >
-                        Skip tutorials
+                        →
                       </button>
                     </div>
+
+                    <button
+                      type="button"
+                      className="auth-link-chip"
+                      onClick={() => void completeSignup(true)}
+                      disabled={isSubmitting}
+                    >
+                      Skip tutorials
+                    </button>
+                  </div>
                 </div>
               )}
 

@@ -14,6 +14,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+          (function () {
+            try {
+              var theme = localStorage.getItem("unbounded.theme");
+
+              if (theme !== "light") {
+                document.documentElement.classList.add("dark-mode");
+              }
+            } catch (e) {}
+          })();
+        `
+          }}
+        />
+      </head>
+
       <body>
         {process.env.NODE_ENV === "development" ? (
           <script
@@ -24,7 +42,9 @@ export default function RootLayout({
             }}
           />
         ) : null}
+
         <LayoutWrapper>{children}</LayoutWrapper>
+
         <SiteChatbot />
       </body>
     </html>

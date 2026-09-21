@@ -11,6 +11,7 @@ import Header from "./components/header/Header";
 import StayUpdated from "./components/stay-updated/StayUpdated";
 import FoundersCircle from "./components/founders-circle/FoundersCircle";
 import HeroSection from "./components/home/hero-section/HeroSection";
+import ThemeToggle from "./components/theme-toggle/ThemeToggle";
 
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
 const FOUNDERS_CIRCLE_SEATS_TOTAL = 300;
@@ -131,6 +132,7 @@ export default function Home() {
   const [calcOddsB, setCalcOddsB] = useState("");
   const [calcMode, setCalcMode] = useState("ev");
   const [showExample, setShowExample] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const toDecimalOdds = (americanOdds: string) => {
     const value = Number(americanOdds);
@@ -305,11 +307,22 @@ export default function Home() {
       setIsFoundersCircleSubmitting(false);
     }
   };
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.classList.add('menuOpen');
+    } else {
+      document.body.classList.remove('menuOpen');
+    }
+
+    return () => {
+      document.body.classList.remove('menuOpen');
+    };
+  }, [menuOpen]);
 
   return (
     <div className="site">
       <header>
-        <div className="site-header">
+        <div className="siteHeader">
           <div className="brand">
             <Image
               src="/unbounded.jpeg"
@@ -322,7 +335,28 @@ export default function Home() {
               <span>Unbounded</span>
             </a>
           </div>
-          <nav className="nav-links">
+          <nav className="navLinks">
+            <div className="navClose">
+              <span>Menu items</span>
+              <button
+                onClick={() => setMenuOpen(false)}
+                type="button"
+                aria-label="Close menu"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1.4 14L0 12.6L5.6 7L0 1.4L1.4 0L7 5.6L12.6 0L14 1.4L8.4 7L14 12.6L12.6 14L7 8.4L1.4 14Z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+            </div>
             <a href="/">Home</a>
             <a href="/arbitrage">Arbitrage</a>
             <a href="/positive-ev">Positive EV</a>
@@ -330,7 +364,8 @@ export default function Home() {
             <a href="/tutorials">Discover</a>
             <a href="#pricing">Pricing</a>
           </nav>
-          <div className="header-actions">
+
+          <div className="headerActions">
             {isAuthReady ? (
               isAuthenticated ? (
                 <div className="account-menu">
@@ -376,9 +411,25 @@ export default function Home() {
             ) : (
               <div className="header-actions-placeholder" aria-hidden="true" />
             )}
+
+            {/* <ThemeToggle /> */}
+
           </div>
+
+          <button
+            className={`hamburger ${menuOpen ? `menuOpen active` : ""}`}
+            type="button"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
       </header>
+
 
       {/* <Header /> */}
 

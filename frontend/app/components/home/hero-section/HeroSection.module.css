@@ -16,6 +16,8 @@
 @media(max-width:1024px){
     .smarterArbitrageBox{display: flex; flex-direction: column-reverse; text-align: center;}
     .buttonGroup{ display:flex; gap:15px; justify-content:center;}
+    .smarterArbitrageMedia{ max-width:600px; width:100%;}
+    
 }
 @media(max-width:767px){
     .smarterArbitrageContent{ display:grid; gap:15px;}
