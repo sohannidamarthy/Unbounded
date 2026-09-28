@@ -7,7 +7,7 @@ import resend
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, EmailStr
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.auth import require_admin
@@ -17,6 +17,8 @@ from app.db.session import get_db
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/founders-circle", tags=["founders-circle"])
+
+FOUNDERS_CIRCLE_SEATS_TOTAL = 300
 
 
 class FoundersCircleSignupPayload(BaseModel):
@@ -80,6 +82,15 @@ async def founders_circle_signup(
 @router.options("/signup")
 async def founders_circle_signup_options() -> dict:
     return {"status": "ok"}
+
+
+@router.get("/count")
+async def founders_circle_count(db: Session = Depends(get_db)) -> dict:
+    claimed = db.scalar(select(func.count()).select_from(FoundersCircleSignup)) or 0
+    return {
+        "claimed": min(claimed, FOUNDERS_CIRCLE_SEATS_TOTAL),
+        "total": FOUNDERS_CIRCLE_SEATS_TOTAL,
+    }
 
 
 @router.get("/export")
