@@ -6,7 +6,7 @@
     "description": "Find and evaluate arbitrage betting opportunities across sports with Unbounded. Scan sportsbook odds for pricing differences, validate potential arbitrage positions with built-in calculations, and understand your potential returns before placing your bets.\n\nUnbounded brings opportunity discovery, bet validation, position tracking, and results management into one streamlined sports betting workflow.",
     "primaryButton": { "label": "Open arbitrage board", "href": "/arbitrage-bets" },
     "secondaryButton": { "label": "Join newsletter" },
-    "image": { "src": "/SmartArbitrage.jpg", "alt": "Unbounded Dashboard Preview" }
+    "image": { "src": "/arbitrage-control-board.png", "alt": "Arbitrage Control Board showing live moneyline opportunities" }
   },
   "findTheEdge": {
     "highlight": "Find the Edge",

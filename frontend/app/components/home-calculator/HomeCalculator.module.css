@@ -1,0 +1,83 @@
+/* The calculator section keeps a dark navy background in both site themes,
+   so colours here are fixed rather than theme variables. */
+.head { display: grid; gap: 12px; margin-bottom: 28px; }
+.accent { width: 56px; height: 4px; border-radius: 2px; background: #f2a92e; }
+.title { margin: 0; font-size: clamp(1.9rem, 1.4rem + 1.6vw, 2.6rem); line-height: 1.15; color: #f7f3ea; font-weight: 700; }
+.title em { font-style: normal; color: #f2a92e; }
+.lead { margin: 0; color: rgba(247, 243, 234, 0.72); font-size: 16px; line-height: 1.5; max-width: 900px; }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+
+.card {
+  background: rgba(9, 25, 39, 0.7);
+  border: 1px solid rgba(247, 243, 234, 0.1);
+  border-radius: 20px;
+  padding: 32px;
+  color: #f7f3ea;
+}
+
+/* Tabs */
+.tabs { display: inline-flex; padding: 4px; gap: 4px; border-radius: 999px; border: 1px solid rgba(247, 243, 234, 0.14); background: rgba(255, 255, 255, 0.03); }
+.tab { border: 0; background: transparent; color: rgba(247, 243, 234, 0.72); font: inherit; font-size: 14px; font-weight: 700; padding: 10px 26px; border-radius: 999px; cursor: pointer; min-height: 40px; }
+.tab:focus-visible { outline: 2px solid #f2a92e; outline-offset: 2px; }
+.tabActive { background: #f2a92e; color: #0b2239; }
+.divider { border: 0; border-top: 1px solid rgba(247, 243, 234, 0.1); margin: 20px 0 24px; }
+
+/* Form */
+.formTitle { margin: 0 0 6px; font-size: 22px; font-weight: 700; color: #f7f3ea; }
+.formSubtitle { margin: 0 0 24px; color: rgba(247, 243, 234, 0.7); font-size: 14px; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
+.fullRow { margin-top: 20px; }
+.field { display: grid; gap: 4px; align-content: start; min-width: 0; }
+.label { font-size: 13px; font-weight: 700; color: #f7f3ea; }
+.labelCaps { font-size: 12px; font-weight: 700; color: #f7f3ea; text-transform: uppercase; letter-spacing: 0.08em; }
+.required { color: #f2a92e; }
+.hint { font-size: 12px; color: rgba(247, 243, 234, 0.5); margin-bottom: 4px; }
+.input { height: 46px; width: 100%; box-sizing: border-box; padding: 0 14px; border-radius: 10px; border: 1px solid rgba(247, 243, 234, 0.2); background: rgba(255, 255, 255, 0.06); color: #f7f3ea; font: inherit; font-size: 16px; outline: none; }
+.input::placeholder { color: rgba(247, 243, 234, 0.4); }
+.input:focus { border-color: #f2a92e; box-shadow: 0 0 0 2px rgba(242, 169, 46, 0.25); }
+.inputError { border-color: #ff7b7b; }
+.error { font-size: 12px; color: #ff9c9c; }
+
+.actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+.primaryBtn, .ghostBtn { font: inherit; font-size: 14px; font-weight: 700; border-radius: 999px; padding: 14px 28px; cursor: pointer; min-height: 48px; }
+.primaryBtn { border: 2px solid #f2a92e; background: #f2a92e; color: #0b2239; }
+.ghostBtn { border: 2px solid #f2a92e; background: transparent; color: #f2a92e; }
+.primaryBtn:focus-visible, .ghostBtn:focus-visible { outline: 2px solid #f7f3ea; outline-offset: 2px; }
+.helper { margin: 14px 0 0; font-size: 13px; color: rgba(247, 243, 234, 0.5); }
+
+/* Results */
+.results { margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(247, 243, 234, 0.1); display: grid; gap: 10px; }
+.verdict { padding: 12px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; }
+.good { background: rgba(80, 200, 120, 0.12); border: 1px solid rgba(80, 200, 120, 0.4); color: #8ee0a7; }
+.bad { background: rgba(255, 123, 123, 0.1); border: 1px solid rgba(255, 123, 123, 0.35); color: #ffb0b0; }
+.resultRow { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-size: 14px; color: rgba(247, 243, 234, 0.72); }
+.resultRow strong { color: #f7f3ea; white-space: nowrap; }
+.resultRow strong.goodText { color: #8ee0a7; }
+.resultRow strong.badText { color: #ffb0b0; }
+.evSide { display: grid; gap: 2px; }
+.evNote { font-size: 12px; color: rgba(247, 243, 234, 0.5); margin: 0; }
+
+/* Info panel */
+.infoHead { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+.infoIcon { flex: none; width: 56px; height: 56px; border-radius: 50%; border: 2px solid #f2a92e; color: #f2a92e; display: grid; place-items: center; }
+.infoTitle { margin: 0 0 6px; font-size: 20px; font-weight: 700; color: #f7f3ea; }
+.infoText { margin: 0; font-size: 14px; line-height: 1.75; color: rgba(247, 243, 234, 0.72); }
+.infoBox { border: 1px solid rgba(242, 169, 46, 0.25); border-radius: 14px; padding: 20px; margin-top: 20px; }
+.infoBox h4 { margin: 0 0 12px; font-size: 15px; font-weight: 700; color: #f2a92e; }
+.keyPoints { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.keyPoints li { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; line-height: 1.6; color: rgba(247, 243, 234, 0.85); }
+.check { flex: none; color: #f2a92e; display: inline-flex; margin-top: 1px; }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .card { padding: 20px; border-radius: 16px; }
+  .grid { grid-template-columns: 1fr; }
+  .actions > button { flex: 1 1 100%; }
+  .resultRow { flex-wrap: wrap; }
+  .infoHead { flex-direction: column; }
+  .infoBox { padding: 16px; }
+}

@@ -1,17 +1,47 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./FoundersCircle.module.css";
 import Container from "../container/Container";
 import Subscribe from "../../../public/subscribe.png"
 import Image from "next/image";
 
-const FOUNDERS_CIRCLE_SEATS_TOTAL = 300;
-const FOUNDERS_CIRCLE_SEATS_CLAIMED = 214;
+const FOUNDERS_CIRCLE_SEATS_TOTAL_FALLBACK = 300;
 
 export default function FoundersCircle() {
   const [foundersCircleSubmitted, setFoundersCircleSubmitted] = useState(false);
   const [isFoundersCircleSubmitting, setIsFoundersCircleSubmitting] = useState(false);
+  const [seatsClaimed, setSeatsClaimed] = useState(0);
+  const [seatsTotal, setSeatsTotal] = useState(FOUNDERS_CIRCLE_SEATS_TOTAL_FALLBACK);
+  const [isSeatsLoaded, setIsSeatsLoaded] = useState(false);
+
+  useEffect(() => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
+    let cancelled = false;
+
+    const fetchSeatCount = async () => {
+      try {
+        const response = await fetch(`${apiBase}/founders-circle/count`);
+        if (!response.ok) {
+          throw new Error("Request failed");
+        }
+        const data = await response.json();
+        if (!cancelled) {
+          setSeatsClaimed(data.claimed);
+          setSeatsTotal(data.total);
+          setIsSeatsLoaded(true);
+        }
+      } catch (error) {
+        // Keep the fallback values if the count can't be fetched.
+      }
+    };
+
+    fetchSeatCount();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleFoundersCircleSubmit = async (
     event: React.FormEvent<HTMLFormElement>
@@ -41,6 +71,7 @@ export default function FoundersCircle() {
       if (!response.ok) {
         throw new Error("Request failed");
       }
+      setSeatsClaimed((current) => Math.min(current + 1, seatsTotal));
     } catch (error) {
       // Keep optimistic confirmation even if the request errors.
     } finally {
@@ -150,20 +181,20 @@ export default function FoundersCircle() {
             <div
               className={styles.foundersCircleProgressTrack}
               role="progressbar"
-              aria-valuenow={FOUNDERS_CIRCLE_SEATS_CLAIMED}
+              aria-valuenow={seatsClaimed}
               aria-valuemin={0}
-              aria-valuemax={FOUNDERS_CIRCLE_SEATS_TOTAL}
+              aria-valuemax={seatsTotal}
               aria-label="Founder seats claimed"
             >
               <div
                 className={styles.foundersCircleProgressFill}
                 style={{
-                  width: `${(FOUNDERS_CIRCLE_SEATS_CLAIMED / FOUNDERS_CIRCLE_SEATS_TOTAL) * 100}%`
+                  width: isSeatsLoaded ? `${(seatsClaimed / seatsTotal) * 100}%` : "0%"
                 }}
               />
             </div>
             <p>
-              {FOUNDERS_CIRCLE_SEATS_CLAIMED} of {FOUNDERS_CIRCLE_SEATS_TOTAL} founder seats claimed
+              {isSeatsLoaded ? seatsClaimed : "–"} of {seatsTotal} founder seats claimed
             </p>
           </div>
           {foundersCircleSubmitted ? (

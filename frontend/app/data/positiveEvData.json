@@ -6,7 +6,7 @@
     "description": "Find and evaluate positive EV betting opportunities across sportsbooks. Compare posted odds against a fair, no-vig line, and understand your true edge before you place a bet.\n\nUnbounded brings odds comparison, fair-value calculation, bet tracking, and results management into one streamlined positive EV workflow.",
     "primaryButton": { "label": "Explore Positive EV", "href": "/ev-bets" },
     "secondaryButton": { "label": "View Pricing", "href": "/pricing" },
-    "image": { "src": "/blurred2.jpg", "alt": "Sportsbook odds overlaid with fair-value and EV percentage indicators" }
+    "image": { "src": "/positive-ev-decision-board.png", "alt": "Positive EV Decision Board showing live moneyline opportunities" }
   },
   "findTheEdge": {
     "highlight": "Find the Edge",
