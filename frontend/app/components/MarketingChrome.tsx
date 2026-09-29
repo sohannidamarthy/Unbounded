@@ -139,9 +139,9 @@ export function MarketingChrome({ children }: MarketingChromeProps) {
             ) : (
               <div className="header-actions-placeholder" aria-hidden="true" />
             )}
+          <ThemeToggle />
           </div>
           
-          {/* <ThemeToggle /> */}
 
           <button
             className={`hamburger ${menuOpen ? `menuOpen active` : ""}`}
