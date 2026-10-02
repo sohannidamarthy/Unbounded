@@ -1,13 +1,13 @@
 import os
 import logging
 
-import resend
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, EmailStr
 
 from app.api.ws_arbs import router as ws_arbs_router
 from app.db.session import init_db
+from app.services.email_sender import email_configured, send_email
 from app.redis_client import get_redis, close_redis
 from app.routes.auth import router as auth_router
 from app.routes.debug import router as debug_router
@@ -88,28 +88,24 @@ class WaitlistSignup(BaseModel):
 
 @app.post("/waitlist")
 async def waitlist_signup(payload: WaitlistSignup):
-    api_key = os.getenv("RESEND_API_KEY")
     from_email = os.getenv("WAITLIST_FROM_EMAIL")
     notify_email = os.getenv("WAITLIST_NOTIFY_EMAIL")
 
-    if not api_key or not from_email or not notify_email:
+    if not notify_email or not email_configured(from_email):
         raise HTTPException(status_code=500, detail="Email service not configured.")
 
-    resend.api_key = api_key
     name = payload.name.strip() if payload.name else None
 
     try:
-        resend.Emails.send(
-            {
-                "from": from_email,
-                "to": notify_email,
-                "subject": "New waitlist signup",
-                "html": (
-                    "<p>New waitlist signup:</p>"
-                    f"{f'<p>Name: <strong>{name}</strong></p>' if name else ''}"
-                    f"<p><strong>{payload.email}</strong></p>"
-                ),
-            }
+        send_email(
+            to=notify_email,
+            from_email=from_email,
+            subject="New waitlist signup",
+            html=(
+                "<p>New waitlist signup:</p>"
+                f"{f'<p>Name: <strong>{name}</strong></p>' if name else ''}"
+                f"<p><strong>{payload.email}</strong></p>"
+            ),
         )
     except Exception as exc:
         raise HTTPException(status_code=502, detail="Email send failed.") from exc

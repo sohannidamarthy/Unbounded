@@ -5,7 +5,6 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-import resend
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
@@ -15,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.core.security import create_access_token, hash_password, verify_password
 from app.db.models.user import User
 from app.db.session import get_db
+from app.services.email_sender import send_email
 from app.services.user_profile_cache import upsert_user_signup_profile
 
 router = APIRouter()
@@ -142,12 +142,8 @@ def _frontend_url(path: str, token: str) -> str:
 
 
 def _send_email(*, to: str, subject: str, html: str) -> None:
-    api_key = os.getenv("RESEND_API_KEY")
     from_email = os.getenv("AUTH_FROM_EMAIL") or os.getenv("WAITLIST_FROM_EMAIL")
-    if not api_key or not from_email:
-        raise RuntimeError("Email service not configured.")
-    resend.api_key = api_key
-    resend.Emails.send({"from": from_email, "to": to, "subject": subject, "html": html})
+    send_email(to=to, subject=subject, html=html, from_email=from_email)
 
 
 def _issue_email_verification(db: Session, user: User) -> None:
@@ -268,7 +264,7 @@ async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
         logger.exception("Failed to send verification email for user %s", user.id)
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Account created, but verification email could not be sent. Check Resend configuration and use resend verification.",
+            detail="Account created, but verification email could not be sent. Check the email configuration and use resend verification.",
         )
 
     return SignupResponse(

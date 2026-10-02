@@ -3,7 +3,6 @@ import io
 import logging
 import os
 
-import resend
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, EmailStr
@@ -13,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.core.auth import require_admin
 from app.db.models.founders_circle import FoundersCircleSignup
 from app.db.session import get_db
+from app.services.email_sender import email_configured, send_email
 
 logger = logging.getLogger(__name__)
 
@@ -31,28 +31,24 @@ def _notify_signup(first_name: str, last_name: str, email: str) -> None:
     """Best-effort email notification. Persistence to Postgres is the
     source of truth, so a missing/misconfigured email service should
     never fail the signup."""
-    api_key = os.getenv("RESEND_API_KEY")
     from_email = os.getenv("WAITLIST_FROM_EMAIL")
     notify_email = os.getenv("FOUNDERS_CIRCLE_NOTIFY_EMAIL") or os.getenv(
         "WAITLIST_NOTIFY_EMAIL"
     )
 
-    if not api_key or not from_email or not notify_email:
+    if not notify_email or not email_configured(from_email):
         return
 
-    resend.api_key = api_key
     try:
-        resend.Emails.send(
-            {
-                "from": from_email,
-                "to": notify_email,
-                "subject": "New Founders Circle signup",
-                "html": (
-                    "<p>New Founders Circle signup:</p>"
-                    f"<p><strong>{first_name} {last_name}</strong></p>"
-                    f"<p>{email}</p>"
-                ),
-            }
+        send_email(
+            to=notify_email,
+            from_email=from_email,
+            subject="New Founders Circle signup",
+            html=(
+                "<p>New Founders Circle signup:</p>"
+                f"<p><strong>{first_name} {last_name}</strong></p>"
+                f"<p>{email}</p>"
+            ),
         )
     except Exception:
         logger.exception("Founders Circle notification email failed.")

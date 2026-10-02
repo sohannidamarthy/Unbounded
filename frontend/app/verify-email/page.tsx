@@ -1,12 +1,14 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
   const [status, setStatus] = useState("Verifying email...");
+  // Tokens are single-use; React Strict Mode runs effects twice in dev.
+  const requestedToken = useRef<string | null>(null);
 
   const apiBase = useMemo(() => {
     const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "");
@@ -21,6 +23,10 @@ function VerifyEmailContent() {
       setStatus("Verification link is missing a token.");
       return;
     }
+    if (requestedToken.current === token) {
+      return;
+    }
+    requestedToken.current = token;
 
     fetch(`${apiBase}/auth/verify-email`, {
       method: "POST",

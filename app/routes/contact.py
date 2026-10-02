@@ -3,7 +3,6 @@ import io
 import logging
 import os
 
-import resend
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, EmailStr, field_validator
@@ -13,6 +12,7 @@ from sqlalchemy.orm import Session
 from app.core.auth import require_admin
 from app.db.models.contact_messages import ContactMessage
 from app.db.session import get_db
+from app.services.email_sender import email_configured, send_email
 
 logger = logging.getLogger(__name__)
 
@@ -38,29 +38,25 @@ def _notify_contact(full_name: str, email: str, reason: str, message: str) -> No
     """Best-effort email notification. Persistence to Postgres is the
     source of truth, so a missing/misconfigured email service should
     never fail the submission."""
-    api_key = os.getenv("RESEND_API_KEY")
     from_email = os.getenv("WAITLIST_FROM_EMAIL")
     notify_email = os.getenv("CONTACT_NOTIFY_EMAIL") or os.getenv(
         "WAITLIST_NOTIFY_EMAIL"
     )
 
-    if not api_key or not from_email or not notify_email:
+    if not notify_email or not email_configured(from_email):
         return
 
-    resend.api_key = api_key
     try:
-        resend.Emails.send(
-            {
-                "from": from_email,
-                "to": notify_email,
-                "subject": f"New contact message: {reason}",
-                "html": (
-                    "<p>New contact form submission:</p>"
-                    f"<p><strong>{full_name}</strong> ({email})</p>"
-                    f"<p>Reason: {reason}</p>"
-                    f"<p>{message}</p>"
-                ),
-            }
+        send_email(
+            to=notify_email,
+            from_email=from_email,
+            subject=f"New contact message: {reason}",
+            html=(
+                "<p>New contact form submission:</p>"
+                f"<p><strong>{full_name}</strong> ({email})</p>"
+                f"<p>Reason: {reason}</p>"
+                f"<p>{message}</p>"
+            ),
         )
     except Exception:
         logger.exception("Contact form notification email failed.")
