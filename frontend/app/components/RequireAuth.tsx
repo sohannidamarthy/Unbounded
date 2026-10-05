@@ -52,10 +52,13 @@ export function RequireAuth({ children }: { children: ReactNode }) {
 
   if (!allowed) {
     return (
-      <main className="auth-link-page">
-        <section className="auth-dialog auth-link-card">
-          <p>Checking your session...</p>
-        </section>
+      <main
+        className="auth-link-page"
+        role="status"
+        aria-live="polite"
+        aria-label="Checking your session"
+      >
+        <div className="session-spinner" />
       </main>
     );
   }

@@ -3525,6 +3525,27 @@ a {
   width: min(460px, 100%);
 }
 
+.session-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(212, 168, 62, 0.25);
+  border-top-color: #d4a83e;
+  border-radius: 50%;
+  animation: sessionSpin 0.8s linear infinite;
+}
+
+@keyframes sessionSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-spinner {
+    animation-duration: 2.4s;
+  }
+}
+
 .auth-link-button {
   display: inline-flex;
   justify-content: center;
