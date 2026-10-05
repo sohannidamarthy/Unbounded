@@ -3704,8 +3704,10 @@ a {
 
 .dashboard-betcalc-modal {
   position: absolute;
-  width: min(560px, 100%);
+  width: min(640px, 100%);
   max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  grid-template-rows: auto auto minmax(0, 1fr);
   border-radius: 18px;
   border: 1px solid rgba(215, 170, 66, 0.75);
   background: linear-gradient(165deg, rgba(8, 24, 40, 0.98), rgba(6, 18, 31, 0.98));
@@ -3760,159 +3762,10 @@ a {
   cursor: pointer;
 }
 
-.dashboard-betcalc-toggle {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.dashboard-betcalc-toggle button {
-  border-radius: 12px;
-  border: 1px solid rgba(215, 170, 66, 0.45);
-  background: rgba(9, 25, 39, 0.82);
-  color: rgba(247, 241, 232, 0.88);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
-  padding: 11px 12px;
-  cursor: pointer;
-}
-
-.dashboard-betcalc-toggle button.is-active {
-  border-color: rgba(215, 170, 66, 0.9);
-  background: linear-gradient(135deg, #d7aa42, #b6882c);
-  color: #0b2239;
-}
-
-.dashboard-betcalc-toggle button.is-off {
-  opacity: 0.9;
-}
-
-.dashboard-betcalc-inputs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.dashboard-betcalc-field {
-  display: grid;
-  gap: 6px;
-}
-
-.dashboard-betcalc-field span {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(247, 241, 232, 0.65);
-}
-
-.dashboard-betcalc-field input {
-  width: 100%;
-  min-width: 0;
-  border-radius: 10px;
-  border: 1px solid rgba(215, 170, 66, 0.45);
-  background: rgba(9, 25, 39, 0.72);
-  color: #f7f1e8;
-  padding: 10px 12px;
-  font-weight: 600;
-  -moz-appearance: textfield;
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.dashboard-betcalc-field input::-webkit-outer-spin-button,
-.dashboard-betcalc-field input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.dashboard-betcalc-field input::placeholder {
-  color: rgba(247, 241, 232, 0.4);
-}
-
-.dashboard-betcalc-field input:focus {
-  outline: none;
-  border-color: rgba(215, 170, 66, 0.9);
-  background: rgba(9, 25, 39, 0.9);
-}
-
-.dashboard-betcalc-result {
-  border-radius: 12px;
-  border: 1px solid rgba(215, 170, 66, 0.32);
-  background: rgba(9, 25, 39, 0.7);
-  padding: 14px;
-}
-
-.dashboard-betcalc-result p {
-  margin: 0;
-  color: rgba(247, 241, 232, 0.76);
-  font-size: 13px;
-}
-
-.dashboard-betcalc-arb-result {
-  display: grid;
-  gap: 9px;
-}
-
-.dashboard-betcalc-arb-result strong {
-  color: #f7f1e8;
-}
-
-.dashboard-betcalc-status {
-  display: inline-flex;
-  width: fit-content;
-  border-radius: 999px;
-  border: 1px solid rgba(197, 28, 45, 0.65);
-  color: rgba(255, 194, 194, 0.95);
-  background: rgba(197, 28, 45, 0.18);
-  padding: 5px 10px;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  font-weight: 700;
-}
-
-.dashboard-betcalc-status.is-yes {
-  border-color: rgba(98, 215, 137, 0.75);
-  color: #8cf4b1;
-  background: rgba(98, 215, 137, 0.18);
-}
-
-.dashboard-betcalc-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.dashboard-betcalc-meta span {
-  font-size: 12px;
-  color: rgba(247, 241, 232, 0.78);
-}
-
-.dashboard-betcalc-ev-result {
-  display: grid;
-  gap: 10px;
-}
-
-.dashboard-betcalc-ev-row {
-  border-radius: 10px;
-  border: 1px solid rgba(215, 170, 66, 0.28);
-  background: rgba(6, 18, 31, 0.62);
-  padding: 10px 12px;
-  display: grid;
-  gap: 4px;
-}
-
-.dashboard-betcalc-ev-row span {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(247, 241, 232, 0.62);
-}
-
-.dashboard-betcalc-ev-row strong {
-  color: #f7f1e8;
-  font-size: 13px;
+.dashboard-betcalc-body {
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
 }
 
 .dashboard-ev-header {
@@ -11649,9 +11502,6 @@ header .conaerin .contact-header {
     padding: 16px;
   }
 
-  .dashboard-betcalc-inputs {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 720px) {

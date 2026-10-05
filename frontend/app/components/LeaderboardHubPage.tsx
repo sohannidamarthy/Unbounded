@@ -9,9 +9,6 @@ import { LeaderboardHub } from "./LeaderboardHub";
 export function LeaderboardHubPage() {
   const [isBetCalculatorOpen, setIsBetCalculatorOpen] = useState(false);
   const [betCalculatorMode, setBetCalculatorMode] = useState<"arb" | "ev">("arb");
-  const [betCalculatorStake, setBetCalculatorStake] = useState("100");
-  const [betCalculatorOddsA, setBetCalculatorOddsA] = useState("");
-  const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
 
   useEffect(() => {
     if (window.location.hash === "#bet-calculator") {
@@ -32,14 +29,8 @@ export function LeaderboardHubPage() {
       <DraggableBetCalculatorPopup
         isOpen={isBetCalculatorOpen}
         mode={betCalculatorMode}
-        stake={betCalculatorStake}
-        oddsA={betCalculatorOddsA}
-        oddsB={betCalculatorOddsB}
         onClose={() => setIsBetCalculatorOpen(false)}
         onModeChange={setBetCalculatorMode}
-        onStakeChange={setBetCalculatorStake}
-        onOddsAChange={setBetCalculatorOddsA}
-        onOddsBChange={setBetCalculatorOddsB}
       />
     </div>
   );

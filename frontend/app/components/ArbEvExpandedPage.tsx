@@ -418,9 +418,6 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const [manualOddsB, setManualOddsB] = useState("");
   const [isBetCalculatorOpen, setIsBetCalculatorOpen] = useState(false);
   const [betCalculatorMode, setBetCalculatorMode] = useState<ArbEvView>(initialView);
-  const [betCalculatorStake, setBetCalculatorStake] = useState("100");
-  const [betCalculatorOddsA, setBetCalculatorOddsA] = useState("");
-  const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
   const [liveArbRows, setLiveArbRows] = useState<ArbEvTableRow[]>([]);
   const [liveEvRows, setLiveEvRows] = useState<ArbEvTableRow[]>([]);
   const [savedLocalBets, setSavedLocalBets] = useState<SavedLocalBet[]>([]);
@@ -1811,14 +1808,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
       <DraggableBetCalculatorPopup
         isOpen={isBetCalculatorOpen}
         mode={betCalculatorMode}
-        stake={betCalculatorStake}
-        oddsA={betCalculatorOddsA}
-        oddsB={betCalculatorOddsB}
         onClose={() => setIsBetCalculatorOpen(false)}
         onModeChange={setBetCalculatorMode}
-        onStakeChange={setBetCalculatorStake}
-        onOddsAChange={setBetCalculatorOddsA}
-        onOddsBChange={setBetCalculatorOddsB}
       />
     </div>
   );

@@ -280,9 +280,6 @@ function DashboardPageContent() {
   const [evTabProfitTracker, setEvTabProfitTracker] = useState(false);
   const [isBetCalculatorOpen, setIsBetCalculatorOpen] = useState(false);
   const [betCalculatorMode, setBetCalculatorMode] = useState<"arb" | "ev">("arb");
-  const [betCalculatorStake, setBetCalculatorStake] = useState("100");
-  const [betCalculatorOddsA, setBetCalculatorOddsA] = useState("");
-  const [betCalculatorOddsB, setBetCalculatorOddsB] = useState("");
   const [includeSelfInLeaderboard, setIncludeSelfInLeaderboard] = useState(false);
   const [currentUserName, setCurrentUserName] = useState("You");
   const [liveArbRows, setLiveArbRows] = useState<DashboardArbRow[]>([]);
@@ -1866,14 +1863,8 @@ function DashboardPageContent() {
       <DraggableBetCalculatorPopup
         isOpen={isBetCalculatorOpen}
         mode={betCalculatorMode}
-        stake={betCalculatorStake}
-        oddsA={betCalculatorOddsA}
-        oddsB={betCalculatorOddsB}
         onClose={() => setIsBetCalculatorOpen(false)}
         onModeChange={setBetCalculatorMode}
-        onStakeChange={setBetCalculatorStake}
-        onOddsAChange={setBetCalculatorOddsA}
-        onOddsBChange={setBetCalculatorOddsB}
       />
 
     </div>

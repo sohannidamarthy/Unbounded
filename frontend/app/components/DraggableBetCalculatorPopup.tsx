@@ -1,24 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import ArbitrageForm from "./home-calculator/ArbitrageForm";
+import EvForm from "./home-calculator/EvForm";
+import styles from "./home-calculator/HomeCalculator.module.css";
 
 type BetCalculatorMode = "arb" | "ev";
 
 type DraggableBetCalculatorPopupProps = {
   isOpen: boolean;
   mode: BetCalculatorMode;
-  stake: string;
-  oddsA: string;
-  oddsB: string;
   disableBackdropBlur?: boolean;
   onClose: () => void;
   onModeChange: (mode: BetCalculatorMode) => void;
-  onStakeChange: (value: string) => void;
-  onOddsAChange: (value: string) => void;
-  onOddsBChange: (value: string) => void;
 };
 
-const MODAL_WIDTH = 560;
+const MODAL_WIDTH = 640;
 const DEFAULT_MODAL_HEIGHT = 420;
 const VIEWPORT_MARGIN = 16;
 
@@ -28,15 +25,9 @@ const clamp = (value: number, min: number, max: number) =>
 export function DraggableBetCalculatorPopup({
   isOpen,
   mode,
-  stake,
-  oddsA,
-  oddsB,
   disableBackdropBlur = false,
   onClose,
   onModeChange,
-  onStakeChange,
-  onOddsAChange,
-  onOddsBChange,
 }: DraggableBetCalculatorPopupProps) {
   const modalRef = useRef<HTMLDivElement | null>(null);
   const dragStateRef = useRef<{
@@ -152,44 +143,6 @@ export function DraggableBetCalculatorPopup({
     setIsDragging(true);
   };
 
-  const toDecimalOdds = (americanOdds: string) => {
-    const value = Number(americanOdds);
-    if (Number.isNaN(value) || value === 0) {
-      return null;
-    }
-    return value > 0 ? 1 + value / 100 : 1 + 100 / Math.abs(value);
-  };
-
-  const calculatorDecimalOddsA = toDecimalOdds(oddsA.trim());
-  const calculatorDecimalOddsB = toDecimalOdds(oddsB.trim());
-  const calculatorStakeValue = Math.max(0, Number(stake || 0));
-  const canCalculate =
-    Boolean(calculatorDecimalOddsA && calculatorDecimalOddsB) && calculatorStakeValue > 0;
-  const impliedProbabilitySum =
-    canCalculate && calculatorDecimalOddsA && calculatorDecimalOddsB
-      ? 1 / calculatorDecimalOddsA + 1 / calculatorDecimalOddsB
-      : null;
-  const hasArbitrage = impliedProbabilitySum !== null && impliedProbabilitySum < 1;
-  const arbStakeA =
-    canCalculate && calculatorDecimalOddsA && calculatorDecimalOddsB
-      ? (calculatorStakeValue * calculatorDecimalOddsB) /
-        (calculatorDecimalOddsA + calculatorDecimalOddsB)
-      : 0;
-  const arbStakeB = canCalculate ? calculatorStakeValue - arbStakeA : 0;
-  const arbPayout =
-    canCalculate && calculatorDecimalOddsA ? arbStakeA * calculatorDecimalOddsA : 0;
-  const arbNetProfit = arbPayout - calculatorStakeValue;
-  const evProfitSideA =
-    canCalculate && calculatorDecimalOddsA
-      ? calculatorStakeValue * (calculatorDecimalOddsA - 1)
-      : 0;
-  const evProfitSideB =
-    canCalculate && calculatorDecimalOddsB
-      ? calculatorStakeValue * (calculatorDecimalOddsB - 1)
-      : 0;
-  const formatSignedUsd = (value: number) =>
-    `${value >= 0 ? "+" : "-"}$${Math.abs(value).toFixed(2)}`;
-
   if (!isOpen) {
     return null;
   }
@@ -216,7 +169,7 @@ export function DraggableBetCalculatorPopup({
         >
           <div>
             <span>Bet calculator</span>
-            <h3>Arb / EV</h3>
+            <h3>Arbitrage / EV</h3>
           </div>
           <button
             type="button"
@@ -227,88 +180,33 @@ export function DraggableBetCalculatorPopup({
             ×
           </button>
         </div>
-        <div className="dashboard-betcalc-toggle">
-          <button
-            type="button"
-            className={mode === "arb" ? "is-active" : "is-off"}
-            onClick={() => onModeChange("arb")}
-          >
-            Arb
-          </button>
-          <button
-            type="button"
-            className={mode === "ev" ? "is-active" : "is-off"}
-            onClick={() => onModeChange("ev")}
-          >
-            EV
-          </button>
+        <div className={styles.tabs} role="tablist" aria-label="Calculator type">
+          {(
+            [
+              { id: "arb", label: "Arbitrage" },
+              { id: "ev", label: "EV" },
+            ] as const
+          ).map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={mode === tab.id}
+              className={`${styles.tab} ${mode === tab.id ? styles.tabActive : ""}`}
+              onClick={() => onModeChange(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-        <div className="dashboard-betcalc-inputs">
-          <label className="dashboard-betcalc-field">
-            <span>Odds side A</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="+110"
-              value={oddsA}
-              onChange={(event) => onOddsAChange(event.target.value)}
-            />
-          </label>
-          <label className="dashboard-betcalc-field">
-            <span>Odds side B</span>
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="-110"
-              value={oddsB}
-              onChange={(event) => onOddsBChange(event.target.value)}
-            />
-          </label>
-          <label className="dashboard-betcalc-field">
-            <span>Total stake</span>
-            <input
-              type="number"
-              min="0"
-              placeholder="100"
-              value={stake}
-              onChange={(event) => onStakeChange(event.target.value)}
-            />
-          </label>
-        </div>
-        <div className="dashboard-betcalc-result">
-          {!canCalculate ? (
-            <p>Enter valid + / - American odds for both sides and a stake.</p>
-          ) : mode === "arb" ? (
-            <div className="dashboard-betcalc-arb-result">
-              <div className={`dashboard-betcalc-status${hasArbitrage ? " is-yes" : ""}`}>
-                Arbitrage: {hasArbitrage ? "Yes" : "No"}
-              </div>
-              {hasArbitrage ? (
-                <>
-                  <strong>Net profit: {formatSignedUsd(arbNetProfit)}</strong>
-                  <div className="dashboard-betcalc-meta">
-                    <span>Stake A: ${arbStakeA.toFixed(2)}</span>
-                    <span>Stake B: ${arbStakeB.toFixed(2)}</span>
-                  </div>
-                </>
-              ) : (
-                <strong>Net profit: none</strong>
-              )}
-            </div>
-          ) : (
-            <div className="dashboard-betcalc-ev-result">
-              <div className="dashboard-betcalc-ev-row">
-                <span>If side A wins</span>
-                <strong>Profit A: {formatSignedUsd(evProfitSideA)}</strong>
-                <strong>Loss B: {formatSignedUsd(-calculatorStakeValue)}</strong>
-              </div>
-              <div className="dashboard-betcalc-ev-row">
-                <span>If side B wins</span>
-                <strong>Profit B: {formatSignedUsd(evProfitSideB)}</strong>
-                <strong>Loss A: {formatSignedUsd(-calculatorStakeValue)}</strong>
-              </div>
-            </div>
-          )}
+        <div className="dashboard-betcalc-body">
+          {/* Both forms stay mounted so switching tabs keeps what was typed. */}
+          <div role="tabpanel" hidden={mode !== "arb"}>
+            <ArbitrageForm />
+          </div>
+          <div role="tabpanel" hidden={mode !== "ev"}>
+            <EvForm />
+          </div>
         </div>
       </div>
     </div>
