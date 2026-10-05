@@ -116,7 +116,7 @@ const pageConfigs = {
     panelTitle: "Arbitrage control board",
     panelDescription: "Track daily arbitrage opportunities, verify the matchup, and keep your preferred execution settings tight.",
     tutorialCategories: [
-      { value: "all", label: "All" },
+      { value: "all", label: "ALL" },
       { value: "concepts", label: "Concepts" },
       { value: "execution", label: "Execution" },
       { value: "risk", label: "Risk" },
@@ -139,7 +139,7 @@ const pageConfigs = {
     panelTitle: "Positive EV decision board",
     panelDescription: "Track daily positive EV looks, keep preferred filters active, and review candidate bets with the calculator flow close by.",
     tutorialCategories: [
-      { value: "all", label: "All" },
+      { value: "all", label: "ALL" },
       { value: "concepts", label: "Concepts" },
       { value: "math", label: "Math" },
       { value: "execution", label: "Execution" },
@@ -423,6 +423,9 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const [savedLocalBets, setSavedLocalBets] = useState<SavedLocalBet[]>([]);
   const [topBetsBetTypes, setTopBetsBetTypes] = useState<BetType[]>([...ALL_BET_TYPES]);
   const [controlHubBetTypes, setControlHubBetTypes] = useState<BetType[]>([...ALL_BET_TYPES]);
+  const [controlHubAnalyticsView, setControlHubAnalyticsView] = useState<"personal" | "community">(
+    "personal"
+  );
   const [selectedSports, setSelectedSports] = useState<Sport[]>([...sportOptions]);
   const [selectedBooks, setSelectedBooks] = useState<Book[]>([...bookOptions]);
   const [selectedBetTypes, setSelectedBetTypes] = useState<BetType[]>([...ALL_BET_TYPES]);
@@ -892,15 +895,15 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
       };
     })
     .filter(Boolean) as Array<{
-    path: string;
-    category: TutorialCategory;
-    title: string;
-    eyebrow: string;
-    excerpt: string;
-    summary: string;
-    takeaway: string;
-    links: Array<{ href: string; title: string; description: string }>;
-  }>;
+      path: string;
+      category: TutorialCategory;
+      title: string;
+      eyebrow: string;
+      excerpt: string;
+      summary: string;
+      takeaway: string;
+      links: Array<{ href: string; title: string; description: string }>;
+    }>;
   const visibleTutorialCards = tutorialCards.filter(
     (item) =>
       selectedTutorialCategory === "all" || item.category === selectedTutorialCategory
@@ -1007,11 +1010,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
       <main className="arb-ev-page-main">
         <div className="arb-ev-page-shell">
           {arbEvView === "arb" ? (
-            <section
-              className="top-bets-rail top-bets-rail--arb"
-              aria-label="Top 10 arbitrage bets of the day"
-            >
-              <div className="top-bets-rail-head">
+            <section className="dashboard-panel" aria-label="Top 10 arbitrage bets of the day">
+              <div className="dashboard-panel-header">
                 <div>
                   <span className="top-bets-rail-kicker">Daily leaders</span>
                   <h2>Top 10 Arbitrage Bets of the Day</h2>
@@ -1020,14 +1020,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                   </p>
                 </div>
                 <div className="top-bets-rail-actions">
-                  <SectionBetTypeFilter
-                    label="Bet types"
-                    selected={topBetsBetTypes}
-                    onChange={setTopBetsBetTypes}
-                  />
-                  <Link href="/profit-tracker" className="top-bets-rail-link">
-                    See profits
-                  </Link>
+                  <Link href="/profit-tracker" className="top-bets-rail-link"> See profits</Link>
+                  <SectionBetTypeFilter label="Bet types" selected={topBetsBetTypes} onChange={setTopBetsBetTypes} />
                 </div>
               </div>
               {topArbBets.length === 0 ? (
@@ -1035,7 +1029,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                   No profitable arbitrage bets yet today.
                 </p>
               ) : (
-                <div className="top-bets-table-wrap">
+                <div className="dashboard-panel-body">
                   <div
                     className="dashboard-arb-table is-expanded top-bets-table"
                     role="table"
@@ -1052,10 +1046,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                       const rowId = `top10-${row.id}`;
                       return (
                         <Fragment key={rowId}>
-                          <div
-                            className={`dashboard-arb-row${
-                              eventPopout?.id === rowId ? " is-selected" : ""
-                            }`}
+                          <div className={`dashboard-arb-row${eventPopout?.id === rowId ? " is-selected" : ""}`}
                             role="row"
                             onClick={() =>
                               openEventPopout(
@@ -1101,17 +1092,32 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
             </section>
           ) : null}
 
-          <section
-            className="dashboard-arb arb-ev-page-panel"
-            aria-label={arbEvView === "arb" ? "Arbitrage bets per day" : "EV bets per day"}
-          >
-            <div className="dashboard-arb-header">
+          <section className="dashboard-panel" aria-label={arbEvView === "arb" ? "Arbitrage bets per day" : "EV bets per day"}>
+            <div className="dashboard-panel-header">
               <div>
-                <h3>
-                  {activePageConfig.panelTitle}
-                </h3>
+                <h2>{activePageConfig.panelTitle}</h2>
                 <p>{activePageConfig.panelDescription}</p>
               </div>
+              <div className="dashboard-panel-tracker-toggle dashboard-panel-tracker-toggle--corner">
+                <span>Add to Profit Tracker</span>
+                <button
+                  type="button"
+                  className={`dashboard-event-toggle${isCurrentTabTracked ? " is-on" : " is-off"
+                    }`}
+                  aria-pressed={isCurrentTabTracked}
+                  onClick={() => {
+                    if (arbEvView === "arb") {
+                      setArbTabProfitTracker((prev) => !prev);
+                    } else {
+                      setEvTabProfitTracker((prev) => !prev);
+                    }
+                  }}
+                >
+                  <span className="dashboard-event-toggle-knob" aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+            <div className="dashboard-panel-body">
               <div className="dashboard-arb-controls" ref={pageFiltersRef}>
                 <label className="dashboard-arb-field dashboard-page-filter-field">
                   <span>Date</span>
@@ -1122,9 +1128,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     <span>Sport</span>
                     <button
                       type="button"
-                      className={`dashboard-filter-trigger${
-                        openPageFilter === "sports" ? " is-open" : ""
-                      }`}
+                      className={`dashboard-filter-trigger${openPageFilter === "sports" ? " is-open" : ""
+                        }`}
                       aria-haspopup="dialog"
                       aria-expanded={openPageFilter === "sports"}
                       onClick={() => openFilterMenu("sports")}
@@ -1161,9 +1166,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                               <button
                                 key={sport}
                                 type="button"
-                                className={`dashboard-filter-option${
-                                  isSelected ? " is-selected" : ""
-                                }`}
+                                className={`dashboard-filter-option${isSelected ? " is-selected" : ""
+                                  }`}
                                 aria-pressed={isSelected}
                                 onClick={() => toggleDraftSport(sport)}
                               >
@@ -1192,9 +1196,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     <span>Books</span>
                     <button
                       type="button"
-                      className={`dashboard-filter-trigger dashboard-filter-trigger--books${
-                        openPageFilter === "books" ? " is-open" : ""
-                      }`}
+                      className={`dashboard-filter-trigger dashboard-filter-trigger--books${openPageFilter === "books" ? " is-open" : ""
+                        }`}
                       aria-haspopup="dialog"
                       aria-expanded={openPageFilter === "books"}
                       onClick={() => openFilterMenu("books")}
@@ -1224,15 +1227,13 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                             return (
                               <div
                                 key={book}
-                                className={`dashboard-filter-option-card${
-                                  isSelected ? " is-selected" : ""
-                                }`}
+                                className={`dashboard-filter-option-card${isSelected ? " is-selected" : ""
+                                  }`}
                               >
                                 <button
                                   type="button"
-                                  className={`dashboard-filter-option dashboard-filter-option--book${
-                                    isSelected ? " is-selected" : ""
-                                  }`}
+                                  className={`dashboard-filter-option dashboard-filter-option--book${isSelected ? " is-selected" : ""
+                                    }`}
                                   aria-pressed={isSelected}
                                   onClick={() => toggleDraftBook(book)}
                                 >
@@ -1273,9 +1274,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     <span>Bet type</span>
                     <button
                       type="button"
-                      className={`dashboard-filter-trigger${
-                        openPageFilter === "betTypes" ? " is-open" : ""
-                      }`}
+                      className={`dashboard-filter-trigger${openPageFilter === "betTypes" ? " is-open" : ""
+                        }`}
                       aria-haspopup="dialog"
                       aria-expanded={openPageFilter === "betTypes"}
                       onClick={() => openFilterMenu("betTypes")}
@@ -1312,9 +1312,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                               <button
                                 key={option.value}
                                 type="button"
-                                className={`dashboard-filter-option${
-                                  isSelected ? " is-selected" : ""
-                                }`}
+                                className={`dashboard-filter-option${isSelected ? " is-selected" : ""
+                                  }`}
                                 aria-pressed={isSelected}
                                 onClick={() => toggleDraftBetType(option.value)}
                               >
@@ -1341,279 +1340,250 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div
-              className="dashboard-panel-tracker-toggle dashboard-panel-tracker-toggle--corner"
-              style={{ position: "absolute", top: 10, right: 20, zIndex: 3 }}
-            >
-              <span>Add to Profit Tracker</span>
-              <button
-                type="button"
-                className={`dashboard-event-toggle${
-                  isCurrentTabTracked ? " is-on" : " is-off"
-                }`}
-                aria-pressed={isCurrentTabTracked}
-                onClick={() => {
-                  if (arbEvView === "arb") {
-                    setArbTabProfitTracker((prev) => !prev);
-                  } else {
-                    setEvTabProfitTracker((prev) => !prev);
-                  }
-                }}
+
+
+              <div
+                className="dashboard-arb-table is-expanded"
+                role="table"
+                aria-label={
+                  arbEvView === "arb" ? "Arbitrage betting board" : "EV betting board"
+                }
               >
-                <span className="dashboard-event-toggle-knob" aria-hidden="true" />
-              </button>
-            </div>
-
-            <div
-              className="dashboard-arb-table is-expanded"
-              role="table"
-              aria-label={
-                arbEvView === "arb" ? "Arbitrage betting board" : "EV betting board"
-              }
-            >
-              <div className="dashboard-arb-row dashboard-arb-row--header" role="row">
-                <span role="columnheader">Match starts</span>
-                <span role="columnheader">Sport</span>
-                <span role="columnheader">League</span>
-                <span role="columnheader">Match</span>
-                <span role="columnheader">Net profit</span>
-              </div>
-              {filteredRows.length === 0 ? (
-                <div className="dashboard-bet-type-empty" role="row">
-                  No bets match the current sport and bet-type filters.
+                <div className="dashboard-arb-row dashboard-arb-row--header" role="row">
+                  <span role="columnheader">Match starts</span>
+                  <span role="columnheader">Sport</span>
+                  <span role="columnheader">League</span>
+                  <span role="columnheader">Match</span>
+                  <span role="columnheader">Net profit</span>
                 </div>
-              ) : null}
-              {filteredRows.map((row) => {
-                const rowId = `${arbEvView}-${row.id}`;
-                return (
-                  <Fragment key={rowId}>
-                    <div
-                      className={`dashboard-arb-row${
-                        eventPopout?.id === rowId ? " is-selected" : ""
-                      }`}
-                      role="row"
-                      onClick={() =>
-                        openEventPopout(
-                          buildEventPopout({
-                            id: rowId,
-                            board: arbEvView === "arb" ? "Arbitrage" : "EV",
-                            start: row.start,
-                            sport: row.sport,
-                            league: row.league,
-                            match: row.match,
-                            betType: row.betType,
-                            legs: row.legs,
-                          })
-                        )
-                      }
-                    >
-                      <span className="dashboard-arb-cell dashboard-arb-cell--time">
-                        {row.isLive ? (
-                          <span className="dashboard-live-badge dashboard-live-badge--table">
-                            <span className="dashboard-live-dot" aria-hidden="true" />
-                            Live
-                          </span>
-                        ) : (
-                          row.start
-                        )}
-                      </span>
-                      <span className="dashboard-arb-cell dashboard-arb-cell--sport">
-                        {row.sport}
-                      </span>
-                      <span className="dashboard-arb-cell dashboard-arb-cell--league">
-                        {row.league}
-                      </span>
-                      <span className="dashboard-arb-cell dashboard-arb-cell--match">
-                        <span>{row.match}</span>
-                        <span className="dashboard-bet-type-badge">
-                          {BET_TYPE_LABELS[row.betType]}
+                {filteredRows.length === 0 ? (
+                  <div className="dashboard-bet-type-empty" role="row">
+                    No bets match the current sport and bet-type filters.
+                  </div>
+                ) : null}
+                {filteredRows.map((row) => {
+                  const rowId = `${arbEvView}-${row.id}`;
+                  return (
+                    <Fragment key={rowId}>
+                      <div
+                        className={`dashboard-arb-row${eventPopout?.id === rowId ? " is-selected" : ""
+                          }`}
+                        role="row"
+                        onClick={() =>
+                          openEventPopout(
+                            buildEventPopout({
+                              id: rowId,
+                              board: arbEvView === "arb" ? "Arbitrage" : "EV",
+                              start: row.start,
+                              sport: row.sport,
+                              league: row.league,
+                              match: row.match,
+                              betType: row.betType,
+                              legs: row.legs,
+                            })
+                          )
+                        }
+                      >
+                        <span className="dashboard-arb-cell dashboard-arb-cell--time">
+                          {row.isLive ? (
+                            <span className="dashboard-live-badge dashboard-live-badge--table">
+                              <span className="dashboard-live-dot" aria-hidden="true" />
+                              Live
+                            </span>
+                          ) : (
+                            row.start
+                          )}
                         </span>
-                      </span>
-                      <span className="dashboard-arb-cell dashboard-arb-cell--net">
-                        {row.netProfit}
-                      </span>
+                        <span className="dashboard-arb-cell dashboard-arb-cell--sport">
+                          {row.sport}
+                        </span>
+                        <span className="dashboard-arb-cell dashboard-arb-cell--league">
+                          {row.league}
+                        </span>
+                        <span className="dashboard-arb-cell dashboard-arb-cell--match">
+                          <span>{row.match}</span>
+                          <span className="dashboard-bet-type-badge">
+                            {BET_TYPE_LABELS[row.betType]}
+                          </span>
+                        </span>
+                        <span className="dashboard-arb-cell dashboard-arb-cell--net">
+                          {row.netProfit}
+                        </span>
+                      </div>
+                      {renderEventDropdown(rowId)}
+                    </Fragment>
+                  );
+                })}
+              </div>
+
+              {arbEvView === "arb" ? (
+                <div
+                  className="dashboard-arb-options"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div className="dashboard-arb-body">
+                    <div className="dashboard-arb-left">
+                      <div className="dashboard-arb-limit">
+                        <span>Include bet limits</span>
+                        <div className="dashboard-arb-toggle-group">
+                          <button type="button" className="dashboard-arb-toggle is-active">
+                            On
+                          </button>
+                          <button type="button" className="dashboard-arb-toggle is-off">
+                            Off
+                          </button>
+                        </div>
+                      </div>
+                      <div className="dashboard-arb-metric">
+                        <span>Arb ways</span>
+                        <div className="dashboard-arb-ways">
+                          <button
+                            type="button"
+                            className={`dashboard-arb-way${arbWays === "2-way" ? " is-active" : ""}`}
+                            onClick={() => setArbWays("2-way")}
+                          >
+                            2-way
+                          </button>
+                          <button
+                            type="button"
+                            className={`dashboard-arb-way${arbWays === "3-way" ? " is-active" : ""}`}
+                            onClick={() => setArbWays("3-way")}
+                          >
+                            3-way
+                          </button>
+                          <button
+                            type="button"
+                            className={`dashboard-arb-way${arbWays === "4-way" ? " is-active" : ""}`}
+                            onClick={() => setArbWays("4-way")}
+                          >
+                            4-way
+                          </button>
+                        </div>
+                      </div>
                     </div>
-                    {renderEventDropdown(rowId)}
-                  </Fragment>
-                );
-              })}
+                    <div className="dashboard-arb-right">
+                      <div className="dashboard-arb-preference">
+                        <div>
+                          <span>Favorite arb technique</span>
+                          <p>Use my preferred books + sport stacks.</p>
+                        </div>
+                        <div className="dashboard-arb-actions">
+                          <button
+                            type="button"
+                            className={`dashboard-arb-toggle${favoriteArb === "Yes" ? " is-active" : " is-off"
+                              }`}
+                            onClick={() => setFavoriteArb("Yes")}
+                          >
+                            Yes
+                          </button>
+                          <button
+                            type="button"
+                            className={`dashboard-arb-toggle${favoriteArb === "No" ? " is-active" : " is-off"
+                              }`}
+                            onClick={() => setFavoriteArb("No")}
+                          >
+                            No
+                          </button>
+                          <button type="button" className="dashboard-arb-link">
+                            Change settings
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  className="dashboard-ev-options"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div className="dashboard-ev-body">
+                    <div className="dashboard-ev-left">
+                      <div className="dashboard-ev-limit">
+                        <span>Include bet limits</span>
+                        <div className="dashboard-ev-toggle-group">
+                          <button
+                            type="button"
+                            className={`dashboard-ev-toggle${evIncludeLimits === "On" ? " is-active" : " is-off"
+                              }`}
+                            onClick={() => setEvIncludeLimits("On")}
+                          >
+                            On
+                          </button>
+                          <button
+                            type="button"
+                            className={`dashboard-ev-toggle${evIncludeLimits === "Off" ? " is-active" : " is-off"
+                              }`}
+                            onClick={() => setEvIncludeLimits("Off")}
+                          >
+                            Off
+                          </button>
+                        </div>
+                      </div>
+                      <div className="dashboard-ev-metric">
+                        <span>EV types</span>
+                        <div className="dashboard-ev-ways">
+                          <button
+                            type="button"
+                            className={`dashboard-ev-way${evType === "+EV" ? " is-active" : ""}`}
+                            onClick={() => setEvType("+EV")}
+                          >
+                            +EV
+                          </button>
+                          <button
+                            type="button"
+                            className={`dashboard-ev-way${evType === "Boosted" ? " is-active" : ""
+                              }`}
+                            onClick={() => setEvType("Boosted")}
+                          >
+                            Boosted
+                          </button>
+                          <button
+                            type="button"
+                            className={`dashboard-ev-way${evType === "Alt lines" ? " is-active" : ""
+                              }`}
+                            onClick={() => setEvType("Alt lines")}
+                          >
+                            Alt lines
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="dashboard-ev-right">
+                      <div className="dashboard-ev-preference">
+                        <div>
+                          <span>Favorite EV technique</span>
+                          <p>Keep my preferred books + models active.</p>
+                        </div>
+                        <div className="dashboard-ev-actions">
+                          <button
+                            type="button"
+                            className={`dashboard-ev-toggle${favoriteEv === "Yes" ? " is-active" : " is-off"
+                              }`}
+                            onClick={() => setFavoriteEv("Yes")}
+                          >
+                            Yes
+                          </button>
+                          <button
+                            type="button"
+                            className={`dashboard-ev-toggle${favoriteEv === "No" ? " is-active" : " is-off"
+                              }`}
+                            onClick={() => setFavoriteEv("No")}
+                          >
+                            No
+                          </button>
+                          <button type="button" className="dashboard-ev-link">
+                            Change settings
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {arbEvView === "arb" ? (
-              <div
-                className="dashboard-arb-options"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <div className="dashboard-arb-body">
-                  <div className="dashboard-arb-left">
-                    <div className="dashboard-arb-limit">
-                      <span>Include bet limits</span>
-                      <div className="dashboard-arb-toggle-group">
-                        <button type="button" className="dashboard-arb-toggle is-active">
-                          On
-                        </button>
-                        <button type="button" className="dashboard-arb-toggle is-off">
-                          Off
-                        </button>
-                      </div>
-                    </div>
-                    <div className="dashboard-arb-metric">
-                      <span>Arb ways</span>
-                      <div className="dashboard-arb-ways">
-                        <button
-                          type="button"
-                          className={`dashboard-arb-way${arbWays === "2-way" ? " is-active" : ""}`}
-                          onClick={() => setArbWays("2-way")}
-                        >
-                          2-way
-                        </button>
-                        <button
-                          type="button"
-                          className={`dashboard-arb-way${arbWays === "3-way" ? " is-active" : ""}`}
-                          onClick={() => setArbWays("3-way")}
-                        >
-                          3-way
-                        </button>
-                        <button
-                          type="button"
-                          className={`dashboard-arb-way${arbWays === "4-way" ? " is-active" : ""}`}
-                          onClick={() => setArbWays("4-way")}
-                        >
-                          4-way
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="dashboard-arb-right">
-                    <div className="dashboard-arb-preference">
-                      <div>
-                        <span>Favorite arb technique</span>
-                        <p>Use my preferred books + sport stacks.</p>
-                      </div>
-                      <div className="dashboard-arb-actions">
-                        <button
-                          type="button"
-                          className={`dashboard-arb-toggle${
-                            favoriteArb === "Yes" ? " is-active" : " is-off"
-                          }`}
-                          onClick={() => setFavoriteArb("Yes")}
-                        >
-                          Yes
-                        </button>
-                        <button
-                          type="button"
-                          className={`dashboard-arb-toggle${
-                            favoriteArb === "No" ? " is-active" : " is-off"
-                          }`}
-                          onClick={() => setFavoriteArb("No")}
-                        >
-                          No
-                        </button>
-                        <button type="button" className="dashboard-arb-link">
-                          Change settings
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div
-                className="dashboard-ev-options"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <div className="dashboard-ev-body">
-                  <div className="dashboard-ev-left">
-                    <div className="dashboard-ev-limit">
-                      <span>Include bet limits</span>
-                      <div className="dashboard-ev-toggle-group">
-                        <button
-                          type="button"
-                          className={`dashboard-ev-toggle${
-                            evIncludeLimits === "On" ? " is-active" : " is-off"
-                          }`}
-                          onClick={() => setEvIncludeLimits("On")}
-                        >
-                          On
-                        </button>
-                        <button
-                          type="button"
-                          className={`dashboard-ev-toggle${
-                            evIncludeLimits === "Off" ? " is-active" : " is-off"
-                          }`}
-                          onClick={() => setEvIncludeLimits("Off")}
-                        >
-                          Off
-                        </button>
-                      </div>
-                    </div>
-                    <div className="dashboard-ev-metric">
-                      <span>EV types</span>
-                      <div className="dashboard-ev-ways">
-                        <button
-                          type="button"
-                          className={`dashboard-ev-way${evType === "+EV" ? " is-active" : ""}`}
-                          onClick={() => setEvType("+EV")}
-                        >
-                          +EV
-                        </button>
-                        <button
-                          type="button"
-                          className={`dashboard-ev-way${
-                            evType === "Boosted" ? " is-active" : ""
-                          }`}
-                          onClick={() => setEvType("Boosted")}
-                        >
-                          Boosted
-                        </button>
-                        <button
-                          type="button"
-                          className={`dashboard-ev-way${
-                            evType === "Alt lines" ? " is-active" : ""
-                          }`}
-                          onClick={() => setEvType("Alt lines")}
-                        >
-                          Alt lines
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="dashboard-ev-right">
-                    <div className="dashboard-ev-preference">
-                      <div>
-                        <span>Favorite EV technique</span>
-                        <p>Keep my preferred books + models active.</p>
-                      </div>
-                      <div className="dashboard-ev-actions">
-                        <button
-                          type="button"
-                          className={`dashboard-ev-toggle${
-                            favoriteEv === "Yes" ? " is-active" : " is-off"
-                          }`}
-                          onClick={() => setFavoriteEv("Yes")}
-                        >
-                          Yes
-                        </button>
-                        <button
-                          type="button"
-                          className={`dashboard-ev-toggle${
-                            favoriteEv === "No" ? " is-active" : " is-off"
-                          }`}
-                          onClick={() => setFavoriteEv("No")}
-                        >
-                          No
-                        </button>
-                        <button type="button" className="dashboard-ev-link">
-                          Change settings
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </section>
 
           <section
@@ -1624,15 +1594,14 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                 : "Positive EV page overview"
             }
           >
-            <div className="arb-ev-specialization-hero">
-              <div className="arb-ev-specialization-copy">
-                <span className="arb-ev-specialization-kicker">
-                  {activePageConfig.heroKicker}
-                </span>
-                <h1>{activePageConfig.heroTitle}</h1>
-                <p>{activePageConfig.heroDescription}</p>
-              </div>
+            <div className="arb-ev-specialization-top">
+              <span className="arb-ev-specialization-kicker">
+                {activePageConfig.heroKicker}
+              </span>
               <div className="arb-ev-specialization-actions">
+                <Link href="/profit-tracker" className="top-bets-rail-link">
+                  See Profits
+                </Link>
                 <SectionBetTypeFilter
                   label="Bet types"
                   selected={controlHubBetTypes}
@@ -1640,37 +1609,83 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                 />
               </div>
             </div>
-            <div className="arb-ev-analytics">
-              <div>
-                <h2 className="arb-ev-analytics-title">Your activity</h2>
-                <div className="arb-ev-specialization-stats">
-                  {personalStats.map((stat) => (
-                    <article
-                      className="arb-ev-specialization-stat"
-                      key={`${arbEvView}-personal-${stat.label}`}
+
+            <div className="arb-ev-specialization-copy">
+              <h1>{activePageConfig.heroTitle}</h1>
+              <p>{activePageConfig.heroDescription}</p>
+            </div>
+
+            <div
+              className="arb-ev-analytics-tabs"
+              role="tablist"
+              aria-label="Activity view"
+            >
+              <button
+                type="button"
+                role="tab"
+                aria-selected={controlHubAnalyticsView === "personal"}
+                className={`arb-ev-analytics-tab${
+                  controlHubAnalyticsView === "personal" ? " is-active" : ""
+                }`}
+                onClick={() => setControlHubAnalyticsView("personal")}
+              >
+                Your activity
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={controlHubAnalyticsView === "community"}
+                className={`arb-ev-analytics-tab${
+                  controlHubAnalyticsView === "community" ? " is-active" : ""
+                }`}
+                onClick={() => setControlHubAnalyticsView("community")}
+              >
+                Everyone on Unbounded
+              </button>
+            </div>
+
+            <div
+              className="arb-ev-specialization-stats"
+              role="tabpanel"
+              aria-label={
+                controlHubAnalyticsView === "personal"
+                  ? "Your activity"
+                  : "Everyone on Unbounded"
+              }
+            >
+              {(controlHubAnalyticsView === "personal"
+                ? personalStats
+                : siteStats
+              ).map((stat) => {
+                const isWaiting = stat.value === "Waiting";
+                return (
+                  <article
+                    className={`arb-ev-specialization-stat${
+                      controlHubAnalyticsView === "community"
+                        ? " arb-ev-specialization-stat--community"
+                        : ""
+                    }`}
+                    key={`${arbEvView}-${controlHubAnalyticsView}-${stat.label}`}
+                  >
+                    <div
+                      className={`arb-ev-specialization-stat-value${
+                        isWaiting ? " is-waiting" : ""
+                      }`}
+                      aria-label={isWaiting ? "Waiting" : undefined}
                     >
+                      {isWaiting ? (
+                        <span className="arb-ev-specialization-stat-spinner" aria-hidden="true" />
+                      ) : (
+                        <strong>{stat.value}</strong>
+                      )}
+                    </div>
+                    <div className="arb-ev-specialization-stat-copy">
                       <span>{stat.label}</span>
-                      <strong>{stat.value}</strong>
                       <p>{stat.detail}</p>
-                    </article>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h2 className="arb-ev-analytics-title">Everyone on Unbounded</h2>
-                <div className="arb-ev-specialization-stats">
-                  {siteStats.map((stat) => (
-                    <article
-                      className="arb-ev-specialization-stat arb-ev-specialization-stat--community"
-                      key={`${arbEvView}-site-${stat.label}`}
-                    >
-                      <span>{stat.label}</span>
-                      <strong>{stat.value}</strong>
-                      <p>{stat.detail}</p>
-                    </article>
-                  ))}
-                </div>
-              </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </section>
 
@@ -1683,19 +1698,21 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
             }
           >
             <div className="arb-ev-tutorial-lab-head">
-              <div>
+              <div className="arb-ev-tutorial-lab-head-main">
                 <span className="arb-ev-tutorial-lab-kicker">
                   Interactive tutorial lab
                 </span>
-                <h2>
-                  {arbEvView === "arb"
-                    ? "Build your arbitrage learning stack"
-                    : "Build your positive EV learning stack"}
-                </h2>
-                <p>
-                  Select the tutorials you want, preview the education content,
-                  and move through the SEO-backed guides directly from here.
-                </p>
+                <div className="arb-ev-tutorial-lab-head-content">
+                  <h2>
+                    {arbEvView === "arb"
+                      ? "Build your arbitrage learning stack"
+                      : "Build your positive EV learning stack"}
+                  </h2>
+                  <p>
+                    Select the tutorials you want, preview the education content,
+                    and move through the SEO-backed guides directly from here.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -1704,9 +1721,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                 <button
                   key={`${arbEvView}-${category.value}`}
                   type="button"
-                  className={`arb-ev-tutorial-filter${
-                    selectedTutorialCategory === category.value ? " is-active" : ""
-                  }`}
+                  className={`arb-ev-tutorial-filter${selectedTutorialCategory === category.value ? " is-active" : ""
+                    }`}
                   aria-pressed={selectedTutorialCategory === category.value}
                   onClick={() => setSelectedTutorialCategory(category.value)}
                 >
@@ -1723,9 +1739,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                   return (
                     <article
                       key={tutorial.path}
-                      className={`arb-ev-tutorial-card${
-                        isActive ? " is-active" : ""
-                      }${isSelected ? " is-selected" : ""}`}
+                      className={`arb-ev-tutorial-card${isActive ? " is-active" : ""
+                        }${isSelected ? " is-selected" : ""}`}
                     >
                       <button
                         type="button"
@@ -1739,9 +1754,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                       <div className="arb-ev-tutorial-card-actions">
                         <button
                           type="button"
-                          className={`arb-ev-tutorial-select${
-                            isSelected ? " is-selected" : ""
-                          }`}
+                          className={`arb-ev-tutorial-select${isSelected ? " is-selected" : ""
+                            }`}
                           onClick={() => toggleTutorialSelection(tutorial.path)}
                         >
                           {isSelected ? "Selected" : "Select"}
@@ -1761,21 +1775,19 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                       <strong>{activeTutorial.title}</strong>
                       <p>{activeTutorial.excerpt}</p>
                     </div>
-                    <div className="arb-ev-tutorial-spotlight-copy">
-                      <div>
+                    <div className="arb-ev-tutorial-spotlight-panels">
+                      <div className="arb-ev-tutorial-spotlight-panel">
                         <span>SEO summary</span>
                         <p>{activeTutorial.summary}</p>
                       </div>
-                      <div>
+                      <div className="arb-ev-tutorial-spotlight-panel">
                         <span>Why it matters on this page</span>
                         <p>{activeTutorial.takeaway}</p>
                       </div>
-                    </div>
-                    <div className="arb-ev-tutorial-spotlight-links">
                       {activeTutorial.links.map((link) => (
                         <a
                           key={`${activeTutorial.path}-${link.href}`}
-                          className="arb-ev-tutorial-link"
+                          className="arb-ev-tutorial-link arb-ev-tutorial-spotlight-panel"
                           href={link.href}
                         >
                           <strong>{link.title}</strong>

@@ -1,4 +1,4 @@
-.siteFooter { display: flex; flex-direction: column; gap: 28px; border-top:1px solid rgb(242, 201, 105,.2); color: rgba(247, 243, 234, 0.72); font-size: 14px; }
+.siteFooter { display: flex; flex-direction: column; gap: 28px; border-top:1px solid rgb(242, 201, 105,.2); color: rgba(247, 243, 234, 0.72); font-size: 14px; margin-top:60px; }
 .siteFooter strong {display: block;color: var(--bull-gold);font-size: 18px;}
 .siteFooter section{padding-bottom:0;}
 
