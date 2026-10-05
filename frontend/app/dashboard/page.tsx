@@ -1,10 +1,13 @@
 "use client";
 
+import { RequireAuth } from "../components/RequireAuth";
+
 import { Fragment, useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useRouter } from "next/navigation";
 
 import { ALL_BET_TYPES, BET_TYPE_LABELS, BET_TYPE_OPTIONS, type BetType } from "../components/betTypeConfig";
 import { DashboardHeader } from "../components/DashboardHeader";
+import { redirectIfUnauthorized } from "../lib/auth";
 import { DraggableBetCalculatorPopup } from "../components/DraggableBetCalculatorPopup";
 import { SportsbookLogo, getSportsbookMeta } from "../components/sportsbookMeta";
 
@@ -219,7 +222,7 @@ function formatDisplayName(value: string | null) {
     .join(" ");
 }
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const router = useRouter();
   const sportOptions = ["Basketball", "Football", "Baseball", "Soccer"] as const;
   const liveSportTabs = ["All", ...sportOptions] as const;
@@ -389,6 +392,9 @@ export default function DashboardPage() {
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     })
       .then((response) => {
+        if (redirectIfUnauthorized(response)) {
+          throw new Error("Unauthorized");
+        }
         if (!response.ok) {
           throw new Error(`Arb feed request failed: ${response.status}`);
         }
@@ -423,6 +429,9 @@ export default function DashboardPage() {
       cache: "no-store",
     })
       .then((response) => {
+        if (redirectIfUnauthorized(response)) {
+          throw new Error("Unauthorized");
+        }
         if (!response.ok) {
           throw new Error(`EV feed request failed: ${response.status}`);
         }
@@ -449,7 +458,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-    const wsUrl = apiBase.replace(/^http/i, "ws").replace(/\/$/, "") + "/ws/arbs";
+    const wsToken = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+    if (!wsToken) {
+      return;
+    }
+    const wsUrl =
+      apiBase.replace(/^http/i, "ws").replace(/\/$/, "") +
+      `/ws/arbs?token=${encodeURIComponent(wsToken)}`;
     const socket = new WebSocket(wsUrl);
 
     socket.onopen = () => setArbFeedStatus((current) => (current === "live" ? "live" : "empty"));
@@ -1862,5 +1877,13 @@ export default function DashboardPage() {
       />
 
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <RequireAuth>
+      <DashboardPageContent />
+    </RequireAuth>
   );
 }

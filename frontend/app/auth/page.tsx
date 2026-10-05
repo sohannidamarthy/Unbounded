@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { getSportsbookMeta, SportsbookLogo } from "../components/sportsbookMeta";
 import Container from "../components/container/Container";
 import Header from "../components/header/Header";
+import { getPostLoginPath } from "../lib/auth";
 
 type AuthMode = "login" | "signup";
 type MessageTone = "success" | "error" | "info";
@@ -1122,7 +1123,7 @@ export default function AuthPage() {
       setMessageTone("success");
       setMessage("Authenticated. Redirecting to dashboard...");
       setLoginPassword("");
-      router.push("/dashboard");
+      router.push(getPostLoginPath());
     } catch (error) {
       const details =
         error instanceof Error ? error.message : String(error ?? "");

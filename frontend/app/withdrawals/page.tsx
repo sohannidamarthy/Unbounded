@@ -1,5 +1,7 @@
 "use client";
 
+import { RequireAuth } from "../components/RequireAuth";
+
 import { useEffect, useMemo, useState } from "react";
 import { DashboardShell } from "../components/DashboardShell";
 import { SportsbookLogo } from "../components/sportsbookMeta";
@@ -33,7 +35,7 @@ function scoreTier(score: number) {
   return "is-fair";
 }
 
-export default function WithdrawalsPage() {
+function WithdrawalsPageContent() {
   const [selectedBooks, setSelectedBooks] = useState<string[]>(ALL_BOOKS);
   const [query, setQuery] = useState("");
   const [hydrated, setHydrated] = useState(false);
@@ -175,5 +177,13 @@ export default function WithdrawalsPage() {
         </p>
       </section>
     </DashboardShell>
+  );
+}
+
+export default function WithdrawalsPage() {
+  return (
+    <RequireAuth>
+      <WithdrawalsPageContent />
+    </RequireAuth>
   );
 }

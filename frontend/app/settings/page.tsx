@@ -1,5 +1,7 @@
 "use client";
 
+import { RequireAuth } from "../components/RequireAuth";
+
 import { useEffect, useState } from "react";
 import { DashboardShell } from "../components/DashboardShell";
 import { SportsbookLogo } from "../components/sportsbookMeta";
@@ -42,7 +44,7 @@ const DEFAULT_SETTINGS: Settings = {
   emailDigest: false,
 };
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [hydrated, setHydrated] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -235,5 +237,13 @@ export default function SettingsPage() {
         </div>
       </section>
     </DashboardShell>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <RequireAuth>
+      <SettingsPageContent />
+    </RequireAuth>
   );
 }

@@ -1,5 +1,10 @@
 import { ArbEvExpandedPage } from "../components/ArbEvExpandedPage";
+import { RequireAuth } from "../components/RequireAuth";
 
 export default function EvBetsPage() {
-  return <ArbEvExpandedPage initialView="ev" />;
+  return (
+    <RequireAuth>
+      <ArbEvExpandedPage initialView="ev" />
+    </RequireAuth>
+  );
 }

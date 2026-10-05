@@ -1,5 +1,7 @@
 "use client";
 
+import { RequireAuth } from "../components/RequireAuth";
+
 import { useEffect, useMemo, useState } from "react";
 
 import { ALL_BET_TYPES, BET_TYPE_LABELS, BET_TYPE_OPTIONS, type BetType } from "../components/betTypeConfig";
@@ -108,7 +110,7 @@ const getDateRange = (period: Period, value: string) => {
   };
 };
 
-export default function ProfitTrackerPage() {
+function ProfitTrackerPageContent() {
   const [savedEvents, setSavedEvents] = useState<ProfitEvent[]>([]);
   const [period, setPeriod] = useState<Period>("month");
   const [periodValues, setPeriodValues] = useState<Record<Period, string>>({
@@ -829,5 +831,13 @@ export default function ProfitTrackerPage() {
         onOddsBChange={setBetCalculatorOddsB}
       />
     </div>
+  );
+}
+
+export default function ProfitTrackerPage() {
+  return (
+    <RequireAuth>
+      <ProfitTrackerPageContent />
+    </RequireAuth>
   );
 }

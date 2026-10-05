@@ -1,5 +1,7 @@
 "use client";
 
+import { RequireAuth } from "../components/RequireAuth";
+
 import { useEffect, useMemo, useState } from "react";
 import { MarketingChrome } from "../components/MarketingChrome";
 import { PRICING_PLANS } from "../components/pricingPlans";
@@ -31,7 +33,7 @@ function renewalDate() {
   return date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 }
 
-export default function BillingPage() {
+function BillingPageContent() {
   const [activeTab, setActiveTab] = useState<BillingTab>("plan");
   const [currentPlan, setCurrentPlan] = useState<PlanName>("Premium");
   const [cycle, setCycle] = useState<BillingCycle>("monthly");
@@ -332,5 +334,13 @@ export default function BillingPage() {
 
       {toast ? <div className="billing-toast" role="status">{toast}</div> : null}
     </MarketingChrome>
+  );
+}
+
+export default function BillingPage() {
+  return (
+    <RequireAuth>
+      <BillingPageContent />
+    </RequireAuth>
   );
 }

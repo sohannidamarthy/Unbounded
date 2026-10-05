@@ -1,5 +1,10 @@
 import { LeaderboardHubPage } from "../components/LeaderboardHubPage";
+import { RequireAuth } from "../components/RequireAuth";
 
 export default function LeaderboardPage() {
-  return <LeaderboardHubPage />;
+  return (
+    <RequireAuth>
+      <LeaderboardHubPage />
+    </RequireAuth>
+  );
 }

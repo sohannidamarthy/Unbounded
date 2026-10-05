@@ -1,5 +1,10 @@
 import { ArbEvExpandedPage } from "../components/ArbEvExpandedPage";
+import { RequireAuth } from "../components/RequireAuth";
 
 export default function ArbitrageBetsPage() {
-  return <ArbEvExpandedPage initialView="arb" />;
+  return (
+    <RequireAuth>
+      <ArbEvExpandedPage initialView="arb" />
+    </RequireAuth>
+  );
 }

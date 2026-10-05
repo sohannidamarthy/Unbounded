@@ -7,6 +7,7 @@ import { DashboardHeader } from "./DashboardHeader";
 import { ALL_BET_TYPES, BET_TYPE_LABELS, BET_TYPE_OPTIONS, type BetType } from "./betTypeConfig";
 import { DraggableBetCalculatorPopup } from "./DraggableBetCalculatorPopup";
 import { SEO_PAGES } from "./seoData";
+import { getStoredToken, redirectIfUnauthorized } from "../lib/auth";
 import {
   ARBEV_BOOK_OPTIONS,
   getSportsbookMeta,
@@ -474,10 +475,15 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
 
     async function loadRows() {
       try {
+        const token = getStoredToken();
+        const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
         const [arbResponse, evResponse] = await Promise.all([
-          fetch(`${apiBase}/v1/arbs?sport=all&limit=100`, { cache: "no-store" }),
-          fetch(`${apiBase}/v1/evs?sport=all&limit=100`, { cache: "no-store" }),
+          fetch(`${apiBase}/v1/arbs?sport=all&limit=100`, { cache: "no-store", headers }),
+          fetch(`${apiBase}/v1/evs?sport=all&limit=100`, { cache: "no-store", headers }),
         ]);
+        if (redirectIfUnauthorized(arbResponse) || redirectIfUnauthorized(evResponse)) {
+          return;
+        }
         if (!arbResponse.ok || !evResponse.ok) {
           throw new Error("Board API request failed");
         }
