@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.auth import get_current_user
 from app.core.security import create_access_token, hash_password, verify_password
 from app.db.models.user import User
 from app.db.session import get_db
@@ -304,6 +305,17 @@ def login(payload: AuthPayload, db: Session = Depends(get_db)):
 
     token = create_access_token(str(user.id))
     return AuthResponse(access_token=token)
+
+
+@router.get("/me", response_model=UserProfile)
+def me(user: User = Depends(get_current_user)):
+    return UserProfile(
+        id=str(user.id),
+        email=user.email,
+        is_active=user.is_active,
+        is_admin=user.is_admin,
+        is_email_verified=user.is_email_verified,
+    )
 
 
 @router.post("/verify-email")

@@ -3,9 +3,10 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy import bindparam, text
 
+from app.core.auth import get_current_user
 from app.db.session import SessionLocal
 
 router = APIRouter(prefix="/v1", tags=["evs"])
@@ -95,6 +96,7 @@ def _load_evs_from_db(*, sports: list[str] | None, limit: int) -> list[dict[str,
 async def list_evs(
     sport: str = Query("all", min_length=1),
     limit: int = Query(50, ge=1, le=200),
+    _user=Depends(get_current_user),
 ) -> dict[str, Any]:
     sport_key = sport.strip().lower()
     if sport_key == "all":

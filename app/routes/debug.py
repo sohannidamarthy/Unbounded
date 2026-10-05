@@ -1,12 +1,16 @@
-﻿from fastapi import APIRouter, Body
+﻿from fastapi import APIRouter, Body, Depends
 import time
 from typing import Any, Dict
 
+from app.core.auth import require_admin
 from app.redis_client import get_redis
 from app.services.odds_cache import upsert_odds, get_odds, get_odds_ts, is_stale
 from app.services.arbs_cache import upsert_arb, get_top_arbs, get_arb
 
-router = APIRouter(prefix="/debug", tags=["debug"])
+# These routes write to / read from Redis directly; admin only.
+router = APIRouter(
+    prefix="/debug", tags=["debug"], dependencies=[Depends(require_admin)]
+)
 
 @router.get("/redis")
 async def debug_redis():

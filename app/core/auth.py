@@ -33,6 +33,28 @@ def _unauthorized() -> HTTPException:
     )
 
 
+def get_user_from_token(db: Session, token: str) -> Optional[User]:
+    """Resolve a JWT to an active user, or None. For callers (e.g. websockets)
+    that cannot use the header-based get_current_user dependency."""
+    try:
+        payload = jwt.decode(
+            token,
+            settings.jwt_secret.get_secret_value(),
+            algorithms=[settings.jwt_algorithm],
+        )
+    except JWTError:
+        return None
+
+    subject = payload.get("sub")
+    if not subject:
+        return None
+
+    user = _get_user_by_id(db, subject)
+    if not user or not user.is_active:
+        return None
+    return user
+
+
 def get_current_user(
     authorization: Optional[str] = Header(default=None),
     x_api_key: Optional[str] = Header(default=None, alias="X-API-Key"),

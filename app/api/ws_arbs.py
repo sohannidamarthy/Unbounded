@@ -10,6 +10,9 @@ import redis.asyncio as redis
 from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
+from app.core.auth import get_user_from_token
+from app.db.session import SessionLocal
+
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
@@ -34,8 +37,24 @@ def _coerce_payload(payload: str) -> str:
         return json.dumps({"type": "arb_update", "raw": str(payload)})
 
 
+def _authenticate(token: str | None) -> bool:
+    if not token:
+        return False
+    db = SessionLocal()
+    try:
+        return get_user_from_token(db, token) is not None
+    finally:
+        db.close()
+
+
 @router.websocket("/ws/arbs")
 async def ws_arbs(websocket: WebSocket):
+    # Browsers cannot set an Authorization header on a WebSocket, so the
+    # JWT is passed as ?token=. Reject before accepting or subscribing.
+    if not await asyncio.to_thread(_authenticate, websocket.query_params.get("token")):
+        await websocket.close(code=1008)
+        return
+
     r = _redis()
     pubsub = r.pubsub()
     await pubsub.subscribe(CHANNEL)
