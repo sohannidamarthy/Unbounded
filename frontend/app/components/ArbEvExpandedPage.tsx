@@ -333,7 +333,7 @@ function SectionBetTypeFilter({
     );
   };
 
-  const triggerLabel = getSelectionLabel(selected, ALL_BET_TYPES, "All bet types", "No bet types");
+  const triggerLabel = getSelectionLabel(selected, ALL_BET_TYPES, "All Bet Types", "No Bet Types");
 
   return (
     <div className="section-bet-type-filter" ref={menuRef}>
@@ -406,6 +406,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
   const pageConfig = pageConfigs[initialView];
   const [arbEvView, setArbEvView] = useState<ArbEvView>(initialView);
   const [arbWays, setArbWays] = useState("2-way");
+  const [arbIncludeLimits, setArbIncludeLimits] = useState("On");
   const [favoriteArb, setFavoriteArb] = useState("No");
   const [evIncludeLimits, setEvIncludeLimits] = useState("On");
   const [evType, setEvType] = useState("+EV");
@@ -839,14 +840,12 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
     },
     {
       label: "Your est. net",
-      value: relevantSavedBets.length
-        ? `${personalNet >= 0 ? "+" : ""}$${personalNet.toFixed(2)}`
-        : "Waiting",
+      value: `${personalNet >= 0 ? "+" : ""}$${personalNet.toFixed(2)}`,
       detail: "Estimated payout across everything you've saved.",
     },
     {
       label: "Your top sport",
-      value: personalTopSport ?? "Waiting",
+      value: personalTopSport ?? "—",
       detail: "Where most of your tracked action is coming from.",
     },
   ];
@@ -1040,7 +1039,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                       <span role="columnheader">Match</span>
                       <span role="columnheader">Sport</span>
                       <span role="columnheader">League</span>
-                      <span role="columnheader">Net profit</span>
+                      <span role="columnheader">Net Profit</span>
                     </div>
                     {topArbBets.map((row, index) => {
                       const rowId = `top10-${row.id}`;
@@ -1092,7 +1091,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
             </section>
           ) : null}
 
-          <section className="dashboard-panel" aria-label={arbEvView === "arb" ? "Arbitrage bets per day" : "EV bets per day"}>
+          <section className="dashboard-panel " aria-label={arbEvView === "arb" ? "Arbitrage bets per day" : "EV bets per day"}>
             <div className="dashboard-panel-header">
               <div>
                 <h2>{activePageConfig.panelTitle}</h2>
@@ -1118,14 +1117,29 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
               </div>
             </div>
             <div className="dashboard-panel-body">
-              <div className="dashboard-arb-controls" ref={pageFiltersRef}>
-                <label className="dashboard-arb-field dashboard-page-filter-field">
-                  <span>Date</span>
-                  <input type="date" />
+              <div className="dashboard-arb-controls dashboard-arb-controls--board" ref={pageFiltersRef}>
+                <label className="dashboard-arb-field dashboard-page-filter-field dashboard-page-filter-field--date">
+                  <span className="dashboard-page-filter-sr">Date</span>
+                  <span className="dashboard-page-filter-control">
+                    <input type="date" />
+                    <span className="dashboard-page-filter-calendar" aria-hidden="true">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3.75" y="5.75" width="16.5" height="14.5" rx="2.25" stroke="currentColor" strokeWidth="1.5" />
+                        <path d="M3.75 9.5H20.25" stroke="currentColor" strokeWidth="1.5" />
+                        <path d="M8 3.75V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M16 3.75V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M8.5 13H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M12 13H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M15.5 13H16.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M8.5 16.5H9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                        <path d="M12 16.5H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                      </svg>
+                    </span>
+                  </span>
                 </label>
                 <div className="dashboard-top-filters dashboard-top-filters--page">
                   <div className="dashboard-top-filter dashboard-top-filter--page">
-                    <span>Sport</span>
+                    <span className="dashboard-page-filter-sr">Sport</span>
                     <button
                       type="button"
                       className={`dashboard-filter-trigger${openPageFilter === "sports" ? " is-open" : ""
@@ -1143,7 +1157,9 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                         </span>
                       ) : null}
                       <span className="dashboard-filter-trigger-icon" aria-hidden="true">
-                        ▾
+                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 1.25L7 6.75L13 1.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                       </span>
                     </button>
                     {openPageFilter === "sports" ? (
@@ -1193,7 +1209,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     ) : null}
                   </div>
                   <div className="dashboard-top-filter dashboard-top-filter--page">
-                    <span>Books</span>
+                    <span className="dashboard-page-filter-sr">Books</span>
                     <button
                       type="button"
                       className={`dashboard-filter-trigger dashboard-filter-trigger--books${openPageFilter === "books" ? " is-open" : ""
@@ -1204,7 +1220,9 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     >
                       <span className="dashboard-filter-trigger-label">All books</span>
                       <span className="dashboard-filter-trigger-icon" aria-hidden="true">
-                        ▾
+                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 1.25L7 6.75L13 1.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                       </span>
                     </button>
                     {openPageFilter === "books" ? (
@@ -1271,7 +1289,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     ) : null}
                   </div>
                   <div className="dashboard-top-filter dashboard-top-filter--page">
-                    <span>Bet type</span>
+                    <span className="dashboard-page-filter-sr">Bet type</span>
                     <button
                       type="button"
                       className={`dashboard-filter-trigger${openPageFilter === "betTypes" ? " is-open" : ""
@@ -1289,7 +1307,9 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                         </span>
                       ) : null}
                       <span className="dashboard-filter-trigger-icon" aria-hidden="true">
-                        ▾
+                        <svg width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M1 1.25L7 6.75L13 1.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
                       </span>
                     </button>
                     {openPageFilter === "betTypes" ? (
@@ -1344,7 +1364,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
 
 
               <div
-                className="dashboard-arb-table is-expanded"
+                className="dashboard-arb-table is-expanded cntboard"
                 role="table"
                 aria-label={
                   arbEvView === "arb" ? "Arbitrage betting board" : "EV betting board"
@@ -1402,10 +1422,10 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                           {row.league}
                         </span>
                         <span className="dashboard-arb-cell dashboard-arb-cell--match">
-                          <span>{row.match}</span>
                           <span className="dashboard-bet-type-badge">
                             {BET_TYPE_LABELS[row.betType]}
                           </span>
+                          <span>{row.match}</span>
                         </span>
                         <span className="dashboard-arb-cell dashboard-arb-cell--net">
                           {row.netProfit}
@@ -1426,20 +1446,28 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     <div className="dashboard-arb-left">
                       <div className="dashboard-arb-limit">
                         <span>Include bet limits</span>
-                        <div className="dashboard-arb-toggle-group">
-                          <button type="button" className="dashboard-arb-toggle is-active">
-                            On
-                          </button>
-                          <button type="button" className="dashboard-arb-toggle is-off">
-                            Off
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          className={`dashboard-event-toggle${arbIncludeLimits === "On" ? " is-on" : " is-off"}`}
+                          aria-pressed={arbIncludeLimits === "On"}
+                          aria-label="Include bet limits"
+                          onClick={() =>
+                            setArbIncludeLimits(arbIncludeLimits === "On" ? "Off" : "On")
+                          }
+                        >
+                          <span className="dashboard-event-toggle-label">
+                            {arbIncludeLimits === "On" ? "ON" : "OFF"}
+                          </span>
+                          <span className="dashboard-event-toggle-knob" aria-hidden="true" />
+                        </button>
                       </div>
                       <div className="dashboard-arb-metric">
                         <span>Arb ways</span>
-                        <div className="dashboard-arb-ways">
+                        <div className="dashboard-arb-ways" role="radiogroup" aria-label="Arb ways">
                           <button
                             type="button"
+                            role="radio"
+                            aria-checked={arbWays === "2-way"}
                             className={`dashboard-arb-way${arbWays === "2-way" ? " is-active" : ""}`}
                             onClick={() => setArbWays("2-way")}
                           >
@@ -1447,6 +1475,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                           </button>
                           <button
                             type="button"
+                            role="radio"
+                            aria-checked={arbWays === "3-way"}
                             className={`dashboard-arb-way${arbWays === "3-way" ? " is-active" : ""}`}
                             onClick={() => setArbWays("3-way")}
                           >
@@ -1454,6 +1484,8 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                           </button>
                           <button
                             type="button"
+                            role="radio"
+                            aria-checked={arbWays === "4-way"}
                             className={`dashboard-arb-way${arbWays === "4-way" ? " is-active" : ""}`}
                             onClick={() => setArbWays("4-way")}
                           >
@@ -1464,31 +1496,27 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
                     </div>
                     <div className="dashboard-arb-right">
                       <div className="dashboard-arb-preference">
-                        <div>
+                        <div className="dashboard-arb-preference-header">
                           <span>Favorite arb technique</span>
-                          <p>Use my preferred books + sport stacks.</p>
-                        </div>
-                        <div className="dashboard-arb-actions">
                           <button
                             type="button"
-                            className={`dashboard-arb-toggle${favoriteArb === "Yes" ? " is-active" : " is-off"
-                              }`}
-                            onClick={() => setFavoriteArb("Yes")}
+                            className={`dashboard-event-toggle${favoriteArb === "Yes" ? " is-on" : " is-off"}`}
+                            aria-pressed={favoriteArb === "Yes"}
+                            aria-label="Favorite arb technique"
+                            onClick={() =>
+                              setFavoriteArb(favoriteArb === "Yes" ? "No" : "Yes")
+                            }
                           >
-                            Yes
-                          </button>
-                          <button
-                            type="button"
-                            className={`dashboard-arb-toggle${favoriteArb === "No" ? " is-active" : " is-off"
-                              }`}
-                            onClick={() => setFavoriteArb("No")}
-                          >
-                            No
-                          </button>
-                          <button type="button" className="dashboard-arb-link">
-                            Change settings
+                            <span className="dashboard-event-toggle-label">
+                              {favoriteArb === "Yes" ? "ON" : "OFF"}
+                            </span>
+                            <span className="dashboard-event-toggle-knob" aria-hidden="true" />
                           </button>
                         </div>
+                        <p>Use my preferred books + sport stacks.</p>
+                        <button type="button" className="dashboard-arb-link">
+                          Change settings
+                        </button>
                       </div>
                     </div>
                   </div>

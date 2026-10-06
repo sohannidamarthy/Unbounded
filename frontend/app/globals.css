@@ -474,7 +474,7 @@ a {
   position: relative;
   overflow: hidden;
   border-radius: 24px;
-  border: 1px solid rgba(181, 136, 33, 0.26);
+  border: 1px solid #132432;
   background: linear-gradient(160deg, rgba(10, 24, 38, 0.92), rgba(6, 18, 31, 0.94));
   box-shadow: 0 24px 44px rgba(0, 0, 0, 0.28);
 }
@@ -485,7 +485,7 @@ a {
   gap: 22px;
 }
 
-.arb-ev-specialization::before,
+/* .arb-ev-specialization::before,
 .arb-ev-tutorial-lab::before {
   content: "";
   position: absolute;
@@ -494,9 +494,9 @@ a {
   border-radius: 999px;
   background: radial-gradient(circle, rgba(181, 136, 33, 0.12), transparent 68%);
   pointer-events: none;
-}
+} */
 
-.arb-ev-specialization::before {
+/* .arb-ev-specialization::before {
   top: -120px;
   right: -90px;
 }
@@ -504,14 +504,12 @@ a {
 .arb-ev-tutorial-lab::before {
   bottom: -120px;
   left: -90px;
-}
+} */
 
 .arb-ev-specialization--arb,
 .arb-ev-specialization--ev {
-  border-color: rgba(181, 136, 33, 0.28);
-  background:
-    radial-gradient(circle at 16% 18%, rgba(181, 136, 33, 0.08), transparent 30%),
-    linear-gradient(160deg, rgba(10, 24, 38, 0.96), rgba(6, 18, 31, 0.94));
+  background: #0B1A26;
+  border: 1px solid #132432;
 }
 
 .arb-ev-specialization-top,
@@ -638,20 +636,26 @@ a {
 
 .arb-ev-specialization-stat-value {
   flex: 0 0 auto;
-  width: 40px;
+  min-width: 40px;
+  width: max-content;
+  max-width: 100%;
   height: 40px;
+  padding: 0 10px;
   display: grid;
   place-items: center;
   border-radius: 12px;
   border: 1px solid #EAB751;
   background: #383A2E;
+  box-sizing: border-box;
 }
 
 .arb-ev-specialization-stat-value strong {
   color: #f7f1e8;
-  font-size: 22px;
+  font-size: clamp(13px, 2.2vw, 18px);
   font-weight: 800;
   line-height: 1;
+  white-space: nowrap;
+  text-align: center;
 }
 
 .arb-ev-specialization-stat-spinner {
@@ -673,6 +677,7 @@ a {
   display: grid;
   gap: 4px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
 .arb-ev-specialization-stat-copy span {
@@ -1270,7 +1275,7 @@ border: 1px solid rgba(181, 136, 33, 0.4); padding:6px 10px; border-radius:999px
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 5px 10px;
+  padding: 8px 13px;
   border: 1px solid rgba(215, 170, 66, 0.34);
   background: rgba(215, 170, 66, 0.12);
   color: #f2d384;
@@ -3019,8 +3024,8 @@ padding:12px 14px; display:grid; gap:6px;}
   width: max-content;
   padding: 5px 12px 5px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 86, 86, 0.85);
-  background: linear-gradient(135deg, rgba(214, 35, 47, 0.95), rgba(150, 18, 28, 0.95));
+  border: 1px solid #A40223;
+  background: #a4022366;
   color: #fff5f5;
   font-size: 11px;
   font-weight: 900;
@@ -3174,14 +3179,22 @@ padding:12px 14px; display:grid; gap:6px;}
 }
 
 .dashboard-arb-table.is-expanded .dashboard-arb-row {
-  grid-template-columns: 1.05fr 1.75fr 0.65fr 0.65fr 0.8fr;
+  grid-template-columns: 0.3fr 1.75fr 0.65fr 0.65fr 0.4fr;
   column-gap: 16px;
-  padding: 20px 24px;
+  padding: 14px 24px;
 }
 
 .dashboard-arb-table.is-expanded .dashboard-arb-row--header {
-  grid-template-columns: 1.05fr 1.75fr 0.65fr 0.65fr 0.8fr;
+  grid-template-columns: 0.3fr 1.75fr 0.65fr 0.65fr 0.4fr;
   column-gap: 16px;
+}
+
+.dashboard-arb-table.cntboard.is-expanded .dashboard-arb-row {
+  grid-template-columns: 0.4fr 0.40fr 0.65fr 1.75fr 0.4fr;
+}
+
+.dashboard-arb-table.cntboard.is-expanded .dashboard-arb-row--header {
+  grid-template-columns: 0.4fr 0.40fr 0.65fr 1.75fr 0.4fr;
 }
 
 .dashboard-arb-table.is-expanded .dashboard-arb-row>span,
@@ -3195,7 +3208,7 @@ padding:12px 14px; display:grid; gap:6px;}
   font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(247, 241, 232, 0.6);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .dashboard-arb-cell--net,
@@ -3447,11 +3460,9 @@ padding:12px 14px; display:grid; gap:6px;}
   position: relative;
   width: 100%;
   border-radius: 16px;
-  border: 1px solid rgba(215, 170, 66, 0.75);
-  background: linear-gradient(160deg, rgba(8, 24, 40, 0.96), rgba(6, 18, 31, 0.96));
-  box-shadow:
-    0 22px 40px rgba(0, 0, 0, 0.45),
-    inset 0 0 0 1px rgba(215, 170, 66, 0.18);
+  border: 1px solid #132432;
+  background: #041524;
+  box-shadow: 0 22px 40px rgba(0, 0, 0, 0.45);
   padding: 14px;
 }
 
@@ -3482,8 +3493,8 @@ padding:12px 14px; display:grid; gap:6px;}
   width: 30px;
   height: 30px;
   border-radius: 999px;
-  border: 1px solid rgba(215, 170, 66, 0.65);
-  background: rgba(215, 170, 66, 0.12);
+  border: 1px solid #132432;
+  background: #0B1A26;
   color: #f7f1e8;
   font-size: 18px;
   line-height: 1;
@@ -3696,9 +3707,10 @@ span.dashboard-event-toggle-label {
 
 .dashboard-event-popout-market {
   margin-top: 12px;
-  border: 1px solid rgba(215, 170, 66, 0.28);
+  border: 1px solid #132432;
   border-radius: 12px;
   overflow: hidden;
+  background: #0B1A26;
 }
 
 .dashboard-event-popout-market-row {
@@ -3707,11 +3719,11 @@ span.dashboard-event-toggle-label {
   justify-content: space-between;
   gap: 12px;
   padding: 12px 14px;
-  background: rgba(9, 25, 39, 0.55);
+  background: #0B1A26;
 }
 
 .dashboard-event-popout-market-row+.dashboard-event-popout-market-row {
-  border-top: 1px solid rgba(215, 170, 66, 0.18);
+  border-top: 1px solid #132432;
 }
 
 .dashboard-event-popout-market-row span {
@@ -3730,8 +3742,8 @@ span.dashboard-event-toggle-label {
 .dashboard-event-popout-market-row input {
   width: 96px;
   border-radius: 8px;
-  border: 1px solid rgba(215, 170, 66, 0.55);
-  background: rgba(6, 18, 31, 0.8);
+  border: 1px solid #132432;
+  background: #041524;
   color: #f7f1e8;
   padding: 7px 10px;
   text-align: right;
@@ -9786,11 +9798,18 @@ span.dashboard-event-toggle-label {
 }
 
 .top-bets-rail-kicker {
-  font-size: 11px;
-  font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(242, 201, 105, 0.85);
+  border: 1px solid #E2B146;
+  border-radius: 100px;
+  background: rgb(234 183 81 / 20%);
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 10px;
+  position: absolute;
+  top: -18px;
+  left: 18px;
 }
 
 .top-bets-rail--arb .top-bets-rail-kicker {
@@ -9808,9 +9827,9 @@ span.dashboard-event-toggle-label {
 }
 
 .top-bets-rail-link {
-  color: rgba(247, 241, 232, 0.75);
-  font-weight: 700;
-  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: normal;
+  font-size: 14px;
   white-space: nowrap;
   text-decoration: none;
 }
@@ -9850,6 +9869,11 @@ span.dashboard-event-toggle-label {
 .top-bets-table {
   margin-top: 0;
   min-width: 720px;
+  border: 1px solid #132432;
+  border-radius: 12px;
+  background: #041524;
+  box-shadow: none;
+  overflow: hidden;
 }
 
 .top-bets-table .dashboard-arb-row,
@@ -9857,6 +9881,496 @@ span.dashboard-event-toggle-label {
   grid-template-columns: 72px minmax(220px, 2.2fr) 0.8fr 0.7fr 0.85fr;
   column-gap: 14px;
   padding: 14px 18px;
+  border-bottom: 1px solid #132432;
+  background: #041524;
+}
+
+.top-bets-table .dashboard-arb-row--header {
+  background: #132432;
+  color: rgba(247, 241, 232, 0.78);
+}
+
+.top-bets-table .dashboard-arb-row--header > span:nth-child(4) {
+  color: #e2b146;
+}
+
+.top-bets-table .dashboard-arb-row--header > span:nth-child(5) {
+  color: #7de7aa;
+}
+
+.top-bets-table .dashboard-arb-row:last-child {
+  border-bottom: none;
+}
+
+.top-bets-table .dashboard-arb-row:not(.dashboard-arb-row--header):hover,
+.top-bets-table .dashboard-arb-row.is-selected {
+  transform: none;
+  box-shadow: none;
+  outline: none;
+  background: #0a1f33;
+}
+
+.top-bets-table .dashboard-arb-cell--match {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.top-bets-table .dashboard-bet-type-badge {
+  order: -1;
+  border: 1px solid #e2b146;
+  background: transparent;
+  color: #e2b146;
+}
+
+.top-bets-table .dashboard-arb-cell--league {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.top-bets-table .dashboard-arb-cell--net {
+  color: #7de7aa;
+}
+
+/* Arbitrage / EV control board table (screenshot UI) */
+.dashboard-arb-table.cntboard {
+  margin-top: 18px;
+  border: 1px solid #132432;
+  border-radius: 12px;
+  background: #041524;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.dashboard-arb-table.cntboard .dashboard-arb-row,
+.dashboard-arb-table.cntboard .dashboard-arb-row--header {
+  border-bottom: 1px solid #132432;
+  background: #041524;
+}
+
+.dashboard-arb-table.cntboard .dashboard-arb-row--header {
+  background: #132432;
+  color: rgba(247, 241, 232, 0.72);
+}
+
+.dashboard-arb-table.cntboard .dashboard-arb-row:last-child {
+  border-bottom: none;
+}
+
+.dashboard-arb-table.cntboard .dashboard-arb-row:not(.dashboard-arb-row--header):hover,
+.dashboard-arb-table.cntboard .dashboard-arb-row.is-selected {
+  transform: none;
+  box-shadow: none;
+  outline: none;
+  background: #0a1f33;
+}
+
+.dashboard-arb-table.cntboard .dashboard-arb-cell--match {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-arb-table .dashboard-arb-cell--match > .dashboard-bet-type-badge,
+.dashboard-arb-table .dashboard-bet-type-badge {
+  border: 1px solid #E2B146;
+  border-radius: 100px;
+  background: rgb(226, 177, 70, 0.1);
+  color: #E2B146;
+  font-weight: 700;
+  font-size: 12px;
+  min-width: 104px;
+  text-align: center;
+  justify-content: center;
+}
+
+.arb-ev-page .dashboard-panel-header h2 {
+  color: #ffffff;
+}
+
+.arb-ev-page .dashboard-arb-body {
+  column-gap: 16px;
+  row-gap: 12px;
+  margin-top: 0;
+}
+
+.arb-ev-page .dashboard-arb-left,
+.arb-ev-page .dashboard-arb-right {
+  row-gap: 12px;
+}
+
+.arb-ev-page .dashboard-arb-limit,
+.arb-ev-page .dashboard-arb-metric,
+.arb-ev-page .dashboard-arb-preference,
+.arb-ev-page .dashboard-ev-limit,
+.arb-ev-page .dashboard-ev-metric,
+.arb-ev-page .dashboard-ev-preference {
+  border: 1px solid #132432;
+  border-radius: 12px;
+  background: #041524;
+}
+
+.arb-ev-page .dashboard-arb-limit,
+.arb-ev-page .dashboard-arb-metric {
+  min-height: 64px;
+  padding: 14px 18px;
+  color: #f3efe6;
+  font-size: 15px;
+}
+
+.arb-ev-page .dashboard-arb-limit > span,
+.arb-ev-page .dashboard-arb-metric > span {
+  color: #f3efe6;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.arb-ev-page .dashboard-arb-preference {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 10px 16px;
+  padding: 18px 20px;
+  min-height: 124px;
+}
+
+.arb-ev-page .dashboard-arb-preference-header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.arb-ev-page .dashboard-arb-preference-header > span,
+.arb-ev-page .dashboard-arb-preference span,
+.arb-ev-page .dashboard-ev-preference span {
+  color: #e2b146;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.arb-ev-page .dashboard-arb-preference-header > span{
+  font-size: 20px;
+}
+
+.arb-ev-page .dashboard-arb-preference p {
+  grid-column: 1;
+  margin: 0;
+  color: rgba(195, 201, 210, 0.72);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.arb-ev-page .dashboard-arb-preference .dashboard-arb-link {
+  grid-column: 2;
+  align-self: flex-start;
+  justify-self: end;
+  color: rgba(195, 201, 210, 0.62);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.arb-ev-page .dashboard-arb-preference .dashboard-arb-link:hover {
+  color: rgba(227, 232, 238, 0.85);
+}
+
+.arb-ev-page .dashboard-arb-ways {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.arb-ev-page .dashboard-arb-way,
+.arb-ev-page .dashboard-ev-way {
+  min-width: 64px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(243, 239, 230, 0.72);
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arb-ev-page .dashboard-arb-way:hover,
+.arb-ev-page .dashboard-ev-way:hover {
+  color: #f3efe6;
+}
+
+.arb-ev-page .dashboard-arb-way.is-active,
+.arb-ev-page .dashboard-ev-way.is-active {
+  background: #e2b146;
+  border-color: #e2b146;
+  color: #041524;
+  font-weight: 700;
+}
+
+.arb-ev-page .dashboard-arb-toggle,
+.arb-ev-page .dashboard-ev-toggle {
+  border-radius: 999px;
+  border: 1px solid #132432;
+  background: transparent;
+  color: rgba(247, 241, 232, 0.55);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.arb-ev-page .dashboard-arb-toggle.is-active,
+.arb-ev-page .dashboard-ev-toggle.is-active {
+  background: #e2b146;
+  border-color: #e2b146;
+  color: #041524;
+  font-weight: 700;
+}
+
+.arb-ev-page .dashboard-arb-toggle.is-off,
+.arb-ev-page .dashboard-ev-toggle.is-off {
+  background: transparent;
+  border-color: transparent;
+  color: rgba(247, 241, 232, 0.55);
+}
+
+.arb-ev-page .dashboard-arb-options .dashboard-event-toggle {
+  flex-shrink: 0;
+  position: relative;
+  box-sizing: border-box;
+  width: 88px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1.5px solid #132432;
+  background: #041524;
+  color: rgba(243, 239, 230, 0.48);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+  padding: 0 36px 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  text-align: right;
+  overflow: visible;
+}
+
+.arb-ev-page .dashboard-arb-options .dashboard-event-toggle.is-on {
+  border-color: #e2b146;
+  background: #041524;
+  color: #ffffff;
+  padding: 0 36px 0 14px;
+  justify-content: flex-start;
+  text-align: left;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.18);
+}
+
+.arb-ev-page .dashboard-arb-options .dashboard-event-toggle.is-off {
+  border-color: #132432;
+  background: #041524;
+  color: rgba(195, 201, 210, 0.55);
+  padding: 0 12px 0 36px;
+  justify-content: flex-end;
+  text-align: right;
+  text-shadow: none;
+}
+
+.arb-ev-page .dashboard-arb-options .dashboard-event-toggle-label {
+  display: block;
+  width: auto;
+  line-height: 1;
+  pointer-events: none;
+  position: relative;
+  z-index: 1;
+  color: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: uppercase;
+}
+
+.arb-ev-page .dashboard-arb-options .dashboard-event-toggle-knob {
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  right: auto;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #1d2b42;
+  transform: translateY(-50%);
+  transition: left 0.2s ease, right 0.2s ease, background 0.2s ease;
+  box-shadow: 0 0 0 1px rgba(226, 177, 70, 0.08);
+}
+
+.arb-ev-page .dashboard-arb-options .dashboard-event-toggle.is-on .dashboard-event-toggle-knob {
+  left: auto;
+  right: 3px;
+  background: #e2b146;
+  transform: translateY(-50%);
+  box-shadow: 0 0 12px rgba(226, 177, 70, 0.35);
+}
+
+.arb-ev-page .dashboard-arb-options .dashboard-event-toggle.is-off .dashboard-event-toggle-knob {
+  left: 3px;
+  right: auto;
+  background: #1d2b42;
+  transform: translateY(-50%);
+  box-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .arb-ev-page .dashboard-arb-preference {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
+
+  .arb-ev-page .dashboard-arb-preference-header {
+    width: 100%;
+  }
+}
+
+.arb-ev-page .dashboard-arb-controls--board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 18px;
+}
+
+.arb-ev-page .dashboard-arb-controls--board .dashboard-top-filters--page {
+  display: contents;
+}
+
+.arb-ev-page .dashboard-arb-controls--board .dashboard-page-filter-field,
+.arb-ev-page .dashboard-arb-controls--board .dashboard-top-filter--page {
+  min-width: 0;
+  gap: 0;
+}
+
+.arb-ev-page .dashboard-page-filter-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.arb-ev-page .dashboard-page-filter-control {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.arb-ev-page .dashboard-page-filter-field--date .dashboard-page-filter-control,
+.arb-ev-page .dashboard-arb-controls--board .dashboard-filter-trigger {
+  min-height: 52px;
+  height: 52px;
+  border: 1px solid #132432;
+  border-radius: 8px;
+  background: #041524;
+  box-shadow: none;
+}
+
+.arb-ev-page .dashboard-page-filter-field--date input[type="date"] {
+  width: 100%;
+  height: 52px;
+  min-height: 52px;
+  margin: 0;
+  padding: 0 44px 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 52px;
+  color-scheme: dark;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.arb-ev-page .dashboard-page-filter-field--date input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.arb-ev-page .dashboard-page-filter-calendar {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  pointer-events: none;
+}
+
+.arb-ev-page .dashboard-arb-controls--board .dashboard-filter-trigger {
+  padding: 0 16px;
+  border-radius: 8px;
+  background: #041524;
+  color: #ffffff;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+}
+
+.arb-ev-page .dashboard-arb-controls--board .dashboard-filter-trigger:hover,
+.arb-ev-page .dashboard-arb-controls--board .dashboard-filter-trigger.is-open {
+  border-color: #e2b146;
+  background: #041524;
+  box-shadow: none;
+  transform: none;
+}
+
+.arb-ev-page .dashboard-arb-controls--board .dashboard-filter-trigger-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.arb-ev-page .dashboard-arb-controls--board .dashboard-filter-trigger-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  color: #ffffff;
+  font-size: 0;
+}
+
+.arb-ev-page .dashboard-arb-controls--board .dashboard-filter-trigger-count {
+  min-width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(226, 177, 70, 0.45);
+  background: rgba(226, 177, 70, 0.12);
+  color: #e2b146;
 }
 
 .top-bets-rail-note,
@@ -9874,15 +10388,15 @@ span.dashboard-event-toggle-label {
 
 .top-bets-rail .dashboard-event-dropdown-row {
   padding: 8px 12px 14px;
-  border-bottom: 1px solid rgba(98, 215, 137, 0.16);
-  background: rgba(6, 18, 31, 0.45);
+  border-bottom: 1px solid #e2b146;
+  background: #041524;
 }
 
 .top-bet-rank {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.08em;
-  color: #8ee0a7;
+  color: rgba(247, 241, 232, 0.78);
 }
 
 .top-bets-rail--ev .top-bet-rank {
@@ -9910,6 +10424,7 @@ span.dashboard-event-toggle-label {
 
 .arb-ev-specialization-stat--community .arb-ev-specialization-stat-value {
   border-color: rgba(181, 136, 33, 0.55);
+  background: rgb(234 183 81 / 12%);
 }
 
 .arb-ev-specialization-stat--community .arb-ev-specialization-stat-value strong {
@@ -9944,8 +10459,8 @@ span.dashboard-event-toggle-label {
   border: 1px solid rgba(181, 136, 33, 0.35);
   background: linear-gradient(180deg, rgba(8, 24, 40, 0.88), rgba(6, 17, 29, 0.82));
   color: #f7f1e8;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: normal;
   cursor: pointer;
   white-space: nowrap;
   transition: border-color 0.18s ease, background 0.18s ease;
@@ -9965,8 +10480,6 @@ span.dashboard-event-toggle-label {
 .section-bet-type-trigger-label {
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(247, 241, 232, 0.6);
-  font-size: 10px;
 }
 
 .section-bet-type-trigger-value {
@@ -11535,6 +12048,251 @@ header .conaerin .contact-header {
 }
 
 @media (max-width: 760px) {
+  .top-bets-table {
+    min-width: 0;
+  }
+
+  /* Top 10 bets: compact mobile cards (desktop table layout unchanged above 760px) */
+  .arb-ev-page .dashboard-arb-table.top-bets-table.is-expanded {
+    min-width: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    gap: 10px;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table.is-expanded .dashboard-arb-row--header {
+    display: none;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table.is-expanded .dashboard-arb-row:not(.dashboard-arb-row--header) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "rank sport net"
+      "match match match"
+      "league league league";
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 8px;
+    padding: 14px 14px;
+    border: 1px solid rgba(215, 170, 66, 0.28);
+    border-radius: 14px;
+    background: #041524;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table.is-expanded .dashboard-arb-row:not(.dashboard-arb-row--header):hover,
+  .arb-ev-page .dashboard-arb-table.top-bets-table.is-expanded .dashboard-arb-row.is-selected {
+    transform: none;
+    box-shadow: none;
+    outline: none;
+    background: #0a1f33;
+    border-color: rgba(226, 177, 70, 0.55);
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .top-bet-rank {
+    grid-area: rank;
+    align-self: center;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: rgba(247, 241, 232, 0.72);
+    white-space: nowrap;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--sport {
+    grid-area: sport;
+    min-width: 0;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(247, 241, 232, 0.62);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--net {
+    grid-area: net;
+    justify-content: flex-end;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 800;
+    color: #7de7aa;
+    white-space: nowrap;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--match {
+    grid-area: match;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--match > span:first-child {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #f7f1e8;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-bet-type-badge {
+    order: -1;
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--league {
+    grid-area: league;
+    min-width: 0;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.45);
+    overflow-wrap: break-word;
+  }
+
+  .arb-ev-page .dashboard-panel:has(.top-bets-table) .dashboard-panel-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px 14px;
+  }
+
+  .arb-ev-page .dashboard-panel:has(.top-bets-table) .dashboard-panel-header h2 {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+
+  .arb-ev-page .dashboard-panel:has(.top-bets-table) .top-bets-rail-actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .arb-ev-page .dashboard-panel:has(.top-bets-table) .dashboard-panel-body {
+    padding: 12px 14px 16px;
+  }
+
+  /* Arb/EV control board: compact mobile cards (desktop table unchanged) */
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard {
+    min-width: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    gap: 10px;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard .dashboard-arb-row--header {
+    display: none;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard .dashboard-arb-row:not(.dashboard-arb-row--header) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "time sport net"
+      "match match match"
+      "league league league";
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 8px;
+    padding: 14px;
+    border: 1px solid rgba(215, 170, 66, 0.28);
+    border-radius: 14px;
+    background: #041524;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard .dashboard-arb-row:not(.dashboard-arb-row--header):hover,
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard .dashboard-arb-row.is-selected {
+    transform: none;
+    box-shadow: none;
+    outline: none;
+    background: #0a1f33;
+    border-color: rgba(226, 177, 70, 0.55);
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--time {
+    grid-area: time;
+    align-self: center;
+    min-width: 0;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--sport {
+    grid-area: sport;
+    min-width: 0;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: rgba(247, 241, 232, 0.62);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--net {
+    grid-area: net;
+    justify-content: flex-end;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 800;
+    color: #7de7aa;
+    white-space: nowrap;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--match {
+    grid-area: match;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--match > span:not(.dashboard-bet-type-badge) {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: #f7f1e8;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-bet-type-badge {
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--league {
+    grid-area: league;
+    min-width: 0;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    line-height: 1.35;
+    color: rgba(255, 255, 255, 0.45);
+    overflow-wrap: break-word;
+  }
+
   .site-chatbot {
     right: 14px;
     bottom: calc(env(safe-area-inset-bottom, 0px) + 92px);
@@ -11668,6 +12426,40 @@ header .conaerin .contact-header {
   .dashboard-ev-controls {
     width: 100%;
     gap: 12px;
+  }
+
+  .arb-ev-page .dashboard-arb-controls--board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 16px;
+    row-gap: 12px;
+  }
+
+  .arb-ev-page .dashboard-arb-controls--board .dashboard-page-filter-field,
+  .arb-ev-page .dashboard-arb-controls--board .dashboard-top-filter--page {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .arb-ev-page .dashboard-page-filter-field--date .dashboard-page-filter-control {
+    overflow: hidden;
+  }
+
+  .arb-ev-page .dashboard-page-filter-field--date input[type="date"] {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 38px 0 12px;
+    font-size: 14px;
+  }
+
+  .arb-ev-page .dashboard-page-filter-calendar {
+    right: 12px;
+  }
+
+  .arb-ev-page .dashboard-arb-controls--board .dashboard-filter-trigger {
+    padding: 0 12px;
   }
 
   .dashboard-page-filter-field,
@@ -12033,7 +12825,7 @@ header .conaerin .contact-header {
     width: min(100%, calc(100vw - 40px));
   }
 
-  .arb-ev-page .dashboard-arb-table.is-expanded {
+  .arb-ev-page .dashboard-arb-table.is-expanded:not(.cntboard) {
     border: none;
     background: transparent;
     box-shadow: none;
@@ -12041,11 +12833,11 @@ header .conaerin .contact-header {
     gap: 12px;
   }
 
-  .arb-ev-page .dashboard-arb-table.is-expanded .dashboard-arb-row--header {
+  .arb-ev-page .dashboard-arb-table.is-expanded:not(.cntboard) .dashboard-arb-row--header {
     display: none;
   }
 
-  .arb-ev-page .dashboard-arb-table.is-expanded .dashboard-arb-row {
+  .arb-ev-page .dashboard-arb-table.is-expanded:not(.cntboard) .dashboard-arb-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       "time sport"
@@ -12059,9 +12851,70 @@ header .conaerin .contact-header {
     background: rgba(9, 25, 39, 0.74);
   }
 
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard {
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    gap: 10px;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard .dashboard-arb-row--header {
+    display: none;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard .dashboard-arb-row:not(.dashboard-arb-row--header) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "time sport net"
+      "match match match"
+      "league league league";
+    align-items: center;
+    column-gap: 10px;
+    row-gap: 8px;
+    padding: 14px;
+    border: 1px solid rgba(215, 170, 66, 0.28);
+    border-radius: 14px;
+    background: #041524;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard .dashboard-arb-row:not(.dashboard-arb-row--header):hover,
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard .dashboard-arb-row.is-selected {
+    transform: none;
+    box-shadow: none;
+    outline: none;
+    background: #0a1f33;
+    border-color: rgba(226, 177, 70, 0.55);
+  }
+
   .arb-ev-page .dashboard-arb-table.is-expanded .dashboard-arb-row:not(.dashboard-arb-row--header):hover,
   .arb-ev-page .dashboard-arb-row.is-selected {
     transform: none;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--time {
+    grid-area: time;
+    text-align: left;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--sport {
+    grid-area: sport;
+    text-align: left;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--league {
+    grid-area: league;
+    text-align: left;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--match {
+    grid-area: match;
+    min-width: 0;
+  }
+
+  .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--net {
+    grid-area: net;
+    text-align: right;
   }
 
   .arb-ev-page .dashboard-arb-cell--time {
@@ -12086,40 +12939,58 @@ header .conaerin .contact-header {
     grid-area: net;
   }
 
-  .arb-ev-page .top-bets-table.is-expanded {
-    border: 1px solid rgba(215, 170, 66, 0.5);
-    background: rgba(6, 19, 31, 0.65);
-    box-shadow: inset 0 0 0 1px rgba(215, 170, 66, 0.15);
-    overflow: hidden;
-    gap: 0;
-  }
-
-  .arb-ev-page .top-bets-table.is-expanded .dashboard-arb-row--header {
-    display: grid;
-    grid-template-columns: 72px minmax(220px, 2.2fr) 0.8fr 0.7fr 0.85fr;
-  }
-
-  .arb-ev-page .top-bets-table.is-expanded .dashboard-arb-row {
-    grid-template-columns: 72px minmax(220px, 2.2fr) 0.8fr 0.7fr 0.85fr;
-    grid-template-areas: none;
-    gap: 14px;
-    padding: 14px 18px;
-    border: 0;
-    border-bottom: 1px solid rgba(215, 170, 66, 0.18);
-    border-radius: 0;
+  /* Keep Top 10 mobile cards from the 760px breakpoint; do not revert to table columns */
+  .arb-ev-page .dashboard-arb-table.top-bets-table.is-expanded {
+    border: none;
     background: transparent;
+    box-shadow: none;
+    overflow: visible;
+    gap: 10px;
   }
 
-  .arb-ev-page .top-bets-table .dashboard-arb-cell--sport,
-  .arb-ev-page .top-bets-table .dashboard-arb-cell--league,
-  .arb-ev-page .top-bets-table .dashboard-arb-cell--match,
-  .arb-ev-page .top-bets-table .dashboard-arb-cell--net {
-    grid-area: auto;
+  .arb-ev-page .dashboard-arb-table.top-bets-table.is-expanded .dashboard-arb-row--header {
+    display: none;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table.is-expanded .dashboard-arb-row:not(.dashboard-arb-row--header) {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "rank sport net"
+      "match match match"
+      "league league league";
+    gap: 8px 10px;
+    padding: 14px;
+    border: 1px solid rgba(215, 170, 66, 0.28);
+    border-radius: 14px;
+    background: #041524;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .top-bet-rank {
+    grid-area: rank;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--sport {
+    grid-area: sport;
     text-align: left;
   }
 
-  .arb-ev-page .dashboard-arb-cell--match>span:first-child {
-    overflow-wrap: anywhere;
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--net {
+    grid-area: net;
+    text-align: right;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--match {
+    grid-area: match;
+  }
+
+  .arb-ev-page .dashboard-arb-table.top-bets-table .dashboard-arb-cell--league {
+    grid-area: league;
+    text-align: left;
+  }
+
+  .arb-ev-page .dashboard-arb-cell--match > span:first-child {
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .arb-ev-page .dashboard-event-popout-grid,
