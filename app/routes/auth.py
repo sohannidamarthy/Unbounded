@@ -1,5 +1,6 @@
-import logging
 import hashlib
+import html
+import logging
 import os
 import secrets
 from datetime import datetime, timedelta, timezone
@@ -12,7 +13,13 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.auth import get_current_user
-from app.core.security import create_access_token, hash_password, verify_password
+from app.core.rate_limit import rate_limit
+from app.core.security import (
+    create_access_token,
+    hash_password,
+    pwd_context,
+    verify_password,
+)
 from app.db.models.user import User
 from app.db.session import get_db
 from app.services.email_sender import send_email
@@ -21,10 +28,14 @@ from app.services.user_profile_cache import upsert_user_signup_profile
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+# Hash of a throwaway password, verified when the email is unknown so that
+# login takes the same time whether or not the account exists.
+_DUMMY_PASSWORD_HASH = pwd_context.hash("not-a-real-password")
+
 
 class AuthPayload(BaseModel):
     email: EmailStr
-    password: str = Field(min_length=8)
+    password: str = Field(min_length=8, max_length=100)
 
 
 class SignupPayload(BaseModel):
@@ -159,7 +170,7 @@ def _issue_email_verification(db: Session, user: User) -> None:
         subject="Verify your Unbounded email",
         html=(
             "<p>Verify your Unbounded account email:</p>"
-            f'<p><a href="{verify_url}">Verify email</a></p>'
+            f'<p><a href="{html.escape(verify_url)}">Verify email</a></p>'
             "<p>This link expires in 24 hours.</p>"
         ),
     )
@@ -177,13 +188,17 @@ def _issue_password_reset(db: Session, user: User) -> None:
         subject="Reset your Unbounded password",
         html=(
             "<p>Reset your Unbounded password:</p>"
-            f'<p><a href="{reset_url}">Reset password</a></p>'
+            f'<p><a href="{html.escape(reset_url)}">Reset password</a></p>'
             "<p>This link expires in 1 hour. If you did not request it, you can ignore this email.</p>"
         ),
     )
 
 
-@router.post("/signup", response_model=SignupResponse)
+@router.post(
+    "/signup",
+    response_model=SignupResponse,
+    dependencies=[Depends(rate_limit("signup", ip_limit=10, window_seconds=600, email_limit=5))],
+)
 async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
     email = _normalize_email(payload.email)
     password_error = _validate_signup_password(payload.password)
@@ -280,11 +295,17 @@ async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/login", response_model=AuthResponse)
+@router.post(
+    "/login",
+    response_model=AuthResponse,
+    dependencies=[Depends(rate_limit("login", ip_limit=10, window_seconds=60, email_limit=5))],
+)
 def login(payload: AuthPayload, db: Session = Depends(get_db)):
     email = _normalize_email(payload.email)
     user = _find_user_by_email(db, email)
 
+    if not user:
+        verify_password(payload.password, _DUMMY_PASSWORD_HASH)
     if not user or not verify_password(payload.password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -303,7 +324,7 @@ def login(payload: AuthPayload, db: Session = Depends(get_db)):
             detail="Email not verified.",
         )
 
-    token = create_access_token(str(user.id))
+    token = create_access_token(str(user.id), user.token_version)
     return AuthResponse(access_token=token)
 
 
@@ -337,7 +358,10 @@ def verify_email(payload: VerifyEmailPayload, db: Session = Depends(get_db)):
     return {"status": "ok"}
 
 
-@router.post("/resend-verification")
+@router.post(
+    "/resend-verification",
+    dependencies=[Depends(rate_limit("resend", ip_limit=5, window_seconds=900, email_limit=3))],
+)
 def resend_verification(payload: EmailPayload, db: Session = Depends(get_db)):
     user = _find_user_by_email(db, _normalize_email(payload.email))
     if user and not user.is_email_verified:
@@ -348,7 +372,10 @@ def resend_verification(payload: EmailPayload, db: Session = Depends(get_db)):
     return {"status": "ok"}
 
 
-@router.post("/forgot-password")
+@router.post(
+    "/forgot-password",
+    dependencies=[Depends(rate_limit("forgot", ip_limit=5, window_seconds=900, email_limit=3))],
+)
 def forgot_password(payload: EmailPayload, db: Session = Depends(get_db)):
     user = _find_user_by_email(db, _normalize_email(payload.email))
     if user and user.is_active:
@@ -359,7 +386,10 @@ def forgot_password(payload: EmailPayload, db: Session = Depends(get_db)):
     return {"status": "ok"}
 
 
-@router.post("/reset-password")
+@router.post(
+    "/reset-password",
+    dependencies=[Depends(rate_limit("reset", ip_limit=10, window_seconds=900))],
+)
 def reset_password(payload: ResetPasswordPayload, db: Session = Depends(get_db)):
     password_error = _validate_signup_password(payload.password)
     if password_error:
@@ -378,5 +408,14 @@ def reset_password(payload: ResetPasswordPayload, db: Session = Depends(get_db))
     user.password_hash = hash_password(payload.password)
     user.password_reset_token_hash = None
     user.password_reset_expires_at = None
+    user.token_version += 1  # revoke every token issued before the reset
+    db.commit()
+    return {"status": "ok"}
+
+
+@router.post("/logout-all")
+def logout_all(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Invalidate every token issued to this user, on all devices."""
+    user.token_version += 1
     db.commit()
     return {"status": "ok"}

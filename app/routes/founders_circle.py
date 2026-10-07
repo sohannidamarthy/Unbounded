@@ -1,15 +1,17 @@
 import csv
+import html
 import io
 import logging
 import os
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.auth import require_admin
+from app.core.rate_limit import rate_limit
 from app.db.models.founders_circle import FoundersCircleSignup
 from app.db.session import get_db
 from app.services.email_sender import email_configured, send_email
@@ -22,8 +24,8 @@ FOUNDERS_CIRCLE_SEATS_TOTAL = 300
 
 
 class FoundersCircleSignupPayload(BaseModel):
-    first_name: str
-    last_name: str
+    first_name: str = Field(max_length=100)
+    last_name: str = Field(max_length=100)
     email: EmailStr
 
 
@@ -46,15 +48,18 @@ def _notify_signup(first_name: str, last_name: str, email: str) -> None:
             subject="New Founders Circle signup",
             html=(
                 "<p>New Founders Circle signup:</p>"
-                f"<p><strong>{first_name} {last_name}</strong></p>"
-                f"<p>{email}</p>"
+                f"<p><strong>{html.escape(first_name)} {html.escape(last_name)}</strong></p>"
+                f"<p>{html.escape(email)}</p>"
             ),
         )
     except Exception:
         logger.exception("Founders Circle notification email failed.")
 
 
-@router.post("/signup")
+@router.post(
+    "/signup",
+    dependencies=[Depends(rate_limit("founders", ip_limit=5, window_seconds=600))],
+)
 async def founders_circle_signup(
     payload: FoundersCircleSignupPayload,
     db: Session = Depends(get_db),

@@ -1,15 +1,17 @@
 import csv
+import html
 import io
 import logging
 import os
 
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.auth import require_admin
+from app.core.rate_limit import rate_limit
 from app.db.models.contact_messages import ContactMessage
 from app.db.session import get_db
 from app.services.email_sender import email_configured, send_email
@@ -20,10 +22,10 @@ router = APIRouter(prefix="/contact", tags=["contact"])
 
 
 class ContactMessagePayload(BaseModel):
-    full_name: str
+    full_name: str = Field(max_length=100)
     email: EmailStr
-    reason: str
-    message: str
+    reason: str = Field(max_length=100)
+    message: str = Field(max_length=5000)
 
     @field_validator("full_name", "reason", "message")
     @classmethod
@@ -32,6 +34,13 @@ class ContactMessagePayload(BaseModel):
         if not stripped:
             raise ValueError("This field cannot be blank.")
         return stripped
+
+    @field_validator("full_name", "reason")
+    @classmethod
+    def single_line(cls, value: str) -> str:
+        if any(ch in value for ch in "\r\n"):
+            raise ValueError("Line breaks are not allowed in this field.")
+        return value
 
 
 def _notify_contact(full_name: str, email: str, reason: str, message: str) -> None:
@@ -53,16 +62,19 @@ def _notify_contact(full_name: str, email: str, reason: str, message: str) -> No
             subject=f"New contact message: {reason}",
             html=(
                 "<p>New contact form submission:</p>"
-                f"<p><strong>{full_name}</strong> ({email})</p>"
-                f"<p>Reason: {reason}</p>"
-                f"<p>{message}</p>"
+                f"<p><strong>{html.escape(full_name)}</strong> ({html.escape(email)})</p>"
+                f"<p>Reason: {html.escape(reason)}</p>"
+                f"<p>{html.escape(message)}</p>"
             ),
         )
     except Exception:
         logger.exception("Contact form notification email failed.")
 
 
-@router.post("")
+@router.post(
+    "",
+    dependencies=[Depends(rate_limit("contact", ip_limit=5, window_seconds=600))],
+)
 async def submit_contact_message(
     payload: ContactMessagePayload,
     db: Session = Depends(get_db),

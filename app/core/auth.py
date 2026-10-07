@@ -26,6 +26,11 @@ def _get_user_by_id(db: Session, user_id: str) -> Optional[User]:
     return db.scalar(stmt)
 
 
+def _token_is_current(payload: dict, user: User) -> bool:
+    """Tokens issued before the user's last token_version bump are revoked."""
+    return payload.get("tv", 0) == user.token_version
+
+
 def _unauthorized() -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -50,7 +55,7 @@ def get_user_from_token(db: Session, token: str) -> Optional[User]:
         return None
 
     user = _get_user_by_id(db, subject)
-    if not user or not user.is_active:
+    if not user or not user.is_active or not _token_is_current(payload, user):
         return None
     return user
 
@@ -76,7 +81,7 @@ def get_current_user(
             raise _unauthorized()
 
         user = _get_user_by_id(db, subject)
-        if not user or not user.is_active:
+        if not user or not user.is_active or not _token_is_current(payload, user):
             raise _unauthorized()
 
         return user

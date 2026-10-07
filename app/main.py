@@ -1,9 +1,12 @@
-import os
+import html
 import logging
+import os
 
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
+
+from app.core.rate_limit import rate_limit
 
 from app.api.ws_arbs import router as ws_arbs_router
 from app.db.session import init_db
@@ -32,7 +35,7 @@ frontend_origins = [o.strip() for o in origins_env.split(",") if o.strip()]
 allow_origin_regex = None
 if os.getenv("ENV", "development") == "development":
     allow_origin_regex = r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
-elif os.getenv("ALLOW_VERCEL_PREVIEW_ORIGINS", "1") == "1":
+elif os.getenv("ALLOW_VERCEL_PREVIEW_ORIGINS", "0") == "1":
     allow_origin_regex = r"^https://[a-z0-9-]+\.vercel\.app$"
 
 app.add_middleware(
@@ -83,10 +86,13 @@ async def health():
 # --- Waitlist ---
 class WaitlistSignup(BaseModel):
     email: EmailStr
-    name: str | None = None
+    name: str | None = Field(default=None, max_length=100)
 
 
-@app.post("/waitlist")
+@app.post(
+    "/waitlist",
+    dependencies=[Depends(rate_limit("waitlist", ip_limit=5, window_seconds=600))],
+)
 async def waitlist_signup(payload: WaitlistSignup):
     from_email = os.getenv("WAITLIST_FROM_EMAIL")
     notify_email = os.getenv("WAITLIST_NOTIFY_EMAIL")
@@ -103,8 +109,8 @@ async def waitlist_signup(payload: WaitlistSignup):
             subject="New waitlist signup",
             html=(
                 "<p>New waitlist signup:</p>"
-                f"{f'<p>Name: <strong>{name}</strong></p>' if name else ''}"
-                f"<p><strong>{payload.email}</strong></p>"
+                f"{f'<p>Name: <strong>{html.escape(name)}</strong></p>' if name else ''}"
+                f"<p><strong>{html.escape(str(payload.email))}</strong></p>"
             ),
         )
     except Exception as exc:
@@ -120,10 +126,13 @@ async def waitlist_options():
 
 # --- Routers ---
 app.include_router(ws_arbs_router)
-app.include_router(debug_router)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(sports_router)
 app.include_router(arbs_router)
 app.include_router(evs_router)
 app.include_router(founders_circle_router)
 app.include_router(contact_router)
+
+# Debug routes write straight to Redis: never expose them outside development.
+if os.getenv("ENV", "development") == "development":
+    app.include_router(debug_router)

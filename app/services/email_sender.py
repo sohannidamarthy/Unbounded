@@ -24,7 +24,7 @@ def send_email(*, to: str, subject: str, html: str, from_email: str | None = Non
         msg = EmailMessage()
         msg["From"] = from_email or user
         msg["To"] = to
-        msg["Subject"] = subject
+        msg["Subject"] = " ".join(subject.split())  # no header injection
         msg.set_content("Please view this email in an HTML-capable client.")
         msg.add_alternative(html, subtype="html")
         host = os.getenv("SMTP_HOST", "smtp.gmail.com")
