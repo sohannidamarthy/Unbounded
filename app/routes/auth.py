@@ -6,6 +6,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import anyio.from_thread
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
@@ -13,7 +14,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.auth import get_current_user
-from app.core.rate_limit import rate_limit
+from app.core.rate_limit import FailureLimiter, failure_limit, rate_limit
 from app.core.security import (
     create_access_token,
     hash_password,
@@ -298,15 +299,20 @@ async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
 @router.post(
     "/login",
     response_model=AuthResponse,
-    dependencies=[Depends(rate_limit("login", ip_limit=10, window_seconds=60, email_limit=5))],
+    dependencies=[Depends(rate_limit("login", ip_limit=30, window_seconds=60))],
 )
-def login(payload: AuthPayload, db: Session = Depends(get_db)):
+def login(
+    payload: AuthPayload,
+    db: Session = Depends(get_db),
+    failures: FailureLimiter = Depends(failure_limit("login", limit=5, window_seconds=120)),
+):
     email = _normalize_email(payload.email)
     user = _find_user_by_email(db, email)
 
     if not user:
         verify_password(payload.password, _DUMMY_PASSWORD_HASH)
     if not user or not verify_password(payload.password, user.password_hash):
+        anyio.from_thread.run(failures.fail)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials.",
@@ -324,6 +330,7 @@ def login(payload: AuthPayload, db: Session = Depends(get_db)):
             detail="Email not verified.",
         )
 
+    anyio.from_thread.run(failures.reset)
     token = create_access_token(str(user.id), user.token_version)
     return AuthResponse(access_token=token)
 
