@@ -1,6 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
+import {
+  formatCountdown,
+  retryAfterSeconds,
+  useCooldown,
+} from "../../hooks/useCooldown";
 import styles from "./HowCanWeHelp.module.css";
 import Container from "../container/Container";
 
@@ -65,13 +70,14 @@ const CONTACT_OPTIONS = [
 
 export default function HowCanWeHelp() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "success" | "error" | "rateLimited">("idle");
+  const cooldown = useCooldown();
 
   const handleContactSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    if (isSubmitting) {
+    if (isSubmitting || cooldown.remaining > 0) {
       return;
     }
 
@@ -105,6 +111,12 @@ export default function HowCanWeHelp() {
           message,
         }),
       });
+
+      if (response.status === 429) {
+        cooldown.start(retryAfterSeconds(response));
+        setStatus("rateLimited");
+        return;
+      }
 
       if (!response.ok) {
         throw new Error("Request failed");
@@ -249,6 +261,11 @@ export default function HowCanWeHelp() {
               Thanks for reaching out! We&apos;ve received your message and will get back to you soon.
             </p>
           )}
+          {status === "rateLimited" && (
+            <p className={styles.formStatusError} role="alert">
+              Too many messages sent. Please wait before sending another.
+            </p>
+          )}
           {status === "error" && (
             <p className={styles.formStatusError} role="alert">
               Something went wrong. Please fill in all fields and try again.
@@ -267,9 +284,13 @@ export default function HowCanWeHelp() {
               Your information will only be used to respond to your request.
             </div>
 
-            <button type="submit" className={styles.sendButton} disabled={isSubmitting}>
+            <button type="submit" className={styles.sendButton} disabled={isSubmitting || cooldown.remaining > 0}>
               <span>➤</span>
-              {isSubmitting ? "Sending…" : "Send Message"}
+              {cooldown.remaining > 0
+                ? `Try again in ${formatCountdown(cooldown.remaining)}`
+                : isSubmitting
+                  ? "Sending…"
+                  : "Send Message"}
             </button>
           </div>
         </form>

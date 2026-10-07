@@ -73,7 +73,7 @@ def _notify_contact(full_name: str, email: str, reason: str, message: str) -> No
 
 @router.post(
     "",
-    dependencies=[Depends(rate_limit("contact", ip_limit=5, window_seconds=600))],
+    dependencies=[Depends(rate_limit("contact", ip_limit=5, window_seconds=120))],
 )
 async def submit_contact_message(
     payload: ContactMessagePayload,

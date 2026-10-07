@@ -58,7 +58,7 @@ def _notify_signup(first_name: str, last_name: str, email: str) -> None:
 
 @router.post(
     "/signup",
-    dependencies=[Depends(rate_limit("founders", ip_limit=5, window_seconds=600))],
+    dependencies=[Depends(rate_limit("founders", ip_limit=5, window_seconds=120))],
 )
 async def founders_circle_signup(
     payload: FoundersCircleSignupPayload,

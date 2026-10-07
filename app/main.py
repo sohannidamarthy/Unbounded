@@ -45,6 +45,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Retry-After"],  # lets the frontend show a countdown on 429
 )
 
 # --- Redis lifecycle ---
@@ -91,7 +92,7 @@ class WaitlistSignup(BaseModel):
 
 @app.post(
     "/waitlist",
-    dependencies=[Depends(rate_limit("waitlist", ip_limit=5, window_seconds=600))],
+    dependencies=[Depends(rate_limit("waitlist", ip_limit=5, window_seconds=120))],
 )
 async def waitlist_signup(payload: WaitlistSignup):
     from_email = os.getenv("WAITLIST_FROM_EMAIL")

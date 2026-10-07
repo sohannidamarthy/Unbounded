@@ -198,7 +198,7 @@ def _issue_password_reset(db: Session, user: User) -> None:
 @router.post(
     "/signup",
     response_model=SignupResponse,
-    dependencies=[Depends(rate_limit("signup", ip_limit=10, window_seconds=600, email_limit=5))],
+    dependencies=[Depends(rate_limit("signup", ip_limit=10, window_seconds=180, email_limit=5))],
 )
 async def signup(payload: SignupPayload, db: Session = Depends(get_db)):
     email = _normalize_email(payload.email)
@@ -367,7 +367,7 @@ def verify_email(payload: VerifyEmailPayload, db: Session = Depends(get_db)):
 
 @router.post(
     "/resend-verification",
-    dependencies=[Depends(rate_limit("resend", ip_limit=5, window_seconds=900, email_limit=3))],
+    dependencies=[Depends(rate_limit("resend", ip_limit=5, window_seconds=300, email_limit=3))],
 )
 def resend_verification(payload: EmailPayload, db: Session = Depends(get_db)):
     user = _find_user_by_email(db, _normalize_email(payload.email))
@@ -381,7 +381,7 @@ def resend_verification(payload: EmailPayload, db: Session = Depends(get_db)):
 
 @router.post(
     "/forgot-password",
-    dependencies=[Depends(rate_limit("forgot", ip_limit=5, window_seconds=900, email_limit=3))],
+    dependencies=[Depends(rate_limit("forgot", ip_limit=5, window_seconds=300, email_limit=3))],
 )
 def forgot_password(payload: EmailPayload, db: Session = Depends(get_db)):
     user = _find_user_by_email(db, _normalize_email(payload.email))
@@ -395,7 +395,7 @@ def forgot_password(payload: EmailPayload, db: Session = Depends(get_db)):
 
 @router.post(
     "/reset-password",
-    dependencies=[Depends(rate_limit("reset", ip_limit=10, window_seconds=900))],
+    dependencies=[Depends(rate_limit("reset", ip_limit=10, window_seconds=300))],
 )
 def reset_password(payload: ResetPasswordPayload, db: Session = Depends(get_db)):
     password_error = _validate_signup_password(payload.password)

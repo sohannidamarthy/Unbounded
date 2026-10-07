@@ -2,6 +2,11 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  formatCountdown,
+  retryAfterSeconds,
+  useCooldown
+} from "../hooks/useCooldown";
 import { useRouter } from "next/navigation";
 
 import { getSportsbookMeta, SportsbookLogo } from "../components/sportsbookMeta";
@@ -573,6 +578,9 @@ export default function AuthPage() {
   const [mode, setMode] = useState<AuthMode>("login");
   const [signupStep, setSignupStep] = useState<SignupStep>(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const authCooldown = useCooldown();
+  const resendCooldown = useCooldown();
+  const forgotCooldown = useCooldown();
   const [message, setMessage] = useState<string | null>(null);
   const [messageTone, setMessageTone] = useState<MessageTone>("info");
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
@@ -891,7 +899,7 @@ export default function AuthPage() {
   };
 
   const completeSignup = async (skippedTutorials: boolean) => {
-    if (isSubmitting) {
+    if (isSubmitting || authCooldown.remaining > 0) {
       return;
     }
 
@@ -955,8 +963,9 @@ export default function AuthPage() {
       localStorage.removeItem(TOKEN_STORAGE_KEY);
 
       if (response.status === 429) {
+        authCooldown.start(retryAfterSeconds(response));
         setMessageTone("error");
-        setMessage("Too many attempts. Please wait a minute and try again.");
+        setMessage("Too many attempts. Please wait before trying again.");
         return;
       }
 
@@ -1006,7 +1015,7 @@ export default function AuthPage() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isSubmitting) {
+    if (isSubmitting || authCooldown.remaining > 0) {
       return;
     }
 
@@ -1090,8 +1099,9 @@ export default function AuthPage() {
       }
 
       if (response.status === 429) {
+        authCooldown.start(retryAfterSeconds(response));
         setMessageTone("error");
-        setMessage("Too many attempts. Please wait a minute and try again.");
+        setMessage("Too many attempts. Please wait before trying again.");
         return;
       }
 
@@ -1162,16 +1172,27 @@ export default function AuthPage() {
       return;
     }
 
+    if (forgotCooldown.remaining > 0) {
+      return;
+    }
+
     try {
       const response = await fetch(forgotPasswordEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: identifier })
       });
+      if (response.ok) {
+        forgotCooldown.start(60);
+      } else if (response.status === 429) {
+        forgotCooldown.start(retryAfterSeconds(response));
+      }
       setForgotMessage(
         response.ok
           ? "If an account exists for that email, reset instructions will be sent."
-          : "Password reset is unavailable right now. Try again in a moment."
+          : response.status === 429
+            ? "Too many reset requests. Please wait before trying again."
+            : "Password reset is unavailable right now. Try again in a moment."
       );
     } catch {
       setForgotMessage("Password reset is unavailable right now. Try again in a moment.");
@@ -1185,12 +1206,27 @@ export default function AuthPage() {
       setMessage("Enter your account email first.");
       return;
     }
+    if (resendCooldown.remaining > 0) {
+      return;
+    }
     try {
-      await fetch(resendVerificationEndpoint, {
+      const response = await fetch(resendVerificationEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: emailValue })
       });
+      if (response.status === 429) {
+        resendCooldown.start(retryAfterSeconds(response));
+        setMessageTone("error");
+        setMessage("Too many requests. Please wait before requesting another email.");
+        return;
+      }
+      if (!response.ok) {
+        setMessageTone("error");
+        setMessage("Could not resend verification right now.");
+        return;
+      }
+      resendCooldown.start(60);
       setMessageTone("success");
       setMessage("If that account needs verification, a new link has been sent.");
     } catch {
@@ -1427,8 +1463,11 @@ export default function AuthPage() {
                       type="button"
                       className="auth-inline-link"
                       onClick={handleResendVerification}
+                      disabled={resendCooldown.remaining > 0}
                     >
-                      Resend verification email
+                      {resendCooldown.remaining > 0
+                        ? `Email sent. Resend in ${formatCountdown(resendCooldown.remaining)}`
+                        : "Resend verification email"}
                     </button>
                   </div>
                 </>
@@ -1968,8 +2007,14 @@ export default function AuthPage() {
                   </button>
                 ) : null}
 
-                <button className="auth-primary" type="submit" disabled={isSubmitting}>
-                  {isSubmitting
+                <button
+                  className="auth-primary"
+                  type="submit"
+                  disabled={isSubmitting || authCooldown.remaining > 0}
+                >
+                  {authCooldown.remaining > 0
+                    ? `Try again in ${formatCountdown(authCooldown.remaining)}`
+                    : isSubmitting
                     ? "Working..."
                     : mode === "login"
                       ? "Continue"
@@ -2035,8 +2080,14 @@ export default function AuthPage() {
                     {forgotMessage ? (
                       <div className="auth-message info">{forgotMessage}</div>
                     ) : null}
-                    <button className="auth-primary" type="submit">
-                      Send reset instructions
+                    <button
+                      className="auth-primary"
+                      type="submit"
+                      disabled={forgotCooldown.remaining > 0}
+                    >
+                      {forgotCooldown.remaining > 0
+                        ? `Resend in ${formatCountdown(forgotCooldown.remaining)}`
+                        : "Send reset instructions"}
                     </button>
                   </form>
                 </section>
