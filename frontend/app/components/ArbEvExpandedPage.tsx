@@ -1364,7 +1364,7 @@ export function ArbEvExpandedPage({ initialView }: ArbEvExpandedPageProps) {
 
 
               <div
-                className="dashboard-arb-table is-expanded cntboard"
+                className={`dashboard-arb-table is-expanded cntboard${filteredRows.length > 10 ? " is-scrollable" : ""}`}
                 role="table"
                 aria-label={
                   arbEvView === "arb" ? "Arbitrage betting board" : "EV betting board"

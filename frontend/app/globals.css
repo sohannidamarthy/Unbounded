@@ -352,8 +352,103 @@ a {
   width: 100%;
 }
 
+@media (min-width: 861px) and (max-width: 1400px) {
+  .dashboard-page main {
+    width: calc(100% - clamp(40px, 5vw, 72px));
+  }
+}
+
 .dashboard-main {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dashboard-saved-bets {
+  overflow: hidden;
+  border-color: rgba(181, 136, 33, 0.28);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+
+.dashboard-saved-bets .dashboard-panel-header {
+  min-height: 62px;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
+.dashboard-saved-bets .dashboard-panel-body {
+  padding: 20px 24px;
+}
+
+.dashboard-saved-bets-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 82px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(181, 136, 33, 0.34);
+  border-radius: 8px;
+  background: rgba(181, 136, 33, 0.09);
+  color: #f7f1e8;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.dashboard-saved-bets-toggle:hover {
+  background: rgba(181, 136, 33, 0.18);
+  border-color: rgba(181, 136, 33, 0.62);
+}
+
+.dashboard-saved-bets-chevron {
+  color: var(--bull-gold);
+  font-size: 17px;
+  line-height: 1;
+  transition: transform 0.18s ease;
+}
+
+.dashboard-saved-bets-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.arb-ev-page .dashboard-arb-table.is-expanded.cntboard.is-scrollable {
+  max-height: min(70vh, 760px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(226, 177, 70, 0.72) #071b29;
+}
+
+.arb-ev-page .dashboard-arb-table.is-expanded.cntboard.is-scrollable::-webkit-scrollbar {
+  width: 10px;
+}
+
+.arb-ev-page .dashboard-arb-table.is-expanded.cntboard.is-scrollable::-webkit-scrollbar-track {
+  margin-block: 8px;
+  border: 1px solid rgba(226, 177, 70, 0.12);
+  border-radius: 999px;
+  background: #071b29;
+}
+
+.arb-ev-page .dashboard-arb-table.is-expanded.cntboard.is-scrollable::-webkit-scrollbar-thumb {
+  min-height: 42px;
+  border: 2px solid #071b29;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e2b146, #b58821);
+}
+
+.arb-ev-page .dashboard-arb-table.is-expanded.cntboard.is-scrollable::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #f0c75e, #d09a27);
+}
+
+@media (max-width: 600px) {
+  .dashboard-main { gap: 14px; }
 }
 
 .dashboard-layout {
@@ -12905,6 +13000,13 @@ header .conaerin .contact-header {
   .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--league {
     grid-area: league;
     text-align: left;
+  }
+
+  .arb-ev-page .dashboard-arb-table.is-expanded.cntboard.is-scrollable {
+    max-height: min(70vh, 760px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
   }
 
   .arb-ev-page .dashboard-arb-table.cntboard .dashboard-arb-cell--match {

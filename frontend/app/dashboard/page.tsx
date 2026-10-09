@@ -983,11 +983,12 @@ function DashboardPageContent() {
             <h2>Saved bets ({savedBets.length})</h2>
             <button
               type="button"
-              className="dashboard-panel-close"
+              className="dashboard-saved-bets-toggle"
               aria-expanded={savedBetsOpen}
               onClick={() => setSavedBetsOpen((open) => !open)}
             >
-              {savedBetsOpen ? "Hide" : "Show"}
+              <span>{savedBetsOpen ? "Hide" : "Show"}</span>
+              <span className={`dashboard-saved-bets-chevron${savedBetsOpen ? " is-open" : ""}`} aria-hidden="true">⌄</span>
             </button>
           </div>
           {savedBetsOpen ? (
