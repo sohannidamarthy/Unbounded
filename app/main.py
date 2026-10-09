@@ -1,15 +1,18 @@
+import asyncio
 import html
 import logging
 import os
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy import text
 
 from app.core.rate_limit import rate_limit
 
 from app.api.ws_arbs import router as ws_arbs_router
-from app.db.session import init_db
+from app.db.session import engine, init_db
 from app.services.email_sender import email_configured, send_email
 from app.redis_client import get_redis, close_redis
 from app.routes.auth import router as auth_router
@@ -19,6 +22,7 @@ from app.routes.evs import router as evs_router
 from app.routes.founders_circle import router as founders_circle_router
 from app.routes.contact import router as contact_router
 from app.routes.sports import router as sports_router
+from app.routes.saved_bets import router as saved_bets_router
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +85,35 @@ async def root():
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy"}
+    checks = {"database": "ok", "redis": "ok"}
+
+    try:
+        # SQLAlchemy's configured engine is synchronous; run its short probe
+        # outside the event loop so it does not block other requests.
+        def check_database():
+            with engine.connect() as connection:
+                connection.execute(text("SELECT 1"))
+
+        await asyncio.to_thread(check_database)
+    except Exception:
+        logger.exception("Health check failed for database.")
+        checks["database"] = "unavailable"
+
+    try:
+        r = await get_redis()
+        await r.ping()
+    except Exception:
+        logger.exception("Health check failed for Redis.")
+        checks["redis"] = "unavailable"
+
+    healthy = all(result == "ok" for result in checks.values())
+    return_status = "healthy" if healthy else "unhealthy"
+    if not healthy:
+        return JSONResponse(
+            status_code=503,
+            content={"status": return_status, "checks": checks},
+        )
+    return {"status": return_status, "checks": checks}
 
 
 # --- Waitlist ---
@@ -129,6 +161,7 @@ async def waitlist_options():
 app.include_router(ws_arbs_router)
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(sports_router)
+app.include_router(saved_bets_router)
 app.include_router(arbs_router)
 app.include_router(evs_router)
 app.include_router(founders_circle_router)

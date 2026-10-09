@@ -13,7 +13,6 @@ import { SportsbookLogo, getSportsbookMeta } from "../components/sportsbookMeta"
 
 const SAVED_EMAIL_KEY = "unbounded.saved_email";
 const TOKEN_STORAGE_KEY = "unbounded.access_token";
-const SAVED_BETS_STORAGE_KEY = "unbounded.saved_bets";
 
 type LiveArbLeg = {
   outcome_key: string;
@@ -24,6 +23,21 @@ type LiveArbLeg = {
   line?: number | string | null;
   market_instance_id?: string;
   bet_url?: string;
+};
+
+type SavedBet = {
+  id: string;
+  savedAt: string;
+  sourceId: string;
+  board: string;
+  matchup: string;
+  sport: string;
+  league: string;
+  betType: string;
+  oddsA: string;
+  oddsB: string;
+  estimatedNet: number;
+  legs: LiveArbLeg[];
 };
 
 type LiveArbPayload = {
@@ -347,6 +361,8 @@ function DashboardPageContent() {
   const [arbFeedStatus, setArbFeedStatus] = useState<"connecting" | "live" | "empty" | "offline">("connecting");
   const [evFeedStatus, setEvFeedStatus] = useState<"connecting" | "live" | "empty" | "offline">("connecting");
   const [savedBetStatus, setSavedBetStatus] = useState("");
+  const [savedBets, setSavedBets] = useState<SavedBet[]>([]);
+  const [savedBetsOpen, setSavedBetsOpen] = useState(false);
   const isLiveExpanded = expandedPanel === "live";
   const isWithdrawalExpanded = expandedPanel === "withdrawal";
   const isToolsExpanded = expandedPanel === "tools";
@@ -447,6 +463,40 @@ function DashboardPageContent() {
 
   useEffect(() => {
     setCurrentUserName(formatDisplayName(window.localStorage.getItem(SAVED_EMAIL_KEY)));
+  }, []);
+
+  useEffect(() => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+    const token = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+    let isMounted = true;
+
+    fetch(`${apiBase}/saved-bets`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      cache: "no-store",
+    })
+      .then((response) => {
+        if (redirectIfUnauthorized(response)) {
+          throw new Error("Unauthorized");
+        }
+        if (!response.ok) {
+          throw new Error(`Saved bets request failed: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((payload: SavedBet[]) => {
+        if (isMounted) {
+          setSavedBets(payload);
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setSavedBetStatus("Could not load saved bets. Please refresh and try again.");
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -744,11 +794,9 @@ function DashboardPageContent() {
     if (!eventPopout || eventPopout.id !== rowId) {
       return null;
     }
-    const saveBetLocally = () => {
+    const saveBetToAccount = async () => {
       const savedBet = {
-        id: `${eventPopout.id}-${Date.now()}`,
         sourceId: eventPopout.id,
-        savedAt: new Date().toISOString(),
         board: eventPopout.board,
         matchup: eventPopout.match,
         sport: eventPopout.sport,
@@ -759,10 +807,31 @@ function DashboardPageContent() {
         estimatedNet: Number(calculatedNetProfit),
         legs: eventPopout.legs ?? [],
       };
-      const existing = JSON.parse(window.localStorage.getItem(SAVED_BETS_STORAGE_KEY) || "[]");
-      const next = Array.isArray(existing) ? [savedBet, ...existing].slice(0, 100) : [savedBet];
-      window.localStorage.setItem(SAVED_BETS_STORAGE_KEY, JSON.stringify(next));
-      setSavedBetStatus("Saved locally");
+      setSavedBetStatus("Saving to your account…");
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+        const token = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+        const response = await fetch(`${apiBase}/saved-bets`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(savedBet),
+        });
+        if (redirectIfUnauthorized(response)) {
+          return;
+        }
+        if (!response.ok) {
+          throw new Error(`Save failed: ${response.status}`);
+        }
+        const saved = (await response.json()) as SavedBet;
+        setSavedBets((current) => [saved, ...current].slice(0, 100));
+        setSavedBetsOpen(true);
+        setSavedBetStatus("Saved to your account");
+      } catch {
+        setSavedBetStatus("Could not save bet. Please try again.");
+      }
     };
     const openBetLeg = (leg: LiveArbLeg) => {
       const fallbackHref = getSportsbookMeta(leg.book).siteHref;
@@ -868,7 +937,7 @@ function DashboardPageContent() {
             <button
               type="button"
               className="dashboard-event-popout-btn dashboard-event-popout-btn--primary"
-              onClick={saveBetLocally}
+              onClick={saveBetToAccount}
             >
               Enter bet
             </button>
@@ -909,6 +978,54 @@ function DashboardPageContent() {
       <DashboardHeader onOpenBetCalculator={() => setIsBetCalculatorOpen(true)} />
 
       <main className="dashboard-main">
+        <section className="dashboard-panel dashboard-saved-bets" aria-label="Saved bets">
+          <div className="dashboard-panel-header">
+            <h2>Saved bets ({savedBets.length})</h2>
+            <button
+              type="button"
+              className="dashboard-panel-close"
+              aria-expanded={savedBetsOpen}
+              onClick={() => setSavedBetsOpen((open) => !open)}
+            >
+              {savedBetsOpen ? "Hide" : "Show"}
+            </button>
+          </div>
+          {savedBetsOpen ? (
+            <div className="dashboard-panel-body">
+              {savedBets.length === 0 ? (
+                <p>No saved bets yet. Save one from a bet card to find it here.</p>
+              ) : (
+                savedBets.map((bet) => (
+                  <div className="dashboard-arb-row" key={bet.id}>
+                    <span>{bet.matchup}</span>
+                    <span>{bet.sport} · {bet.betType}</span>
+                    <span>Odds {bet.oddsA} / {bet.oddsB}</span>
+                    <span>Est. net ${Number(bet.estimatedNet).toFixed(2)}</span>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+                        const token = window.localStorage.getItem(TOKEN_STORAGE_KEY);
+                        const response = await fetch(`${apiBase}/saved-bets/${bet.id}`, {
+                          method: "DELETE",
+                          headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+                        });
+                        if (redirectIfUnauthorized(response)) {
+                          return;
+                        }
+                        if (response.ok) {
+                          setSavedBets((current) => current.filter((item) => item.id !== bet.id));
+                        }
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          ) : null}
+        </section>
         <div
           className={`dashboard-layout${expandedPanel ? " dashboard-layout--expanded" : ""
             }`}
