@@ -50,3 +50,58 @@ export function getPostLoginPath(): string {
   }
   return "/dashboard";
 }
+
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+const ACTIVITY_EVENTS = ["pointerdown", "keydown", "scroll", "touchstart"] as const;
+
+/**
+ * Sliding session: while the user is active, swap the access token for a fresh
+ * one every few minutes so it never expires mid-use. Idle users still expire.
+ * Returns a cleanup function.
+ */
+export function startSessionKeepAlive(): () => void {
+  let active = true;
+  let refreshing = false;
+
+  const markActive = () => {
+    active = true;
+  };
+  ACTIVITY_EVENTS.forEach((name) =>
+    window.addEventListener(name, markActive, { passive: true }),
+  );
+
+  const timer = window.setInterval(async () => {
+    const token = getStoredToken();
+    if (!active || refreshing || !token || document.visibilityState === "hidden") {
+      return;
+    }
+    refreshing = true;
+    try {
+      const response = await fetch(`${getApiBase()}/auth/refresh`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        cache: "no-store",
+      });
+      if (response.status === 401) {
+        redirectToLogin();
+        return;
+      }
+      if (response.ok) {
+        const data = await response.json();
+        if (data?.access_token) {
+          window.localStorage.setItem(TOKEN_STORAGE_KEY, data.access_token);
+          active = false;
+        }
+      }
+    } catch {
+      // Network blip: try again next tick.
+    } finally {
+      refreshing = false;
+    }
+  }, REFRESH_INTERVAL_MS);
+
+  return () => {
+    window.clearInterval(timer);
+    ACTIVITY_EVENTS.forEach((name) => window.removeEventListener(name, markActive));
+  };
+}

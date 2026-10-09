@@ -7,13 +7,13 @@ from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 import anyio.from_thread
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.auth import get_current_user
+from app.core.auth import _get_bearer_token, get_current_user, get_user_from_token
 from app.core.rate_limit import FailureLimiter, failure_limit, rate_limit
 from app.core.security import (
     create_access_token,
@@ -333,6 +333,26 @@ def login(
     anyio.from_thread.run(failures.reset)
     token = create_access_token(str(user.id), user.token_version)
     return AuthResponse(access_token=token)
+
+
+@router.post(
+    "/refresh",
+    response_model=AuthResponse,
+    dependencies=[Depends(rate_limit("refresh", ip_limit=60, window_seconds=60))],
+)
+def refresh(
+    authorization: Optional[str] = Header(default=None),
+    db: Session = Depends(get_db),
+):
+    """Sliding session: trade a still-valid access token for a fresh one."""
+    token = _get_bearer_token(authorization)
+    user = get_user_from_token(db, token) if token else None
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials.",
+        )
+    return AuthResponse(access_token=create_access_token(str(user.id), user.token_version))
 
 
 @router.get("/me", response_model=UserProfile)

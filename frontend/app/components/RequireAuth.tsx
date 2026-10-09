@@ -6,6 +6,7 @@ import {
   getApiBase,
   getStoredToken,
   redirectToLogin,
+  startSessionKeepAlive,
 } from "../lib/auth";
 
 /**
@@ -49,6 +50,13 @@ export function RequireAuth({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!allowed) {
+      return;
+    }
+    return startSessionKeepAlive();
+  }, [allowed]);
 
   if (!allowed) {
     return (
